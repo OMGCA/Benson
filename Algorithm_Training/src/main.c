@@ -21,7 +21,7 @@ int main(void){
 
 	params = initialiseParameters(numInputs, numNodes, numOutputs, nodeArity);
 
-    setRandomNumberSeed(1234);
+    	setRandomNumberSeed(1234);
 
 	addNodeFunction(params, "add,sub,mul,div,sin,pow,and,xnor");
 
