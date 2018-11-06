@@ -29,11 +29,7 @@ public class Main extends JFrame {
 	/* Default loading data */
 	static String data = "./Benson_Data/empty.txt";
 	static JPanel panel;
-<<<<<<< HEAD
 	
-=======
-
->>>>>>> 1229decac5352a7e36b46e1be8fe10a5c814f8bb
 	public static void main(String[] args) {
 		/* Load GUI component */
 		GUISetup();
