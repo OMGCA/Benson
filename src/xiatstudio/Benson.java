@@ -238,12 +238,8 @@ public class Benson {
 		group = getGroup();
 		id = getID();
 		mode = getFigureMode();
-<<<<<<< HEAD
 		
 		
-=======
-
->>>>>>> 1229decac5352a7e36b46e1be8fe10a5c814f8bb
 		g2.drawString("Group: " + group, 30, 40);
 		g2.drawString("ID:    " + id, 30, 65);
 		g2.drawString("Mode:  " + mode, 30, 90);
