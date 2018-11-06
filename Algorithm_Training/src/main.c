@@ -6,8 +6,8 @@ int main(void){
 
 	struct parameters *params = NULL;
 	struct dataSet *trainingData = NULL;
-    struct dataSet *validationData = NULL;
-    struct dataSet *testData = NULL;
+    	struct dataSet *validationData = NULL;
+    	struct dataSet *testData = NULL;
 	struct chromosome *chromo = NULL;
 
 	int numInputs = 8;
@@ -27,11 +27,11 @@ int main(void){
 
 	setTargetFitness(params, targetFitness);
 
-    setMutationRate(params,0.1);
+    	setMutationRate(params,0.1);
 
-    setShortcutConnections(params,0);
+    	setShortcutConnections(params,0);
 
-    setNumThreads(params,2);
+    	setNumThreads(params,2);
 
 	setUpdateFrequency(params, updateFrequency);
 
@@ -39,8 +39,8 @@ int main(void){
 
 	// Note: you may need to check this path such that it is relative to your executable
 	trainingData = initialiseDataSetFromFile("./01_training.csv");
-    validationData = initialiseDataSetFromFile("./02_validation.csv");
-    testData = initialiseDataSetFromFile("./03_test.csv");
+    	validationData = initialiseDataSetFromFile("./02_validation.csv");
+    	testData = initialiseDataSetFromFile("./03_test.csv");
 
 	chromo = runValiTestCGP(params,trainingData,validationData,testData,numGens);
 
@@ -48,23 +48,23 @@ int main(void){
 
 	saveChromosomeDot(chromo,0,"chromo.dot");
 
-    int i;
-    for(i = 0; i < getNumDataSetSamples(testData); i++)
-    {
+    	int i;
+    	for(i = 0; i < getNumDataSetSamples(testData); i++)
+    	{
 		int mismatchError = 0;
-        executeChromosome(chromo,getDataSetSampleInputs(testData,i));
-        double chromoOutputs[9] = {0,0,0,0,0,0,0,0,0};
-        int j;
-        for(j = 0; j < 9; j++){
-            chromoOutputs[j] = getChromosomeOutput(chromo,j);
-            printf("%.2f ",chromoOutputs[j]);
+        	executeChromosome(chromo,getDataSetSampleInputs(testData,i));
+        	double chromoOutputs[9] = {0,0,0,0,0,0,0,0,0};
+        	int j;
+        	for(j = 0; j < 9; j++){
+            		chromoOutputs[j] = getChromosomeOutput(chromo,j);
+            		printf("%.2f ",chromoOutputs[j]);
 			if(abs(chromoOutputs[j] - getDataSetSampleOutputs(testData,i)[j]) > 0.5 )
 				mismatchError++;
-        }
+        	}
 		printf("Mismatches: %d", mismatchError);
-        printf("\n");
+        	printf("\n");
 
-    }
+    	}
 
 	freeDataSet(trainingData);
 	freeChromosome(chromo);
