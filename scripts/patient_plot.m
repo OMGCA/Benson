@@ -1,5 +1,5 @@
-patientData = load("patient_plot.csv");
-controlData = load("control_plot.csv");
+patientData = load('patient_plot.csv');
+controlData = load('control_plot.csv');
 
 patientVelcSD = sort(patientData(:,5));
 patientAngleSD = sort(patientData(:,6));
