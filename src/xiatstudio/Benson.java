@@ -249,6 +249,7 @@ public class Benson {
 		g2.drawString("Angle Stability: " + getAngleSD(), 30, 190);
 		g2.drawString("Length: " + getTotalLength(), 30, 215);
 		g2.drawString("Size: " + getSize()[0] + " x " + getSize()[1], 30, 240);
+		g2.drawString("Hesitation: " +penoffCount(),30,265);
 
 		g2.setFont(new Font("Inconsolata", Font.PLAIN, 15));
 
@@ -278,6 +279,8 @@ public class Benson {
 			}
 
 		}
+
+		markPenoff(g2);
 
 		/* Figure vertex point marking */
 		g2.setColor(new Color(255, 81, 81));
@@ -429,6 +432,26 @@ public class Benson {
 
 		return getStandardDeviation(distance);
 
+	}
+
+	public int penoffCount(){
+		int hesitate = 0;
+		for(int i = 0; i < this.timeStamp-1; i++){
+			if(this.penPressure[i] == 0)
+				hesitate++;
+		}
+
+		return hesitate;
+	}
+
+	public void markPenoff(Graphics2D g2){
+		Color c = new Color(255,255,255);
+		g2.setColor(c);
+		for(int i = 0; i < this.timeStamp-1; i++){
+			if(this.penPressure[i] == 0){
+				g2.fillOval((int)this.xAxis[i], (int)this.yAxis[i],2,2);
+			}
+		}
 	}
 
 	public void plotTilt(Graphics2D g2) {
