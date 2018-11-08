@@ -13,6 +13,8 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
@@ -143,9 +145,9 @@ public class Main extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String[] controlDataList = getDataList("M:\\eclipse-workspace\\bensonFigure\\Benson_Data\\Controls\\");
-				exportAllData(controlDataList, "control.csv");
+				exportAllData(controlDataList, ".\\Sheets\\control_" + new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()) + ".csv");
 				String[] patientDataList = getDataList("M:\\eclipse-workspace\\bensonFigure\\Benson_Data\\Patients\\");
-				exportAllData(patientDataList, "patient.csv");
+				exportAllData(patientDataList, ".\\Sheets\\patient_" + new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()) + ".csv");
 			}
 		});
 	}
@@ -239,10 +241,16 @@ public class Main extends JFrame {
 			writer.append("Size");
 			writer.append(',');
 			
+			writer.append("Aspect ratio");
+			writer.append(',');
+			
 			writer.append("Velocity Stability");
 			writer.append(',');
 			
 			writer.append("Angle Stability");
+			writer.append(',');
+			
+			writer.append("Pen Off %");
 			writer.append(',');
 			
 			writer.append("\r\n");
@@ -252,7 +260,6 @@ public class Main extends JFrame {
 				Benson b = new Benson(dataList[i].replace("\\", "/"));
 				
 				System.out.println("Exporting data from " + b.getID()+"_"+b.getFigureMode());
-				writer.append("\r\n");
 				writer.append(b.getID());
 				writer.append(',');
 				
@@ -268,10 +275,19 @@ public class Main extends JFrame {
 				writer.append(String.valueOf(b.getSize()[0] * b.getSize()[1]));
 				writer.append(',');
 				
+				writer.append(String.valueOf((double)(b.getSize()[0] / b.getSize()[1])));
+				writer.append(',');
+				
 				writer.append(String.valueOf(b.getVelocitySD()));
 				writer.append(',');
 				
 				writer.append(String.valueOf(b.getAngleSD()));
+				writer.append(',');
+				
+				writer.append(String.valueOf(b.penoffCount()/(b.getTimeStamp()+1)));
+				writer.append(',');
+				
+				writer.append("\r\n");
 				
 			}
 			
