@@ -248,8 +248,8 @@ public class Benson {
 		g2.drawString("Velocity Stability: " + getVelocitySD(), 30, 165);
 		g2.drawString("Angle Stability: " + getAngleSD(), 30, 190);
 		g2.drawString("Length: " + getTotalLength(), 30, 215);
-		g2.drawString("Size: " + getSize()[0] + " x " + getSize()[1], 30, 240);
-		g2.drawString("Hesitation: " +penoffCount(),30,265);
+		g2.drawString("Size: " + (int)getSize()[0] + " x " + (int)getSize()[1], 30, 240);
+		g2.drawString("Pen Off: " + penoffCount()*100/(this.timeStamp+1) + " %",30,265);
 
 		g2.setFont(new Font("Inconsolata", Font.PLAIN, 15));
 
@@ -351,10 +351,10 @@ public class Benson {
 		return totalLength;
 	}
 
-	public int[] getSize() {
-		int[] size = new int[2];
-		int horiDiff = (int) (max(this.xAxis) - min(this.xAxis));
-		int vertDiff = (int) (max(this.yAxis) - min(this.yAxis));
+	public double[] getSize() {
+		double[] size = new double[2];
+		double horiDiff = (max(this.xAxis) - min(this.xAxis));
+		double vertDiff = (max(this.yAxis) - min(this.yAxis));
 		size[0] = horiDiff;
 		size[1] = vertDiff;
 		return size;
@@ -434,8 +434,8 @@ public class Benson {
 
 	}
 
-	public int penoffCount(){
-		int hesitate = 0;
+	public double penoffCount(){
+		double hesitate = 0;
 		for(int i = 0; i < this.timeStamp-1; i++){
 			if(this.penPressure[i] == 0)
 				hesitate++;
