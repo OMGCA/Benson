@@ -31,7 +31,7 @@ public class Main extends JFrame {
 	/* Default loading data */
 	static String data = "./Benson_Data/empty.txt";
 	static JPanel panel;
-	
+
 	public static void main(String[] args) {
 		/* Load GUI component */
 		GUISetup();
@@ -126,7 +126,7 @@ public class Main extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Benson b = new Benson(data);
-				exportSingleData(b, data.substring(0, data.lastIndexOf('.'))+".csv");
+				exportSingleData(b, data.substring(0, data.lastIndexOf('.')) + ".csv");
 			}
 
 		});
@@ -140,14 +140,16 @@ public class Main extends JFrame {
 				outputPNGInBatch(patientDataList, panel);
 			}
 		});
-		
+
 		menuItem5.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				String[] controlDataList = getDataList("M:\\eclipse-workspace\\bensonFigure\\Benson_Data\\Controls\\");
-				exportAllData(controlDataList, ".\\Sheets\\control_" + new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()) + ".csv");
+				exportAllData(controlDataList, ".\\Sheets\\control_"
+						+ new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()) + ".csv");
 				String[] patientDataList = getDataList("M:\\eclipse-workspace\\bensonFigure\\Benson_Data\\Patients\\");
-				exportAllData(patientDataList, ".\\Sheets\\patient_" + new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()) + ".csv");
+				exportAllData(patientDataList, ".\\Sheets\\patient_"
+						+ new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()) + ".csv");
 			}
 		});
 	}
@@ -170,14 +172,14 @@ public class Main extends JFrame {
 			data = data.replace("\\", "/");
 
 			p.repaint();
-			
+
 			imagebuf = new BufferedImage(p.getWidth(), p.getHeight(), BufferedImage.TYPE_INT_RGB);
 			p.paint(imagebuf.getGraphics());
 			try {
 				ImageIO.write(imagebuf, "png",
 						new File(dataList[i].substring(0, dataList[i].lastIndexOf('.')) + "-drawing.png"));
-				System.out.println(
-						"Generating image " + dataList[i].substring(0, dataList[i].lastIndexOf('.')) + "-drawing.png ...");
+				System.out.println("Generating image " + dataList[i].substring(0, dataList[i].lastIndexOf('.'))
+						+ "-drawing.png ...");
 			} catch (Exception e1) {
 				System.out.println("error");
 			}
@@ -186,29 +188,29 @@ public class Main extends JFrame {
 
 	public static String[] getDataList(String path) {
 		File folder = new File(path);
-		
+
 		FilenameFilter fileNameFilter = new FilenameFilter() {
-			   
-            @Override
-            public boolean accept(File dir, String name) {
-               if(name.lastIndexOf('.')>0) {
-               
-                  // get last index for '.' char
-                  int lastIndex = name.lastIndexOf('.');
-                  
-                  // get extension
-                  String str = name.substring(lastIndex);
-                  
-                  // match path name extension
-                  if(str.equals(".txt")) {
-                     return true;
-                  }
-               }
-               
-               return false;
-            }
-         };
-         
+
+			@Override
+			public boolean accept(File dir, String name) {
+				if (name.lastIndexOf('.') > 0) {
+
+					// get last index for '.' char
+					int lastIndex = name.lastIndexOf('.');
+
+					// get extension
+					String str = name.substring(lastIndex);
+
+					// match path name extension
+					if (str.equals(".txt")) {
+						return true;
+					}
+				}
+
+				return false;
+			}
+		};
+
 		File[] listOfFiles = folder.listFiles(fileNameFilter);
 
 		String[] fileList = new String[listOfFiles.length];
@@ -219,81 +221,37 @@ public class Main extends JFrame {
 
 		return fileList;
 	}
-	
+
 	public static void exportAllData(String[] dataList, String fileName) {
 		objectCSVFileCreation(fileName);
 		FileWriter writer;
-		
+
 		try {
 			writer = new FileWriter(fileName, true);
-			writer.append("Subject ID");
-			writer.append(',');
-			
-			writer.append("Mode");
-			writer.append(',');
-			
-			writer.append("Total time");
-			writer.append(',');
-			
-			writer.append("Total length");
-			writer.append(',');
-			
-			writer.append("Size");
-			writer.append(',');
-			
-			writer.append("Aspect ratio");
-			writer.append(',');
-			
-			writer.append("Velocity Stability");
-			writer.append(',');
-			
-			writer.append("Angle Stability");
-			writer.append(',');
-			
-			writer.append("Pen Off %");
-			writer.append(',');
-			
+			String[] title = { "Subject ID", "Mode", "Total time", "Total length", "Size", "Aspect Ratio",
+					"Velocity Stability", "Angular Stability", "Pen Off %" };
+			writeData(writer, title);
 			writer.append("\r\n");
-			
-			for(int i = 0; i < dataList.length; i++) {
-				
+
+			for (int i = 0; i < dataList.length; i++) {
+
 				Benson b = new Benson(dataList[i].replace("\\", "/"));
-				
-				System.out.println("Exporting data from " + b.getID()+"_"+b.getFigureMode());
-				writer.append(b.getID());
-				writer.append(',');
-				
-				writer.append(b.getFigureMode());
-				writer.append(',');
-				
-				writer.append(String.valueOf(b.timeSpent));
-				writer.append(',');
-				
-				writer.append(String.valueOf(b.getTotalLength()));
-				writer.append(',');
-				
-				writer.append(String.valueOf(b.getSize()[0] * b.getSize()[1]));
-				writer.append(',');
-				
-				writer.append(String.valueOf((double)(b.getSize()[0] / b.getSize()[1])));
-				writer.append(',');
-				
-				writer.append(String.valueOf(b.getVelocitySD()));
-				writer.append(',');
-				
-				writer.append(String.valueOf(b.getAngleSD()));
-				writer.append(',');
-				
-				writer.append(String.valueOf(b.penoffCount()/(b.getTimeStamp()+1)));
-				writer.append(',');
-				
+				String[] dataPending = { b.getID(), b.getFigureMode(), String.valueOf(b.timeSpent),
+						String.valueOf(b.getTotalLength()), String.valueOf(b.getSize()[0] * b.getSize()[1]),
+						String.valueOf((double) (b.getSize()[0] / b.getSize()[1])), String.valueOf(b.getVelocitySD()),
+						String.valueOf(b.getAngleSD()), String.valueOf(b.penoffCount() / (b.getTimeStamp() + 1)) };
+
+				System.out.println("Exporting data from " + b.getID() + "_" + b.getFigureMode());
+
+				writeData(writer, dataPending);
+
 				writer.append("\r\n");
-				
+
 			}
-			
+
 			System.out.println("File " + fileName + " created");
 			System.out.println(" ");
-			
+
 			writer.flush();
 			writer.close();
 
@@ -304,57 +262,33 @@ public class Main extends JFrame {
 		}
 	}
 
+	public static void writeData(FileWriter writer, String[] data) throws IOException {
+		for (int i = 0; i < data.length; i++) {
+			writer.append(data[i]);
+			writer.append(',');
+		}
+	}
+
 	public static void exportSingleData(Benson b, String fileName) {
 		objectCSVFileCreation(fileName);
 
 		FileWriter writer;
 		try {
 			writer = new FileWriter(fileName, true);
-			writer.append("Subject ID");
-			writer.append(',');
-			
-			writer.append("Mode");
-			writer.append(',');
-			
-			writer.append("Total time");
-			writer.append(',');
-			
-			writer.append("Total length");
-			writer.append(',');
-			
-			writer.append("Size");
-			writer.append(',');
-			
-			writer.append("Velocity Stability");
-			writer.append(',');
-			
-			writer.append("Angle Stability");
-			writer.append(',');
-			
+			String[] title = { "Subject ID", "Mode", "Total time", "Total length", "Size", "Aspect Ratio",
+					"Velocity Stability", "Angular Stability", "Pen Off %" };
+			writeData(writer, title);
 			writer.append("\r\n");
-			
-			writer.append(b.getID());
-			writer.append(',');
-			
-			writer.append(b.getFigureMode());
-			writer.append(',');
-			
-			writer.append(String.valueOf(b.timeSpent));
-			writer.append(',');
-			
-			writer.append(String.valueOf(b.getTotalLength()));
-			writer.append(',');
-			
-			writer.append(String.valueOf(b.getSize()[0] * b.getSize()[1]));
-			writer.append(',');
-			
-			writer.append(String.valueOf(b.getVelocitySD()));
-			writer.append(',');
-			
-			writer.append(String.valueOf(b.getAngleSD()));
-			//writer.append(',');
-			
-			
+
+			String[] dataPending = { b.getID(), b.getFigureMode(), String.valueOf(b.timeSpent),
+					String.valueOf(b.getTotalLength()), String.valueOf(b.getSize()[0] * b.getSize()[1]),
+					String.valueOf((double) (b.getSize()[0] / b.getSize()[1])), String.valueOf(b.getVelocitySD()),
+					String.valueOf(b.getAngleSD()), String.valueOf(b.penoffCount() / (b.getTimeStamp() + 1)) };
+
+			writeData(writer, dataPending);
+
+			writer.append("\r\n");
+
 			writer.flush();
 			writer.close();
 
