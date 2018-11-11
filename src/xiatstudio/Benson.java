@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import xiatstudio.Component;
@@ -265,22 +266,62 @@ public class Benson {
 		c = new Color(0, 167, 246);
 		g2.setColor(c);
 
+		
 		/* Drawing loop */
+		/*
 		for (int i = 0; i < this.timeStamp - 1; i++) {
+			float[] tmpX = {this.xAxis[i],this.xAxis[i+1]};
+			float[] tmpY = {this.yAxis[i],this.yAxis[i+1]};
 
-			/* Only draw with pen down */
-			if (this.penPressure[i] != 0) {
+			// Only draw with pen down 
+			if (this.penPressure[i] != 0 && (getPointAngle(tmpX, tmpY) < 15) ) {
 				g2.draw(new Line2D.Float(this.xAxis[i], this.yAxis[i], this.xAxis[i + 1], this.yAxis[i + 1]));
 			}
-			/* Change color when pen up */
+			// Change color when pen up 
 			else if (this.penPressure[i] == 0) {
 				c = randomColor();
 				g2.setColor(c);
 			}
 
+		} */
+
+		//Angle based plotting
+		for (int i = 0; i < this.timeStamp - 1; i++) {
+			float[] tmpX = {this.xAxis[i],this.xAxis[i+1]};
+			float[] tmpY = {this.yAxis[i],this.yAxis[i+1]};
+
+			/* Only draw with pen down */
+			if (this.penPressure[i] != 0 && (getPointAngle(tmpX, tmpY) <= 15) ) {
+				g2.draw(new Line2D.Float(this.xAxis[i], this.yAxis[i], this.xAxis[i + 1], this.yAxis[i + 1]));
+			}
 		}
 
-		markPenoff(g2);
+		g2.setColor(new Color(88,200,21));
+
+		for (int i = 0; i < this.timeStamp - 1; i++) {
+			float[] tmpX = {this.xAxis[i],this.xAxis[i+1]};
+			float[] tmpY = {this.yAxis[i],this.yAxis[i+1]};
+
+			/* Only draw with pen down */
+			if (this.penPressure[i] != 0 && (getPointAngle(tmpX, tmpY) >= 70) ) {
+				g2.draw(new Line2D.Float(this.xAxis[i], this.yAxis[i], this.xAxis[i + 1], this.yAxis[i + 1]));
+			}
+		}
+
+		g2.setColor(new Color(242,89,85));
+
+		for (int i = 0; i < this.timeStamp - 1; i++) {
+			float[] tmpX = {this.xAxis[i],this.xAxis[i+1]};
+			float[] tmpY = {this.yAxis[i],this.yAxis[i+1]};
+
+			/* Only draw with pen down */
+			if (this.penPressure[i] != 0 && (getPointAngle(tmpX, tmpY) > 15 && getPointAngle(tmpX,tmpY) < 70) ) {
+				g2.draw(new Line2D.Float(this.xAxis[i], this.yAxis[i], this.xAxis[i + 1], this.yAxis[i + 1]));
+			}
+		}
+		
+
+		//markPenoff(g2);
 
 		/* Figure vertex point marking */
 		g2.setColor(new Color(255, 81, 81));
@@ -452,6 +493,18 @@ public class Benson {
 				g2.fillOval((int)this.xAxis[i], (int)this.yAxis[i],2,2);
 			}
 		}
+	}
+
+	public int linearSearch(float[] arr, float entity){
+		int i = 0;
+		int found = 0;
+		while(i < arr.length && found == 0){
+			if(entity == arr[i])
+				found = 1;
+			i++;
+		}
+
+		return i;
 	}
 
 	public void plotTilt(Graphics2D g2) {
