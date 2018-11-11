@@ -1,584 +1,340 @@
 package xiatstudio;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Font;
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.geom.Line2D;
-
-import java.io.BufferedReader;
+import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-import xiatstudio.Component;
+import javax.imageio.ImageIO;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
-public class Benson {
-	float[] xAxis;
-	float[] yAxis;
-	float[] xTilt;
-	float[] yTilt;
-	float[] penPressure;
-	float timeSpent;
-	int timeStamp;
-	String data;
-	ArrayList<Component> components;
+@SuppressWarnings("serial")
+public class Main extends JFrame {
+	/* Default loading data */
+	static String data = "./Benson_Data/empty.txt";
+	static JPanel panel;
 
-	public Benson(String data) {
-		this.data = data;
-		this.timeStamp = fetchTimeStamp(data);
-		this.xAxis = new float[timeStamp];
-		this.yAxis = new float[timeStamp];
-		this.xTilt = new float[timeStamp];
-		this.yTilt = new float[timeStamp];
-		this.timeSpent = 0;
-		this.penPressure = new float[timeStamp];
-		this.components = new ArrayList<Component>();
-
-		initData();
-		positionCentre();
-		registerComponents();
+	public static void main(String[] args) {
+		/* Load GUI component */
+		GUISetup();
 	}
 
-	public int fetchTimeStamp(String data) {
-		int counter = 0;
-		@SuppressWarnings("unused")
-		String line = "";
-
-		BufferedReader br = null;
+	public static void GUISetup() {
+		/* Windows look and feel */
 		try {
-			br = new BufferedReader(new FileReader(data));
-			while ((line = br.readLine()) != null) {
-				counter++;
+			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		/* Initialize JFrame and Menu bar */
+		JFrame frame = new JFrame();
+		JMenuBar menuBar = new JMenuBar();
+		JMenu menu, exportMenu, exportAllMenu;
+		JMenuItem menuItem, menuItem2, menuItem3, menuItem4, menuItem5;
+
+		/* Background color */
+		Color bg = new Color(54, 63, 70);
+
+		menu = new JMenu("File");
+		menuBar.add(menu);
+		menuItem = new JMenuItem("Open");
+		exportMenu = new JMenu("Export as...");
+		exportAllMenu = new JMenu("Export all as...");
+		menuItem2 = new JMenuItem("PNG Image");
+		menuItem3 = new JMenuItem("CSV File");
+		menuItem4 = new JMenuItem("PNG Image");
+		menuItem5 = new JMenuItem("CSV File");
+		menu.add(menuItem);
+		menu.add(exportMenu);
+		menu.add(exportAllMenu);
+		exportMenu.add(menuItem2);
+		exportMenu.add(menuItem3);
+
+		exportAllMenu.add(menuItem4);
+		exportAllMenu.add(menuItem5);
+
+		panel = new GPanel();
+		frame.setJMenuBar(menuBar);
+		frame.add(panel);
+
+		frame.setTitle(data);
+		panel.setBackground(bg);
+		frame.setSize(1280, 720);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setVisible(true);
+
+		/* Open file action */
+		menuItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				/* Default path */
+				JFileChooser fileChooser = new JFileChooser(".\\Benson_Data");
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Text Files(*.txt, *.text)", "txt",
+						"text");
+				fileChooser.setFileFilter(filter);
+
+				switch (fileChooser.showOpenDialog(panel)) {
+				case JFileChooser.APPROVE_OPTION:
+					data = fileChooser.getSelectedFile().getPath();
+					/* Replace backslash in the path */
+					data = data.replace("\\", "/");
+					/* Update content */
+					panel.repaint();
+					frame.setTitle(data);
+					// System.out.println(data);
+					break;
+				}
 			}
+		});
+
+		menuItem2.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				BufferedImage imagebuf = null;
+				imagebuf = new BufferedImage(panel.getWidth(), panel.getHeight(), BufferedImage.TYPE_INT_RGB);
+
+				// Graphics2D g2d = imagebuf.getGraphics();
+				panel.paint(imagebuf.getGraphics());
+				try {
+					ImageIO.write(imagebuf, "png", new File(data + ".png"));
+				} catch (Exception e1) {
+					System.out.println("error");
+				}
+			}
+		});
+
+		menuItem3.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Benson b = new Benson(data);
+				exportSingleData(b, data.substring(0, data.lastIndexOf('.')) + ".csv");
+			}
+
+		});
+
+		menuItem4.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String[] controlDataList = getDataList("M:\\eclipse-workspace\\bensonFigure\\Benson_Data\\Controls\\");
+				outputPNGInBatch(controlDataList, panel);
+				String[] patientDataList = getDataList("M:\\eclipse-workspace\\bensonFigure\\Benson_Data\\Patients\\");
+				outputPNGInBatch(patientDataList, panel);
+			}
+		});
+
+		menuItem5.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String[] controlDataList = getDataList("M:\\eclipse-workspace\\bensonFigure\\Benson_Data\\Controls\\");
+				exportAllData(controlDataList, ".\\Sheets\\control_"
+						+ new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()) + ".csv");
+				String[] patientDataList = getDataList("M:\\eclipse-workspace\\bensonFigure\\Benson_Data\\Patients\\");
+				exportAllData(patientDataList, ".\\Sheets\\patient_"
+						+ new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()) + ".csv");
+			}
+		});
+	}
+
+	public static void objectCSVFileCreation(String fileName) {
+		File f = new File(fileName);
+
+		try {
+			f.createNewFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void outputPNGInBatch(String[] dataList, JPanel p) {
+		BufferedImage imagebuf = null;
+
+		for (int i = 0; i < dataList.length; i++) {
+			data = dataList[i];
+			data = data.replace("\\", "/");
+
+			p.repaint();
+
+			imagebuf = new BufferedImage(p.getWidth(), p.getHeight(), BufferedImage.TYPE_INT_RGB);
+			p.paint(imagebuf.getGraphics());
+			try {
+				ImageIO.write(imagebuf, "png",
+						new File(dataList[i].substring(0, dataList[i].lastIndexOf('.')) + "-drawing.png"));
+				System.out.println("Generating image " + dataList[i].substring(0, dataList[i].lastIndexOf('.'))
+						+ "-drawing.png ...");
+			} catch (Exception e1) {
+				System.out.println("error");
+			}
+		}
+	}
+
+	public static String[] getDataList(String path) {
+		File folder = new File(path);
+
+		FilenameFilter fileNameFilter = new FilenameFilter() {
+
+			@Override
+			public boolean accept(File dir, String name) {
+				if (name.lastIndexOf('.') > 0) {
+
+					// get last index for '.' char
+					int lastIndex = name.lastIndexOf('.');
+
+					// get extension
+					String str = name.substring(lastIndex);
+
+					// match path name extension
+					if (str.equals(".txt")) {
+						return true;
+					}
+				}
+
+				return false;
+			}
+		};
+
+		File[] listOfFiles = folder.listFiles(fileNameFilter);
+
+		String[] fileList = new String[listOfFiles.length];
+
+		for (int i = 0; i < listOfFiles.length; i++) {
+			fileList[i] = path + listOfFiles[i].getName();
+		}
+
+		return fileList;
+	}
+
+	public static void exportAllData(String[] dataList, String fileName) {
+		objectCSVFileCreation(fileName);
+		FileWriter writer;
+
+		try {
+			writer = new FileWriter(fileName, true);
+			String[] title = { "Subject ID", "Mode", "Total time", "Total length", "Size", "Aspect Ratio",
+					"Velocity Stability", "Angular Stability", "Pen Off %" };
+			writeData(writer, title);
+			writer.append("\r\n");
+
+			for (int i = 0; i < dataList.length; i++) {
+
+				Benson b = new Benson(dataList[i].replace("\\", "/"));
+				String[] dataPending = { b.getID(), b.getFigureMode(), String.valueOf(b.timeSpent),
+						String.valueOf(b.getTotalLength()), String.valueOf(b.getSize()[0] * b.getSize()[1]),
+						String.valueOf((double) (b.getSize()[0] / b.getSize()[1])), String.valueOf(b.getVelocitySD()),
+						String.valueOf(b.getAngleSD()), String.valueOf(b.penoffCount() / (b.getTimeStamp() + 1)) };
+
+				System.out.println("Exporting data from " + b.getID() + "_" + b.getFigureMode());
+
+				writeData(writer, dataPending);
+
+				writer.append("\r\n");
+
+			}
+
+			System.out.println("File " + fileName + " created");
+			System.out.println(" ");
+
+			writer.flush();
+			writer.close();
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
 		}
-
-		return counter;
 	}
 
-	public void initData() {
-		String splitBy = "\\s+";
-		String line = "";
+	public static void writeData(FileWriter writer, String[] data) throws IOException {
+		for (int i = 0; i < data.length; i++) {
+			writer.append(data[i]);
+			writer.append(',');
+		}
+	}
 
-		int i = 0;
+	public static void exportSingleData(Benson b, String fileName) {
+		objectCSVFileCreation(fileName);
 
-		/* Changing figure visiable size */
-		int multipiler = 1200;
-
-		BufferedReader br = null;
+		FileWriter writer;
 		try {
-			br = new BufferedReader(new FileReader(this.data));
-			while ((line = br.readLine()) != null) {
-				String[] tmpArray = line.split(splitBy);
-				this.xAxis[i] = Float.parseFloat(tmpArray[1]);
-				this.xAxis[i] *= multipiler;
-				this.yAxis[i] = Float.parseFloat(tmpArray[2]);
-				this.yAxis[i] *= multipiler;
-				this.xTilt[i] = Float.parseFloat(tmpArray[3]);
-				this.xTilt[i] *= multipiler;
-				this.yTilt[i] = Float.parseFloat(tmpArray[4]);
-				this.yTilt[i] *= multipiler;
-				this.penPressure[i] = Float.parseFloat(tmpArray[5]);
-				i++;
-				this.timeSpent = Float.parseFloat(tmpArray[0]);
-			}
+			writer = new FileWriter(fileName, true);
+			String[] title = { "Subject ID", "Mode", "Total time", "Total length", "Size", "Aspect Ratio",
+					"Velocity Stability", "Angular Stability", "Pen Off %" };
+			writeData(writer, title);
+			writer.append("\r\n");
+
+			String[] dataPending = { b.getID(), b.getFigureMode(), String.valueOf(b.timeSpent),
+					String.valueOf(b.getTotalLength()), String.valueOf(b.getSize()[0] * b.getSize()[1]),
+					String.valueOf((double) (b.getSize()[0] / b.getSize()[1])), String.valueOf(b.getVelocitySD()),
+					String.valueOf(b.getAngleSD()), String.valueOf(b.penoffCount() / (b.getTimeStamp() + 1)) };
+
+			writeData(writer, dataPending);
+
+			writer.append("\r\n");
+
+			writer.flush();
+			writer.close();
+
 		} catch (FileNotFoundException e) {
-			System.out.println("ERROR: Specific data file can not be found.");
+			e.printStackTrace();
 		} catch (IOException e) {
-			System.out.println("ERROR: Specific data file can not be accessed.");
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+			e.printStackTrace();
 		}
 	}
 
-	public String getData() {
-		return this.data;
-	}
+	public static class GPanel extends JPanel {
 
-	public void registerComponents() {
-		int index = 0;
-		this.components.add(new Component(index));
-
-		/* Current standard for segmentation */
-		/* Based on pen pressure change */
-
-		for (int i = 0; i < this.timeStamp - 1; i++) {
-			if (this.penPressure[i] != 0) {
-				this.components.get(index).addNewAxis(this.xAxis[i], this.yAxis[i]);
-			}
-			if (this.penPressure[i] != 0 && this.penPressure[i + 1] == 0) {
-				this.components.get(index).resizeAxis();
-				index++;
-				this.components.add(new Component(index));
-			}
+		public void Panel() {
+			super.setPreferredSize(new Dimension(1280, 720));
 		}
 
-	}
+		@Override
+		public void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			Graphics2D g2 = (Graphics2D) g;
 
-	public void positionCentre() {
-		/* Horizontal anchor point */
-		float stdX = (max(this.xAxis) + min(this.xAxis)) / 2 - 640;
-		for (int i = 0; i < this.xAxis.length; i++) {
-			this.xAxis[i] -= stdX;
-		}
-		/* Vertical anchor point */
-		float stdY = (max(this.yAxis) + min(this.yAxis)) / 2 - 360;
-		for (int i = 0; i < this.yAxis.length; i++) {
-			this.yAxis[i] -= stdY;
-		}
+			RenderingHints hints = new RenderingHints(RenderingHints.KEY_ANTIALIASING,
+					RenderingHints.VALUE_ANTIALIAS_ON);
 
-	}
-
-	public int getComponentCount() {
-		return this.components.size();
-	}
-
-	/* Getter functions */
-	public int getTimeStamp() {
-		return this.timeStamp;
-	}
-
-	public float[] getX() {
-		return this.xAxis;
-	}
-
-	public float[] getY() {
-		return this.yAxis;
-	}
-
-	public float[] getXTilt() {
-		return this.xTilt;
-	}
-
-	public float[] getYTilt() {
-		return this.yTilt;
-	}
-
-	public float[] getPenPressure() {
-		return this.penPressure;
-	}
-
-	/* Get drawing mode from data file name */
-	public String getFigureMode() {
-		try{
-			if (this.data.split("/")[this.data.split("/").length - 1].split("_")[2].contains("copy"))
-				return "Copy";
-			else
-				return "Recall";
-		} catch (ArrayIndexOutOfBoundsException e){
-			return "Unknown";
-		}
-		
-	}
-
-	public String getGroup(){
-		try{
-			return this.data.split("/")[this.data.split("/").length - 2];
-		} catch (ArrayIndexOutOfBoundsException e){
-			return "Unknown";
+			g2.setRenderingHints(hints);
+			Benson testFigure = new Benson(data);
+			testFigure.drawBenson(g2);
 		}
 	}
 
-	public String getID(){
-		try{
-			return this.data.split("/")[this.data.split("/").length - 1].split("_")[1];
-		} catch (ArrayIndexOutOfBoundsException e){
-			return "Unknown";
+	public static class TPanel extends JPanel {
+		public void Panel() {
+			super.setPreferredSize(new Dimension(1280, 720));
+		}
+
+		@Override
+		public void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			Graphics2D g2 = (Graphics2D) g;
+
+			RenderingHints hints = new RenderingHints(RenderingHints.KEY_ANTIALIASING,
+					RenderingHints.VALUE_ANTIALIAS_ON);
+
+			g2.setRenderingHints(hints);
+			Benson testFigure = new Benson(data);
+			testFigure.plotTilt(g2);
 		}
 	}
-
-
-
-	public void markComponent(Component c, Graphics2D g2) {
-		int[] centre = { 640, 360 };
-		int[] compAvgPos = c.getAvgPos();
-		g2.drawString("Seg " + c.getIndex(), rotateCoordinate(centre, compAvgPos)[0],
-				rotateCoordinate(centre, compAvgPos)[1]);
-
-	}
-
-	public int[] rotateCoordinate(int[] x, int[] y) {
-		int newX = Math.abs(x[0] + x[0] - y[0]);
-		int newY = Math.abs(x[1] + x[1] - y[1]);
-
-		int[] newPos = { newX, newY };
-
-		return newPos;
-	}
-
-	public void drawBenson(Graphics2D g2) {
-		/* Set stroke */
-		g2.setStroke(new BasicStroke(3));
-		/* Text color */
-		Color c = new Color(234, 234, 234);
-		g2.setColor(c);
-		g2.setFont(new Font("Inconsolata", Font.PLAIN, 20));
-		String group, id, mode;
-
-		group = getGroup();
-		id = getID();
-		mode = getFigureMode();
-		
-		
-		g2.drawString("Group: " + group, 30, 40);
-		g2.drawString("ID:    " + id, 30, 65);
-		g2.drawString("Mode:  " + mode, 30, 90);
-		g2.drawString("Data Location: " + this.data, 30, 115);
-		g2.drawString("Total time spent: " + this.timeSpent / 1000 + " s", 30, 140);
-		g2.drawString("Velocity Stability: " + getVelocitySD(), 30, 165);
-		g2.drawString("Angle Stability: " + getAngleSD(), 30, 190);
-		g2.drawString("Length: " + getTotalLength(), 30, 215);
-		g2.drawString("Size: " + (int)getSize()[0] + " x " + (int)getSize()[1], 30, 240);
-		g2.drawString("Pen Off: " + penoffCount()*100/(this.timeStamp+1) + " %",30,265);
-
-		g2.setFont(new Font("Inconsolata", Font.PLAIN, 15));
-
-		/*
-		 * for(int i = 0 ; i < this.components.size(); i++){
-		 * markComponent(this.components.get(i), g2); }
-		 */
-
-		/* Rotate figure to recognizable orientation */
-		g2.rotate(Math.toRadians(180), 640, 360);
-
-		/* Initial segment color */
-		c = new Color(0, 167, 246);
-		g2.setColor(c);
-
-		
-		/* Drawing loop */
-		/*
-		for (int i = 0; i < this.timeStamp - 1; i++) {
-			float[] tmpX = {this.xAxis[i],this.xAxis[i+1]};
-			float[] tmpY = {this.yAxis[i],this.yAxis[i+1]};
-
-			// Only draw with pen down 
-			if (this.penPressure[i] != 0 && (getPointAngle(tmpX, tmpY) < 15) ) {
-				g2.draw(new Line2D.Float(this.xAxis[i], this.yAxis[i], this.xAxis[i + 1], this.yAxis[i + 1]));
-			}
-			// Change color when pen up 
-			else if (this.penPressure[i] == 0) {
-				c = randomColor();
-				g2.setColor(c);
-			}
-
-		} */
-
-		//Angle based plotting
-		for (int i = 0; i < this.timeStamp - 1; i++) {
-			float[] tmpX = {this.xAxis[i],this.xAxis[i+1]};
-			float[] tmpY = {this.yAxis[i],this.yAxis[i+1]};
-
-			/* Only draw with pen down */
-			if (this.penPressure[i] != 0 && (getPointAngle(tmpX, tmpY) <= 15) ) {
-				g2.draw(new Line2D.Float(this.xAxis[i], this.yAxis[i], this.xAxis[i + 1], this.yAxis[i + 1]));
-			}
-		}
-
-		g2.setColor(new Color(88,200,21));
-
-		for (int i = 0; i < this.timeStamp - 1; i++) {
-			float[] tmpX = {this.xAxis[i],this.xAxis[i+1]};
-			float[] tmpY = {this.yAxis[i],this.yAxis[i+1]};
-
-			/* Only draw with pen down */
-			if (this.penPressure[i] != 0 && (getPointAngle(tmpX, tmpY) >= 70) ) {
-				g2.draw(new Line2D.Float(this.xAxis[i], this.yAxis[i], this.xAxis[i + 1], this.yAxis[i + 1]));
-			}
-		}
-
-		g2.setColor(new Color(242,89,85));
-
-		for (int i = 0; i < this.timeStamp - 1; i++) {
-			float[] tmpX = {this.xAxis[i],this.xAxis[i+1]};
-			float[] tmpY = {this.yAxis[i],this.yAxis[i+1]};
-
-			/* Only draw with pen down */
-			if (this.penPressure[i] != 0 && (getPointAngle(tmpX, tmpY) > 15 && getPointAngle(tmpX,tmpY) < 70) ) {
-				g2.draw(new Line2D.Float(this.xAxis[i], this.yAxis[i], this.xAxis[i + 1], this.yAxis[i + 1]));
-			}
-		}
-		
-
-		//markPenoff(g2);
-
-		/* Figure vertex point marking */
-		g2.setColor(new Color(255, 81, 81));
-		g2.fillOval((int) min(this.xAxis), (int) min(this.yAxis), 20, 20);
-		g2.setColor(new Color(96, 175, 240));
-		g2.fillOval((int) min(this.xAxis), (int) max(this.yAxis), 20, 20);
-		g2.setColor(new Color(188, 235, 101));
-		g2.fillOval((int) max(this.xAxis), (int) min(this.yAxis), 20, 20);
-		g2.setColor(new Color(248, 193, 154));
-		g2.fillOval((int) max(this.xAxis), (int) max(this.yAxis), 20, 20);
-	}
-
-	public Color randomColor() {
-		Random rand = new Random();
-		Color c = new Color(rand.nextFloat(), rand.nextFloat(), rand.nextFloat());
-		return c;
-	}
-
-	public float min(float[] arr) {
-		float minNum = 500000;
-
-		for (int i = 0; i < arr.length; i++) {
-			if (arr[i] < minNum && this.penPressure[i] != 0)
-				minNum = arr[i];
-		}
-
-		return minNum;
-	}
-
-	public float max(float[] arr) {
-		float maxNum = 0;
-
-		for (int i = 0; i < arr.length; i++) {
-			if (arr[i] > maxNum && this.penPressure[i] != 0)
-				maxNum = arr[i];
-		}
-
-		return maxNum;
-	}
-
-	public double getDistanceBetweenPoints(float[] x, float[] y) {
-		return Math.sqrt((x[0] - x[1]) * (x[0] - x[1]) + (y[0] - y[1]) * (y[0] - y[1]));
-	}
-
-	public double getPointAngle(float[] x, float[] y) {
-		double angle = 0;
-		if (x[1] != x[0] && y[1] != y[0]) {
-			angle = Math.toDegrees(Math.atan2(Math.abs(y[1] - y[0]), Math.abs(x[1] - x[0])));
-		} else if (y[1] == y[0]) {
-			angle = 0;
-		} else if (x[1] == x[0]) {
-			angle = 90;
-		}
-
-		return angle;
-	}
-
-	public double getTotalLength() {
-		double totalLength = 0;
-		for (int i = 0; i < this.timeStamp - 1; i++) {
-			if (this.penPressure[i] != 0) {
-				float[] tmpX = { this.xAxis[i], this.xAxis[i + 1] };
-				float[] tmpY = { this.yAxis[i], this.yAxis[i + 1] };
-				totalLength += getDistanceBetweenPoints(tmpX, tmpY);
-			}
-		}
-
-		return totalLength;
-	}
-
-	public double[] getSize() {
-		double[] size = new double[2];
-		double horiDiff = (max(this.xAxis) - min(this.xAxis));
-		double vertDiff = (max(this.yAxis) - min(this.yAxis));
-		size[0] = horiDiff;
-		size[1] = vertDiff;
-		return size;
-	}
-
-	public double getStandardDeviation(double[] arr) {
-		double tmpAvg = getAvg(arr);
-
-		double tmpTotal = 0;
-		for (int i = 0; i < arr.length; i++) {
-			tmpTotal += Math.pow((arr[i] - tmpAvg), 2);
-		}
-		tmpTotal /= arr.length;
-
-		return Math.sqrt(tmpTotal / arr.length);
-	}
-
-	public double getAvg(double[] arr) {
-		double tmpAvg = 0;
-		for (int i = 0; i < arr.length; i++) {
-			tmpAvg += arr[i];
-		}
-
-		return tmpAvg / arr.length;
-	}
-
-	public double getAngleSD() {
-		double sampleRate = 25;
-		double[] angle = new double[(int) (this.timeStamp / sampleRate)];
-		double tmpAngle = 0;
-		int k = 0;
-
-		for (int i = 0; i < angle.length; i++) {
-			tmpAngle = 0;
-			for (int j = 0; j < sampleRate; j++) {
-				float[] tmpX = { this.xAxis[k], this.xAxis[k + 1] };
-				float[] tmpY = { this.yAxis[k], this.yAxis[k + 1] };
-				tmpAngle += getPointAngle(tmpX, tmpY);
-				if(k >= this.timeStamp-2)
-					break;
-				k++;
-			}
-			tmpAngle /= sampleRate;
-
-			angle[i] = tmpAngle;
-			if(k >= this.timeStamp-2)
-				break;
-		}
-
-		return getStandardDeviation(angle);
-
-	}
-
-	public double getVelocitySD() {
-		double sampleRate = 25;
-		double[] distance = new double[(int) (this.timeStamp / sampleRate)];
-		double tmpDistance = 0;
-		int k = 0;
-
-		for (int i = 0; i < distance.length; i++) {
-			tmpDistance = 0;
-			for (int j = 0; j < sampleRate; j++) {
-				float[] tmpX = { this.xAxis[k], this.xAxis[k + 1] };
-				float[] tmpY = { this.yAxis[k], this.yAxis[k + 1] };
-				tmpDistance += getDistanceBetweenPoints(tmpX, tmpY);
-				if(k >= this.timeStamp-2)
-					break;
-				k++;
-			}
-
-			distance[i] = tmpDistance;
-			if(k >= this.timeStamp-2)
-				break;
-		}
-
-		return getStandardDeviation(distance);
-
-	}
-
-	public double penoffCount(){
-		double hesitate = 0;
-		for(int i = 0; i < this.timeStamp-1; i++){
-			if(this.penPressure[i] == 0)
-				hesitate++;
-		}
-
-		return hesitate;
-	}
-
-	public void markPenoff(Graphics2D g2){
-		Color c = new Color(255,255,255);
-		g2.setColor(c);
-		for(int i = 0; i < this.timeStamp-1; i++){
-			if(this.penPressure[i] == 0){
-				g2.fillOval((int)this.xAxis[i], (int)this.yAxis[i],2,2);
-			}
-		}
-	}
-
-	public int linearSearch(float[] arr, float entity){
-		int i = 0;
-		int found = 0;
-		while(i < arr.length && found == 0){
-			if(entity == arr[i])
-				found = 1;
-			i++;
-		}
-
-		return i;
-	}
-
-	public void plotTilt(Graphics2D g2) {
-		Color c = new Color(234, 234, 234);
-		g2.setColor(c);
-		g2.setFont(new Font("Inconsolata", Font.PLAIN, 20));
-
-		String group, id, mode;
-
-		try {
-			group = this.data.split("/")[this.data.split("/").length - 2];
-			id = this.data.split("/")[this.data.split("/").length - 1].split("_")[1];
-			mode = getFigureMode();
-		} catch (ArrayIndexOutOfBoundsException e) {
-			group = "Unknown";
-			id = "Unknown";
-			mode = "Unknown";
-		}
-
-		g2.drawString("Group: " + group, 30, 40);
-		g2.drawString("ID:    " + id, 30, 65);
-		g2.drawString("Mode:  " + mode, 30, 90);
-
-		float[] tmpX = new float[this.timeStamp];
-		float[] tmpY = new float[this.timeStamp];
-
-		for (int i = 0; i < this.timeStamp; i++) {
-			tmpX[i] = this.xTilt[i];
-			tmpY[i] = this.yTilt[i];
-
-		}
-
-		for (int i = 0; i < this.timeStamp; i++) {
-			if (this.penPressure[i] != 0) {
-				tmpX[i] *= -1;
-				tmpY[i] *= -1;
-			}
-		}
-
-		for (int i = 0; i < this.timeStamp; i++) {
-			if (this.penPressure[i] != 0) {
-				tmpX[i] -= min(tmpX);
-				tmpY[i] -= min(tmpY);
-			}
-		}
-
-		if (max(tmpX) > 1280) {
-			float coef = max(tmpX) / 1280;
-			for (int i = 0; i < this.timeStamp; i++) {
-				tmpX[i] /= coef;
-			}
-		}
-
-		if (max(tmpY) > 1280) {
-			float coef = max(tmpY) / 1280;
-			for (int i = 0; i < this.timeStamp; i++) {
-				tmpY[i] /= coef;
-			}
-		}
-
-		int xCounter = 0;
-		int incre = 1;
-		for (int i = 0; i < this.timeStamp - 1; i++) {
-			if (this.penPressure[i] != 0) {
-				c = new Color(234, 234, 234);
-				g2.setColor(c);
-				g2.draw(new Line2D.Float(xCounter, tmpX[i], xCounter + incre, tmpX[i + 1]));
-				c = new Color(0, 167, 246);
-				g2.setColor(c);
-				g2.draw(new Line2D.Float(xCounter, tmpY[i], xCounter + incre, tmpY[i + 1]));
-				xCounter++;
-			}
-		}
-
-	}
-
 }
