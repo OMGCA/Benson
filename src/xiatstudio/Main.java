@@ -305,17 +305,19 @@ public class Main extends JFrame {
 		try {
 			writer = new FileWriter(fileName, true);
 			String[] title = { "Subject ID", "Mode", "Total time", "Total length", "Size", "Aspect Ratio",
-					"Velocity Stability", "Angular Stability", "Pen Off %" };
+					"Velocity Stability", "Angular Stability", "Pen Off %","Hori Portion","Vert Portion","Obli Portion" };
 			writeData(writer, title);
 			writer.append("\r\n");
 
 			for (int i = 0; i < dataList.length; i++) {
 
 				Benson b = new Benson(dataList[i].replace("\\", "/"));
+				b.calcThreeLength();
 				String[] dataPending = { b.getID(), b.getFigureMode(), String.valueOf(b.timeSpent),
 						String.valueOf(b.getTotalLength()), String.valueOf(b.getSize()[0] * b.getSize()[1]),
 						String.valueOf((double) (b.getSize()[0] / b.getSize()[1])), String.valueOf(b.getVelocitySD()),
-						String.valueOf(b.getAngleSD()), String.valueOf(b.penoffCount() / (b.getTimeStamp() + 1)) };
+						String.valueOf(b.getAngleSD()), String.valueOf(b.penoffCount() / (b.getTimeStamp() + 1)),
+						String.valueOf((double)(b.getHoriPortion())),String.valueOf((double)b.getVertPortion()), String.valueOf((double)b.getObliPortion()  )};
 
 				System.out.println("Exporting data from " + b.getID() + "_" + b.getFigureMode());
 
