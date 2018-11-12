@@ -354,15 +354,12 @@ public class Benson {
 			if (tmpAngle <= angleRange[0]) {
 				g2.setColor(new Color(0, 167, 246));
 				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
-				this.horiLength += getDistanceBetweenPoints(tmpX, tmpY);
 			} else if (tmpAngle >= angleRange[1]) {
 				g2.setColor(new Color(88, 200, 21));
 				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
-				this.vertLength += getDistanceBetweenPoints(tmpX, tmpY);
 			} else if (tmpAngle > angleRange[0] && tmpAngle < angleRange[1]) {
 				g2.setColor(new Color(242, 89, 85));
 				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
-				this.obliLength += getDistanceBetweenPoints(tmpX, tmpY);
 			}
 		} else if (mode == 1) {
 			if (tmpAngle <= angleRange[0]) {
