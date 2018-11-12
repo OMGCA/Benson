@@ -302,7 +302,7 @@ public class Benson {
 
 	public void drawMode(Graphics2D g2, int mode, float[] tmpX, float[] tmpY){
 		double tmpAngle = getPointAngle(tmpX, tmpY);
-		double angleRange[] = {15,60};
+		double angleRange[] = {10,65};
 		if(mode == 0){
 			if(tmpAngle <= angleRange[0]){
 				g2.setColor(new Color(0, 167, 246));
