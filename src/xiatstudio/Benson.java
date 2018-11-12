@@ -283,17 +283,18 @@ public class Benson {
 		for (int i = 0; i < this.timeStamp - tickJump; i++){
 			float[] tmpX = { this.xAxis[i], this.xAxis[i + tickJump] };
 			float[] tmpY = { this.yAxis[i], this.yAxis[i + tickJump] };
+			double tmpAngle = getPointAngle(tmpX, tmpY);
 			
 			if(this.penPressure[i] != 0){
-				if(getPointAngle(tmpX, tmpY) <= angleRange[0]){
+				if(tmpAngle <= angleRange[0]){
 					g2.setColor(new Color(0, 167, 246));
 					g2.draw(new Line2D.Float(this.xAxis[i], this.yAxis[i], this.xAxis[i + 1], this.yAxis[i + 1]));
 				}
-				else if (getPointAngle(tmpX, tmpY) >= angleRange[1]){
+				else if (tmpAngle >= angleRange[1]){
 					g2.setColor(new Color(88,200,21));
 					g2.draw(new Line2D.Float(this.xAxis[i], this.yAxis[i], this.xAxis[i + 1], this.yAxis[i + 1]));
 				}
-				else if (getPointAngle(tmpX, tmpY) > angleRange[0] && getPointAngle(tmpX,tmpY) < angleRange[1]){
+				else if (tmpAngle > angleRange[0] && tmpAngle < angleRange[1]){
 					g2.setColor(new Color(242, 89, 85));
 					g2.draw(new Line2D.Float(this.xAxis[i], this.yAxis[i], this.xAxis[i + 1], this.yAxis[i + 1]));
 				}
