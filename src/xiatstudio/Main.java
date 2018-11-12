@@ -396,22 +396,4 @@ public class Main extends JFrame {
 			testFigure.drawBenson(g2, displayMode);
 		}
 	}
-
-	public static class TPanel extends JPanel {
-		public void Panel() {
-			super.setPreferredSize(new Dimension(1280, 720));
-		}
-
-		@Override
-		public void paintComponent(Graphics g) {
-			super.paintComponent(g);
-			Graphics2D g2 = (Graphics2D) g;
-
-			RenderingHints hints = new RenderingHints(RenderingHints.KEY_ANTIALIASING,
-					RenderingHints.VALUE_ANTIALIAS_ON);
-
-			g2.setRenderingHints(hints);
-			Benson testFigure = new Benson(data);
-		}
-	}
 }
