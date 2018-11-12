@@ -11,10 +11,10 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
 import xiatstudio.Component;
+
 
 public class Benson {
 	float[] xAxis;
@@ -40,7 +40,7 @@ public class Benson {
 
 		initData();
 		positionCentre();
-		registerComponents();
+		//registerComponents();
 	}
 
 	public int fetchTimeStamp(String data) {
@@ -225,7 +225,7 @@ public class Benson {
 		return newPos;
 	}
 
-	public void drawBenson(Graphics2D g2) {
+	public void drawBenson(Graphics2D g2, int displayMode){
 		/* Set stroke */
 		g2.setStroke(new BasicStroke(3));
 		/* Text color */
@@ -248,6 +248,7 @@ public class Benson {
 		g2.drawString("Length: " + getTotalLength(), 30, 215);
 		g2.drawString("Size: " + (int) getSize()[0] + " x " + (int) getSize()[1], 30, 240);
 		g2.drawString("Pen Off: " + penoffCount() * 100 / (this.timeStamp + 1) + " %", 30, 265);
+		
 
 		g2.setFont(new Font("Inconsolata", Font.PLAIN, 15));
 
@@ -279,30 +280,14 @@ public class Benson {
 		 */
 
 		int tickJump = 1;
-		int angleRange[] = {15,70};
 		for (int i = 0; i < this.timeStamp - tickJump; i++){
 			float[] tmpX = { this.xAxis[i], this.xAxis[i + tickJump] };
 			float[] tmpY = { this.yAxis[i], this.yAxis[i + tickJump] };
-			double tmpAngle = getPointAngle(tmpX, tmpY);
-			
 			if(this.penPressure[i] != 0){
-				if(tmpAngle <= angleRange[0]){
-					g2.setColor(new Color(0, 167, 246));
-					g2.draw(new Line2D.Float(this.xAxis[i], this.yAxis[i], this.xAxis[i + 1], this.yAxis[i + 1]));
-				}
-				else if (tmpAngle >= angleRange[1]){
-					g2.setColor(new Color(88,200,21));
-					g2.draw(new Line2D.Float(this.xAxis[i], this.yAxis[i], this.xAxis[i + 1], this.yAxis[i + 1]));
-				}
-				else if (tmpAngle > angleRange[0] && tmpAngle < angleRange[1]){
-					g2.setColor(new Color(242, 89, 85));
-					g2.draw(new Line2D.Float(this.xAxis[i], this.yAxis[i], this.xAxis[i + 1], this.yAxis[i + 1]));
-				}
+				drawMode(g2,displayMode,tmpX,tmpY);
 			}
-		}
-	
 
-		// markPenoff(g2);
+		}
 
 		/* Figure vertex point marking */
 		g2.setColor(new Color(255, 81, 81));
@@ -313,6 +298,46 @@ public class Benson {
 		g2.fillOval((int) max(this.xAxis), (int) min(this.yAxis), 20, 20);
 		g2.setColor(new Color(248, 193, 154));
 		g2.fillOval((int) max(this.xAxis), (int) max(this.yAxis), 20, 20);
+	}
+
+	public void drawMode(Graphics2D g2, int mode, float[] tmpX, float[] tmpY){
+		double tmpAngle = getPointAngle(tmpX, tmpY);
+		double angleRange[] = {15,60};
+		if(mode == 0){
+			if(tmpAngle <= angleRange[0]){
+				g2.setColor(new Color(0, 167, 246));
+				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
+			}
+			else if (tmpAngle >= angleRange[1]){
+				g2.setColor(new Color(88,200,21));
+				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
+			}
+			else if (tmpAngle > angleRange[0] && tmpAngle < angleRange[1]){
+				g2.setColor(new Color(242, 89, 85));
+				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
+			}
+		}
+		else if (mode == 1){
+			if(tmpAngle <= angleRange[0]){
+				g2.setColor(new Color(0, 167, 246));
+				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
+			}
+		}
+		else if (mode == 2){
+			if (tmpAngle >= angleRange[1]){
+				g2.setColor(new Color(88,200,21));
+				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
+			}
+		}
+		else if (mode == 3){
+			if (tmpAngle > angleRange[0] && tmpAngle < angleRange[1]){
+				g2.setColor(new Color(242, 89, 85));
+				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
+			}
+		}
+		else if (mode == 4){
+			markPenoff(g2);
+		}
 	}
 
 	public Color randomColor() {
