@@ -181,34 +181,32 @@ public class Benson {
 
 	/* Get drawing mode from data file name */
 	public String getFigureMode() {
-		try{
+		try {
 			if (this.data.split("/")[this.data.split("/").length - 1].split("_")[2].contains("copy"))
 				return "Copy";
 			else
 				return "Recall";
-		} catch (ArrayIndexOutOfBoundsException e){
+		} catch (ArrayIndexOutOfBoundsException e) {
 			return "Unknown";
 		}
-		
+
 	}
 
-	public String getGroup(){
-		try{
+	public String getGroup() {
+		try {
 			return this.data.split("/")[this.data.split("/").length - 2];
-		} catch (ArrayIndexOutOfBoundsException e){
+		} catch (ArrayIndexOutOfBoundsException e) {
 			return "Unknown";
 		}
 	}
 
-	public String getID(){
-		try{
+	public String getID() {
+		try {
 			return this.data.split("/")[this.data.split("/").length - 1].split("_")[1];
-		} catch (ArrayIndexOutOfBoundsException e){
+		} catch (ArrayIndexOutOfBoundsException e) {
 			return "Unknown";
 		}
 	}
-
-
 
 	public void markComponent(Component c, Graphics2D g2) {
 		int[] centre = { 640, 360 };
@@ -239,8 +237,7 @@ public class Benson {
 		group = getGroup();
 		id = getID();
 		mode = getFigureMode();
-		
-		
+
 		g2.drawString("Group: " + group, 30, 40);
 		g2.drawString("ID:    " + id, 30, 65);
 		g2.drawString("Mode:  " + mode, 30, 90);
@@ -249,8 +246,8 @@ public class Benson {
 		g2.drawString("Velocity Stability: " + getVelocitySD(), 30, 165);
 		g2.drawString("Angle Stability: " + getAngleSD(), 30, 190);
 		g2.drawString("Length: " + getTotalLength(), 30, 215);
-		g2.drawString("Size: " + (int)getSize()[0] + " x " + (int)getSize()[1], 30, 240);
-		g2.drawString("Pen Off: " + penoffCount()*100/(this.timeStamp+1) + " %",30,265);
+		g2.drawString("Size: " + (int) getSize()[0] + " x " + (int) getSize()[1], 30, 240);
+		g2.drawString("Pen Off: " + penoffCount() * 100 / (this.timeStamp + 1) + " %", 30, 265);
 
 		g2.setFont(new Font("Inconsolata", Font.PLAIN, 15));
 
@@ -266,62 +263,45 @@ public class Benson {
 		c = new Color(0, 167, 246);
 		g2.setColor(c);
 
-		
 		/* Drawing loop */
 		/*
-		for (int i = 0; i < this.timeStamp - 1; i++) {
-			float[] tmpX = {this.xAxis[i],this.xAxis[i+1]};
-			float[] tmpY = {this.yAxis[i],this.yAxis[i+1]};
+		 * for (int i = 0; i < this.timeStamp - 1; i++) { float[] tmpX =
+		 * {this.xAxis[i],this.xAxis[i+1]}; float[] tmpY =
+		 * {this.yAxis[i],this.yAxis[i+1]};
+		 * 
+		 * // Only draw with pen down if (this.penPressure[i] != 0 &&
+		 * (getPointAngle(tmpX, tmpY) < 15) ) { g2.draw(new Line2D.Float(this.xAxis[i],
+		 * this.yAxis[i], this.xAxis[i + 1], this.yAxis[i + 1])); } // Change color when
+		 * pen up else if (this.penPressure[i] == 0) { c = randomColor();
+		 * g2.setColor(c); }
+		 * 
+		 * }
+		 */
 
-			// Only draw with pen down 
-			if (this.penPressure[i] != 0 && (getPointAngle(tmpX, tmpY) < 15) ) {
-				g2.draw(new Line2D.Float(this.xAxis[i], this.yAxis[i], this.xAxis[i + 1], this.yAxis[i + 1]));
-			}
-			// Change color when pen up 
-			else if (this.penPressure[i] == 0) {
-				c = randomColor();
-				g2.setColor(c);
-			}
-
-		} */
-
-		//Angle based plotting
-		for (int i = 0; i < this.timeStamp - 1; i++) {
-			float[] tmpX = {this.xAxis[i],this.xAxis[i+1]};
-			float[] tmpY = {this.yAxis[i],this.yAxis[i+1]};
-
-			/* Only draw with pen down */
-			if (this.penPressure[i] != 0 && (getPointAngle(tmpX, tmpY) <= 15) ) {
-				g2.draw(new Line2D.Float(this.xAxis[i], this.yAxis[i], this.xAxis[i + 1], this.yAxis[i + 1]));
-			}
-		}
-
-		g2.setColor(new Color(88,200,21));
-
-		for (int i = 0; i < this.timeStamp - 1; i++) {
-			float[] tmpX = {this.xAxis[i],this.xAxis[i+1]};
-			float[] tmpY = {this.yAxis[i],this.yAxis[i+1]};
-
-			/* Only draw with pen down */
-			if (this.penPressure[i] != 0 && (getPointAngle(tmpX, tmpY) >= 70) ) {
-				g2.draw(new Line2D.Float(this.xAxis[i], this.yAxis[i], this.xAxis[i + 1], this.yAxis[i + 1]));
+		int tickJump = 1;
+		int angleRange[] = {15,70};
+		for (int i = 0; i < this.timeStamp - tickJump; i++){
+			float[] tmpX = { this.xAxis[i], this.xAxis[i + tickJump] };
+			float[] tmpY = { this.yAxis[i], this.yAxis[i + tickJump] };
+			
+			if(this.penPressure[i] != 0){
+				if(getPointAngle(tmpX, tmpY) <= angleRange[0]){
+					g2.setColor(new Color(0, 167, 246));
+					g2.draw(new Line2D.Float(this.xAxis[i], this.yAxis[i], this.xAxis[i + 1], this.yAxis[i + 1]));
+				}
+				else if (getPointAngle(tmpX, tmpY) >= angleRange[1]){
+					g2.setColor(new Color(88,200,21));
+					g2.draw(new Line2D.Float(this.xAxis[i], this.yAxis[i], this.xAxis[i + 1], this.yAxis[i + 1]));
+				}
+				else if (getPointAngle(tmpX, tmpY) > angleRange[0] && getPointAngle(tmpX,tmpY) < angleRange[1]){
+					g2.setColor(new Color(242, 89, 85));
+					g2.draw(new Line2D.Float(this.xAxis[i], this.yAxis[i], this.xAxis[i + 1], this.yAxis[i + 1]));
+				}
 			}
 		}
+	
 
-		g2.setColor(new Color(242,89,85));
-
-		for (int i = 0; i < this.timeStamp - 1; i++) {
-			float[] tmpX = {this.xAxis[i],this.xAxis[i+1]};
-			float[] tmpY = {this.yAxis[i],this.yAxis[i+1]};
-
-			/* Only draw with pen down */
-			if (this.penPressure[i] != 0 && (getPointAngle(tmpX, tmpY) > 15 && getPointAngle(tmpX,tmpY) < 70) ) {
-				g2.draw(new Line2D.Float(this.xAxis[i], this.yAxis[i], this.xAxis[i + 1], this.yAxis[i + 1]));
-			}
-		}
-		
-
-		//markPenoff(g2);
+		// markPenoff(g2);
 
 		/* Figure vertex point marking */
 		g2.setColor(new Color(255, 81, 81));
@@ -434,14 +414,14 @@ public class Benson {
 				float[] tmpX = { this.xAxis[k], this.xAxis[k + 1] };
 				float[] tmpY = { this.yAxis[k], this.yAxis[k + 1] };
 				tmpAngle += getPointAngle(tmpX, tmpY);
-				if(k >= this.timeStamp-2)
+				if (k >= this.timeStamp - 2)
 					break;
 				k++;
 			}
 			tmpAngle /= sampleRate;
 
 			angle[i] = tmpAngle;
-			if(k >= this.timeStamp-2)
+			if (k >= this.timeStamp - 2)
 				break;
 		}
 
@@ -461,13 +441,13 @@ public class Benson {
 				float[] tmpX = { this.xAxis[k], this.xAxis[k + 1] };
 				float[] tmpY = { this.yAxis[k], this.yAxis[k + 1] };
 				tmpDistance += getDistanceBetweenPoints(tmpX, tmpY);
-				if(k >= this.timeStamp-2)
+				if (k >= this.timeStamp - 2)
 					break;
 				k++;
 			}
 
 			distance[i] = tmpDistance;
-			if(k >= this.timeStamp-2)
+			if (k >= this.timeStamp - 2)
 				break;
 		}
 
@@ -475,31 +455,31 @@ public class Benson {
 
 	}
 
-	public double penoffCount(){
+	public double penoffCount() {
 		double hesitate = 0;
-		for(int i = 0; i < this.timeStamp-1; i++){
-			if(this.penPressure[i] == 0)
+		for (int i = 0; i < this.timeStamp - 1; i++) {
+			if (this.penPressure[i] == 0)
 				hesitate++;
 		}
 
 		return hesitate;
 	}
 
-	public void markPenoff(Graphics2D g2){
-		Color c = new Color(255,255,255);
+	public void markPenoff(Graphics2D g2) {
+		Color c = new Color(255, 255, 255);
 		g2.setColor(c);
-		for(int i = 0; i < this.timeStamp-1; i++){
-			if(this.penPressure[i] == 0){
-				g2.fillOval((int)this.xAxis[i], (int)this.yAxis[i],2,2);
+		for (int i = 0; i < this.timeStamp - 1; i++) {
+			if (this.penPressure[i] == 0) {
+				g2.fillOval((int) this.xAxis[i], (int) this.yAxis[i], 2, 2);
 			}
 		}
 	}
 
-	public int linearSearch(float[] arr, float entity){
+	public int linearSearch(float[] arr, float entity) {
 		int i = 0;
 		int found = 0;
-		while(i < arr.length && found == 0){
-			if(entity == arr[i])
+		while (i < arr.length && found == 0) {
+			if (entity == arr[i])
 				found = 1;
 			i++;
 		}
