@@ -15,13 +15,15 @@ import java.util.Random;
 
 import xiatstudio.Component;
 
-
 public class Benson {
 	float[] xAxis;
 	float[] yAxis;
 	float[] xTilt;
 	float[] yTilt;
 	float[] penPressure;
+	double horiLength;
+	double vertLength;
+	double obliLength;
 	float timeSpent;
 	int timeStamp;
 	String data;
@@ -34,13 +36,16 @@ public class Benson {
 		this.yAxis = new float[timeStamp];
 		this.xTilt = new float[timeStamp];
 		this.yTilt = new float[timeStamp];
+		this.horiLength = 0;
+		this.vertLength = 0;
+		this.obliLength = 0;
 		this.timeSpent = 0;
 		this.penPressure = new float[timeStamp];
 		this.components = new ArrayList<Component>();
 
 		initData();
 		positionCentre();
-		//registerComponents();
+		// registerComponents();
 	}
 
 	public int fetchTimeStamp(String data) {
@@ -208,6 +213,30 @@ public class Benson {
 		}
 	}
 
+	public double getHoriLength() {
+		return this.horiLength;
+	}
+
+	public double getVertLength() {
+		return this.vertLength;
+	}
+
+	public double getObliLength() {
+		return this.obliLength;
+	}
+
+	public double getHoriPortion() {
+		return this.horiLength / getTotalLength();
+	}
+
+	public double getVertPortion() {
+		return this.vertLength / getTotalLength();
+	}
+
+	public double getObliPortion() {
+		return this.obliLength / getTotalLength();
+	}
+
 	public void markComponent(Component c, Graphics2D g2) {
 		int[] centre = { 640, 360 };
 		int[] compAvgPos = c.getAvgPos();
@@ -225,7 +254,7 @@ public class Benson {
 		return newPos;
 	}
 
-	public void drawBenson(Graphics2D g2, int displayMode){
+	public void drawBenson(Graphics2D g2, int displayMode) {
 		/* Set stroke */
 		g2.setStroke(new BasicStroke(3));
 		/* Text color */
@@ -248,7 +277,6 @@ public class Benson {
 		g2.drawString("Length: " + getTotalLength(), 30, 215);
 		g2.drawString("Size: " + (int) getSize()[0] + " x " + (int) getSize()[1], 30, 240);
 		g2.drawString("Pen Off: " + penoffCount() * 100 / (this.timeStamp + 1) + " %", 30, 265);
-		
 
 		g2.setFont(new Font("Inconsolata", Font.PLAIN, 15));
 
@@ -280,11 +308,11 @@ public class Benson {
 		 */
 
 		int tickJump = 1;
-		for (int i = 0; i < this.timeStamp - tickJump; i++){
+		for (int i = 0; i < this.timeStamp - tickJump; i++) {
 			float[] tmpX = { this.xAxis[i], this.xAxis[i + tickJump] };
 			float[] tmpY = { this.yAxis[i], this.yAxis[i + tickJump] };
-			if(this.penPressure[i] != 0){
-				drawMode(g2,displayMode,tmpX,tmpY);
+			if (this.penPressure[i] != 0) {
+				drawMode(g2, displayMode, tmpX, tmpY);
 			}
 
 		}
@@ -300,42 +328,58 @@ public class Benson {
 		g2.fillOval((int) max(this.xAxis), (int) max(this.yAxis), 20, 20);
 	}
 
-	public void drawMode(Graphics2D g2, int mode, float[] tmpX, float[] tmpY){
+	public void calcThreeLength() {
+		for (int i = 0; i < this.timeStamp-1; i++) {
+			float[] tmpX = { this.xAxis[i], this.xAxis[i + 1] };
+			float[] tmpY = { this.yAxis[i], this.yAxis[i + 1] };
+
+			double tmpAngle = getPointAngle(tmpX, tmpY);
+			double angleRange[] = { 13, 65 };
+
+			if (this.penPressure[i] != 0) {
+				if (tmpAngle <= angleRange[0])
+					this.horiLength += getDistanceBetweenPoints(tmpX, tmpY);
+				else if (tmpAngle >= angleRange[1])
+					this.vertLength += getDistanceBetweenPoints(tmpX, tmpY);
+				else if (tmpAngle > angleRange[0] && tmpAngle < angleRange[1])
+					this.obliLength += getDistanceBetweenPoints(tmpX, tmpY);
+			}
+		}
+	}
+
+	public void drawMode(Graphics2D g2, int mode, float[] tmpX, float[] tmpY) {
 		double tmpAngle = getPointAngle(tmpX, tmpY);
-		double angleRange[] = {10,65};
-		if(mode == 0){
-			if(tmpAngle <= angleRange[0]){
+		double angleRange[] = { 13, 65 };
+		if (mode == 0) {
+			if (tmpAngle <= angleRange[0]) {
+				g2.setColor(new Color(0, 167, 246));
+				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
+				this.horiLength += getDistanceBetweenPoints(tmpX, tmpY);
+			} else if (tmpAngle >= angleRange[1]) {
+				g2.setColor(new Color(88, 200, 21));
+				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
+				this.vertLength += getDistanceBetweenPoints(tmpX, tmpY);
+			} else if (tmpAngle > angleRange[0] && tmpAngle < angleRange[1]) {
+				g2.setColor(new Color(242, 89, 85));
+				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
+				this.obliLength += getDistanceBetweenPoints(tmpX, tmpY);
+			}
+		} else if (mode == 1) {
+			if (tmpAngle <= angleRange[0]) {
 				g2.setColor(new Color(0, 167, 246));
 				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
 			}
-			else if (tmpAngle >= angleRange[1]){
-				g2.setColor(new Color(88,200,21));
+		} else if (mode == 2) {
+			if (tmpAngle >= angleRange[1]) {
+				g2.setColor(new Color(88, 200, 21));
 				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
 			}
-			else if (tmpAngle > angleRange[0] && tmpAngle < angleRange[1]){
+		} else if (mode == 3) {
+			if (tmpAngle > angleRange[0] && tmpAngle < angleRange[1]) {
 				g2.setColor(new Color(242, 89, 85));
 				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
 			}
-		}
-		else if (mode == 1){
-			if(tmpAngle <= angleRange[0]){
-				g2.setColor(new Color(0, 167, 246));
-				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
-			}
-		}
-		else if (mode == 2){
-			if (tmpAngle >= angleRange[1]){
-				g2.setColor(new Color(88,200,21));
-				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
-			}
-		}
-		else if (mode == 3){
-			if (tmpAngle > angleRange[0] && tmpAngle < angleRange[1]){
-				g2.setColor(new Color(242, 89, 85));
-				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
-			}
-		}
-		else if (mode == 4){
+		} else if (mode == 4) {
 			markPenoff(g2);
 		}
 	}
