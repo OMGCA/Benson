@@ -10,7 +10,9 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 
 import xiatstudio.Component;
@@ -256,7 +258,7 @@ public class Benson {
 
 	public void drawBenson(Graphics2D g2, int displayMode) {
 		/* Set stroke */
-		g2.setStroke(new BasicStroke(3));
+		g2.setStroke(new BasicStroke(4));
 		/* Text color */
 		Color c = new Color(234, 234, 234);
 		g2.setColor(c);
@@ -329,7 +331,7 @@ public class Benson {
 	}
 
 	public void calcThreeLength() {
-		for (int i = 0; i < this.timeStamp-1; i++) {
+		for (int i = 0; i < this.timeStamp - 1; i++) {
 			float[] tmpX = { this.xAxis[i], this.xAxis[i + 1] };
 			float[] tmpY = { this.yAxis[i], this.yAxis[i + 1] };
 
@@ -347,10 +349,10 @@ public class Benson {
 		}
 	}
 
-	public float[] resizeFloatArr(float[] arr, int newSize){
+	public float[] resizeFloatArr(float[] arr, int newSize) {
 		float[] tmpArr = new float[newSize];
-		if(newSize < arr.length){
-			for(int i = 0 ; i < newSize; i++){
+		if (newSize < arr.length) {
+			for (int i = 0; i < newSize; i++) {
 				tmpArr[i] = arr[i];
 			}
 		}
@@ -358,7 +360,7 @@ public class Benson {
 		return arr;
 	}
 
-	public double[] getThreeSD(){
+	public double[] getThreeSD() {
 		float[] tmpHoriX = new float[20000];
 		float[] tmpHoriY = new float[20000];
 		float[] tmpVertX = new float[20000];
@@ -368,33 +370,34 @@ public class Benson {
 		int horiCounter = 0;
 		int vertCounter = 0;
 		int obliCounter = 0;
-		
-		for(int i = 0; i < this.timeStamp-1; i++){
+
+		for (int i = 0; i < this.timeStamp - 1; i++) {
 			float[] tmpX = { this.xAxis[i], this.xAxis[i + 1] };
 			float[] tmpY = { this.yAxis[i], this.yAxis[i + 1] };
 
 			double tmpAngle = getPointAngle(tmpX, tmpY);
-			double angleRange[] = { 13, 65 };
+			double angleRange[] = { 10, 65 };
 
 			if (this.penPressure[i] != 0) {
-				if (tmpAngle <= angleRange[0]){
+				if (tmpAngle <= angleRange[0]) {
 					tmpHoriX[horiCounter] = this.xAxis[i];
 					tmpHoriY[horiCounter] = this.yAxis[i];
 					horiCounter++;
+
 				}
-					
-				else if (tmpAngle >= angleRange[1]){
+
+				else if (tmpAngle >= angleRange[1]) {
 					tmpVertX[vertCounter] = this.xAxis[i];
 					tmpVertY[vertCounter] = this.yAxis[i];
 					vertCounter++;
 				}
 
-				else if (tmpAngle > angleRange[0] && tmpAngle < angleRange[1]){
+				else if (tmpAngle > angleRange[0] && tmpAngle < angleRange[1]) {
 					tmpObliX[obliCounter] = this.xAxis[i];
 					tmpObliY[obliCounter] = this.yAxis[i];
 					obliCounter++;
 				}
-					
+
 			}
 		}
 
@@ -409,27 +412,28 @@ public class Benson {
 		double[] vertAng = new double[vertCounter - 1];
 		double[] obliAng = new double[obliCounter - 1];
 
-		for(int i = 0 ; i < horiCounter-1; i++){
-			float[] tmpX = {newHoriX[i],newHoriX[i+1]};
-			float[] tmpY = {newHoriY[i],newHoriY[i+1]};
+		for (int i = 0; i < horiCounter - 1; i++) {
+			float[] tmpX = { newHoriX[i], newHoriX[i + 1] };
+			float[] tmpY = { newHoriY[i], newHoriY[i + 1] };
 
 			horiAng[i] = getPointAngle(tmpX, tmpY);
+
 		}
 
-		for(int i = 0 ; i < vertCounter-1; i++){
-			float[] tmpX = {newVertX[i],newVertX[i+1]};
-			float[] tmpY = {newVertY[i],newVertY[i+1]};
+		for (int i = 0; i < vertCounter - 1; i++) {
+			float[] tmpX = { newVertX[i], newVertX[i + 1] };
+			float[] tmpY = { newVertY[i], newVertY[i + 1] };
 
 			vertAng[i] = getPointAngle(tmpX, tmpY);
 		}
 
-		for(int i = 0 ; i < obliCounter-1; i++){
-			float[] tmpX = {newObliX[i],newObliX[i+1]};
-			float[] tmpY = {newObliY[i],newObliY[i+1]};
+		for (int i = 0; i < obliCounter - 1; i++) {
+			float[] tmpX = { newObliX[i], newObliX[i + 1] };
+			float[] tmpY = { newObliY[i], newObliY[i + 1] };
 
 			obliAng[i] = getPointAngle(tmpX, tmpY);
 		}
-		
+
 		double[] groupSD = new double[3];
 		groupSD[0] = getStandardDeviation(horiAng);
 		groupSD[1] = getStandardDeviation(vertAng);
@@ -441,36 +445,47 @@ public class Benson {
 
 	public void drawMode(Graphics2D g2, int mode, float[] tmpX, float[] tmpY) {
 		double tmpAngle = getPointAngle(tmpX, tmpY);
-		double angleRange[] = { 13, 65 };
+		double angleRange[] = { 10, 65 };
 		if (mode == 0) {
 			if (tmpAngle <= angleRange[0]) {
-				g2.setColor(new Color(0, 167, 246));
+				g2.setColor(new Color(87, 207, 244));
 				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
 			} else if (tmpAngle >= angleRange[1]) {
-				g2.setColor(new Color(88, 200, 21));
+				g2.setColor(new Color(200, 236, 89));
 				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
 			} else if (tmpAngle > angleRange[0] && tmpAngle < angleRange[1]) {
-				g2.setColor(new Color(242, 89, 85));
+				g2.setColor(new Color(218, 157, 223));
 				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
 			}
 		} else if (mode == 1) {
 			if (tmpAngle <= angleRange[0]) {
-				g2.setColor(new Color(0, 167, 246));
+				g2.setColor(new Color(87, 207, 244));
 				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
 			}
 		} else if (mode == 2) {
 			if (tmpAngle >= angleRange[1]) {
-				g2.setColor(new Color(88, 200, 21));
+				g2.setColor(new Color(200, 236, 89));
 				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
 			}
 		} else if (mode == 3) {
 			if (tmpAngle > angleRange[0] && tmpAngle < angleRange[1]) {
-				g2.setColor(new Color(242, 89, 85));
+				g2.setColor(new Color(218, 157, 223));
 				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
 			}
 		} else if (mode == 4) {
+			if (tmpAngle <= angleRange[0]) {
+				g2.setColor(new Color(87, 207, 244));
+				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
+			} else if (tmpAngle >= angleRange[1]) {
+				g2.setColor(new Color(200, 236, 89));
+				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
+			} else if (tmpAngle > angleRange[0] && tmpAngle < angleRange[1]) {
+				g2.setColor(new Color(218, 157, 223));
+				g2.draw(new Line2D.Float(tmpX[0], tmpY[0], tmpX[1], tmpY[1]));
+			}
 			markPenoff(g2);
-		}
+		} else if (mode == 5)
+			mode = 0;
 	}
 
 	public Color randomColor() {
@@ -585,7 +600,6 @@ public class Benson {
 		}
 
 		return getStandardDeviation(angle);
-
 	}
 
 	public double getVelocitySD() {
@@ -611,7 +625,6 @@ public class Benson {
 		}
 
 		return getStandardDeviation(distance);
-
 	}
 
 	public double penoffCount() {
@@ -625,7 +638,7 @@ public class Benson {
 	}
 
 	public void markPenoff(Graphics2D g2) {
-		Color c = new Color(255, 255, 255);
+		Color c = new Color(226, 226, 226);
 		g2.setColor(c);
 		for (int i = 0; i < this.timeStamp - 1; i++) {
 			if (this.penPressure[i] == 0) {
