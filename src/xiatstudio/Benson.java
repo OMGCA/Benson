@@ -347,6 +347,98 @@ public class Benson {
 		}
 	}
 
+	public float[] resizeFloatArr(float[] arr, int newSize){
+		float[] tmpArr = new float[newSize];
+		if(newSize < arr.length){
+			for(int i = 0 ; i < newSize; i++){
+				tmpArr[i] = arr[i];
+			}
+		}
+
+		return arr;
+	}
+
+	public double[] getThreeSD(){
+		float[] tmpHoriX = new float[20000];
+		float[] tmpHoriY = new float[20000];
+		float[] tmpVertX = new float[20000];
+		float[] tmpVertY = new float[20000];
+		float[] tmpObliX = new float[20000];
+		float[] tmpObliY = new float[20000];
+		int horiCounter = 0;
+		int vertCounter = 0;
+		int obliCounter = 0;
+		
+		for(int i = 0; i < this.timeStamp-1; i++){
+			float[] tmpX = { this.xAxis[i], this.xAxis[i + 1] };
+			float[] tmpY = { this.yAxis[i], this.yAxis[i + 1] };
+
+			double tmpAngle = getPointAngle(tmpX, tmpY);
+			double angleRange[] = { 13, 65 };
+
+			if (this.penPressure[i] != 0) {
+				if (tmpAngle <= angleRange[0]){
+					tmpHoriX[horiCounter] = this.xAxis[i];
+					tmpHoriY[horiCounter] = this.yAxis[i];
+					horiCounter++;
+				}
+					
+				else if (tmpAngle >= angleRange[1]){
+					tmpVertX[vertCounter] = this.xAxis[i];
+					tmpVertY[vertCounter] = this.yAxis[i];
+					vertCounter++;
+				}
+
+				else if (tmpAngle > angleRange[0] && tmpAngle < angleRange[1]){
+					tmpObliX[obliCounter] = this.xAxis[i];
+					tmpObliY[obliCounter] = this.yAxis[i];
+					obliCounter++;
+				}
+					
+			}
+		}
+
+		float[] newHoriX = resizeFloatArr(tmpHoriX, horiCounter);
+		float[] newHoriY = resizeFloatArr(tmpHoriY, horiCounter);
+		float[] newVertX = resizeFloatArr(tmpVertX, vertCounter);
+		float[] newVertY = resizeFloatArr(tmpVertY, vertCounter);
+		float[] newObliX = resizeFloatArr(tmpObliX, obliCounter);
+		float[] newObliY = resizeFloatArr(tmpObliY, obliCounter);
+
+		double[] horiAng = new double[horiCounter - 1];
+		double[] vertAng = new double[vertCounter - 1];
+		double[] obliAng = new double[obliCounter - 1];
+
+		for(int i = 0 ; i < horiCounter-1; i++){
+			float[] tmpX = {newHoriX[i],newHoriX[i+1]};
+			float[] tmpY = {newHoriY[i],newHoriY[i+1]};
+
+			horiAng[i] = getPointAngle(tmpX, tmpY);
+		}
+
+		for(int i = 0 ; i < vertCounter-1; i++){
+			float[] tmpX = {newVertX[i],newVertX[i+1]};
+			float[] tmpY = {newVertY[i],newVertY[i+1]};
+
+			vertAng[i] = getPointAngle(tmpX, tmpY);
+		}
+
+		for(int i = 0 ; i < obliCounter-1; i++){
+			float[] tmpX = {newObliX[i],newObliX[i+1]};
+			float[] tmpY = {newObliY[i],newObliY[i+1]};
+
+			obliAng[i] = getPointAngle(tmpX, tmpY);
+		}
+		
+		double[] groupSD = new double[3];
+		groupSD[0] = getStandardDeviation(horiAng);
+		groupSD[1] = getStandardDeviation(vertAng);
+		groupSD[2] = getStandardDeviation(obliAng);
+
+		return groupSD;
+
+	}
+
 	public void drawMode(Graphics2D g2, int mode, float[] tmpX, float[] tmpY) {
 		double tmpAngle = getPointAngle(tmpX, tmpY);
 		double angleRange[] = { 13, 65 };
