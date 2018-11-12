@@ -24,6 +24,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -97,7 +98,6 @@ public class Main extends JFrame {
 		panel = new GPanel();
 		frame.setJMenuBar(menuBar);
 		frame.add(panel);
-
 		frame.setTitle(data);
 		panel.setBackground(bg);
 		frame.setSize(1280, 720);
@@ -410,7 +410,6 @@ public class Main extends JFrame {
 
 			g2.setRenderingHints(hints);
 			Benson testFigure = new Benson(data);
-			testFigure.plotTilt(g2);
 		}
 	}
 }
