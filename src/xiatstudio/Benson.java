@@ -48,6 +48,7 @@ public class Benson {
 		initData();
 		positionCentre();
 		// registerComponents();
+		angleBasedCompoReg();
 	}
 
 	public int fetchTimeStamp(String data) {
@@ -308,7 +309,7 @@ public class Benson {
 		 * 
 		 * }
 		 */
-
+			/*
 		int tickJump = 1;
 		for (int i = 0; i < this.timeStamp - tickJump; i++) {
 			float[] tmpX = { this.xAxis[i], this.xAxis[i + tickJump] };
@@ -318,6 +319,10 @@ public class Benson {
 			}
 
 		}
+
+		*/
+
+		paintComponent(g2,displayMode);
 
 		/* Figure vertex point marking */
 		g2.setColor(new Color(255, 81, 81));
@@ -486,6 +491,115 @@ public class Benson {
 			markPenoff(g2);
 		} else if (mode == 5)
 			mode = 0;
+	}
+
+	public void angleBasedCompoReg(){
+		int compoGroup = 0;
+		int compoIndex = 0;
+		double[] angleRange = {10,65};
+
+		for(int i = 0; i < this.timeStamp - 1; i++){
+
+			if(this.penPressure[i] != 0){
+				float[] tmpX = {this.xAxis[i], this.xAxis[i+1]};
+				float[] tmpY = {this.yAxis[i], this.yAxis[i+1]};
+				double tmpAngle = getPointAngle(tmpX, tmpY);
+				if (tmpAngle <= angleRange[0]) {
+					if(compoGroup != 1){
+						compoGroup = 1;
+						this.components.add(new Component(1));
+						compoIndex++;
+						
+					}
+					this.components.get(compoIndex - 1).addNewAxis(tmpX[0], tmpY[0]);
+
+				} else if (tmpAngle >= angleRange[1]) {
+					if(compoGroup != 2){
+						compoGroup = 2;
+						this.components.add(new Component(2));
+						compoIndex++;
+						
+					}
+					this.components.get(compoIndex - 1).addNewAxis(tmpX[0], tmpY[0]);
+
+				} else if (tmpAngle > angleRange[0] && tmpAngle < angleRange[1]) {
+					if(compoGroup != 3){
+						compoGroup = 3;
+						this.components.add(new Component(3));	
+						compoIndex++;
+						
+					}
+					this.components.get(compoIndex - 1).addNewAxis(tmpX[0], tmpY[0]);
+				}
+			
+			}
+			if(this.penPressure[i] == 0 && this.penPressure[i+1] != 0){
+				this.components.add(new Component(compoGroup));
+				compoIndex++;
+			}
+
+		}
+	}
+
+	public void paintComponent(Graphics2D g2, int displayMode){
+		for(int i = 0; i < this.components.size(); i++){
+			Component tmpComp = this.components.get(i);
+
+			/*
+			if(tmpComp.getIndex() == 2){
+				g2.setColor(new Color(87, 207, 244));
+			}
+			else if(tmpComp.getIndex() == 3){
+				g2.setColor(new Color(200, 236, 89));
+			}
+			else if(tmpComp.getIndex() == 4){
+				g2.setColor(new Color(218, 157, 223));
+			}*/
+			g2.setColor(randomColor());
+
+			tmpComp.resizeAxis();
+
+			if(this.timeStamp != 0)
+				tmpComp.calcLength();
+
+			if(tmpComp.getLength() > 1){
+				if(displayMode == 0){
+					for(int j = 0; j < tmpComp.getAxisSize()-1; j++){
+						g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
+					}
+				}
+				else if (displayMode == 1){
+					if(tmpComp.getIndex() == 2){
+						for(int j = 0; j < tmpComp.getAxisSize()-1; j++){
+							g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
+						}
+					}
+				}
+				else if (displayMode == 2){
+					if(tmpComp.getIndex() == 3){
+						for(int j = 0; j < tmpComp.getAxisSize()-1; j++){
+							g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
+						}
+					}
+				}
+				else if (displayMode == 3){
+					if(tmpComp.getIndex() == 4){
+						for(int j = 0; j < tmpComp.getAxisSize()-1; j++){
+							g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
+						}
+					}
+				}
+			}
+			try{
+				System.out.println("Component " + i);
+				System.out.println("Starting Point: " + tmpComp.getXAxis(0)+ "," + tmpComp.getYAxis(0));
+				System.out.println("Ending Point: " + tmpComp.getXAxis(tmpComp.getAxisSize()-1)+ "," + tmpComp.getYAxis(tmpComp.getAxisSize()-1));
+				System.out.println("-----------------------------");
+			} catch (ArrayIndexOutOfBoundsException e){
+				System.out.println("Empty component");
+			}
+			
+		}
 	}
 
 	public Color randomColor() {
