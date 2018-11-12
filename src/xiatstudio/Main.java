@@ -8,6 +8,7 @@ import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -18,13 +19,13 @@ import java.util.Arrays;
 import java.util.Date;
 
 import javax.imageio.ImageIO;
+
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -38,7 +39,6 @@ public class Main extends JFrame {
 	public static void main(String[] args) {
 		/* Load GUI component */
 		GUISetup();
-
 	}
 
 	public static void GUISetup() {
@@ -61,8 +61,8 @@ public class Main extends JFrame {
 		Color bg = new Color(54, 63, 70);
 
 		menu = new JMenu("File");
-		menu2 = new JMenu("Mode");
-		menu3 = new JMenu("Pen off tracking");
+		menu2 = new JMenu("Component");
+		menu3 = new JMenu("Off-paper tracking");
 		pen_offON = new JMenuItem("ON");
 		pen_offOFF = new JMenuItem("OFF");
 		menu3.add(pen_offON);
@@ -98,7 +98,7 @@ public class Main extends JFrame {
 		panel = new GPanel();
 		frame.setJMenuBar(menuBar);
 		frame.add(panel);
-		frame.setTitle(data);
+		frame.setTitle("Currently viewing: " + data);
 		panel.setBackground(bg);
 		frame.setSize(1280, 720);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -174,8 +174,9 @@ public class Main extends JFrame {
 					/* Replace backslash in the path */
 					data = data.replace("\\", "/");
 					/* Update content */
+					displayMode = 0;
 					panel.repaint();
-					frame.setTitle(data);
+					frame.setTitle("Currently viewing: " + data);
 					// System.out.println(data);
 					break;
 				}
@@ -380,7 +381,6 @@ public class Main extends JFrame {
 	}
 
 	public static class GPanel extends JPanel {
-
 		public void Panel() {
 			super.setPreferredSize(new Dimension(1280, 720));
 		}
