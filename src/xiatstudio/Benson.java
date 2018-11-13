@@ -31,6 +31,9 @@ public class Benson {
 	String data;
 	ArrayList<Component> components;
 
+	ArrayList<Color> colorSet = new ArrayList<Color>();
+	
+
 	public Benson(String data) {
 		this.data = data;
 		this.timeStamp = fetchTimeStamp(data);
@@ -44,6 +47,10 @@ public class Benson {
 		this.timeSpent = 0;
 		this.penPressure = new float[timeStamp];
 		this.components = new ArrayList<Component>();
+
+		colorSet.add(new Color(87,207,244));
+		colorSet.add(new Color(200,236,89));
+		colorSet.add(new Color(218,157,223));
 
 		initData();
 		positionCentre();
@@ -277,10 +284,6 @@ public class Benson {
 
 		/* Rotate figure to recognizable orientation */
 		g2.rotate(Math.toRadians(180), 640, 360);
-
-		/* Initial segment color */
-		c = new Color(0, 167, 246);
-		g2.setColor(c);
 
 		groupComp(g2, displayMode);
 
@@ -534,6 +537,7 @@ public class Benson {
 		initAllCompo();
 
 		ArrayList<Component> groupComponents = new ArrayList<Component>();
+		
 		if (this.components.size() > 0) {
 			for (int l = 0; l < 3; l++) {
 				int j = 0;
@@ -550,27 +554,17 @@ public class Benson {
 				}
 				groupComponents.get(l).resizeAxis();
 			}
-
+			
 			if (displayMode == 0) {
 				for (int i = 0; i < 3; i++) {
-					if (i == 0)
-						g2.setColor(new Color(87, 207, 244));
-					else if (i == 1)
-						g2.setColor(new Color(200, 236, 89));
-					else if (i == 2)
-						g2.setColor(new Color(218, 157, 223));
+					g2.setColor(colorSet.get(i));
 					groupComponents.get(i).drawComponent(g2);
 				}
-			} else if (displayMode == 1) {
-				g2.setColor(new Color(87, 207, 244));
-				groupComponents.get(0).drawComponent(g2);
-			} else if (displayMode == 2) {
-				g2.setColor(new Color(200, 236, 89));
-				groupComponents.get(1).drawComponent(g2);
-			} else if (displayMode == 3) {
-				g2.setColor(new Color(218, 157, 223));
-				groupComponents.get(2).drawComponent(g2);
+			} else{
+				g2.setColor(colorSet.get(displayMode-1));
+				groupComponents.get(displayMode-1).drawComponent(g2);
 			}
+				
 		}
 	}
 
@@ -748,52 +742,25 @@ public class Benson {
 	public void paintComponent(Graphics2D g2, int displayMode) {
 		for (int i = 0; i < this.components.size(); i++) {
 			Component tmpComp = this.components.get(i);
+			g2.setColor(colorSet.get(tmpComp.getIndex()-2));
 
-			if (tmpComp.getIndex() == 2) {
-				g2.setColor(new Color(87, 207, 244));
-			} else if (tmpComp.getIndex() == 3) {
-				g2.setColor(new Color(200, 236, 89));
-			} else if (tmpComp.getIndex() == 4) {
-				g2.setColor(new Color(218, 157, 223));
-			}
-			// g2.setColor(randomColor());
-
-			if (tmpComp.getTicks() != 0)
-				tmpComp.resizeAxis();
-
-			if (this.timeStamp != 0)
-				tmpComp.calcLength();
+			initAllCompo();
 
 			if (tmpComp.getLength() > 1) {
 				if (displayMode == 0) {
 					for (int j = 0; j < tmpComp.getAxisSize() - 1; j++) {
-						// g2.draw(new Line2D.Float(tmpComp.getXAxis(j),
-						// tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
-						g2.fillOval((int) tmpComp.getXAxis(j), (int) tmpComp.getYAxis(j), 3, 3);
-					}
+						tmpComp.drawComponent(g2);					}
 				} else if (displayMode == 1) {
 					if (tmpComp.getIndex() == 2) {
-						for (int j = 0; j < tmpComp.getAxisSize() - 1; j++) {
-							// g2.draw(new Line2D.Float(tmpComp.getXAxis(j),
-							// tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
-							g2.fillOval((int) tmpComp.getXAxis(j), (int) tmpComp.getYAxis(j), 3, 3);
-						}
+							tmpComp.drawComponent(g2);	
 					}
 				} else if (displayMode == 2) {
 					if (tmpComp.getIndex() == 3) {
-						for (int j = 0; j < tmpComp.getAxisSize() - 1; j++) {
-							// g2.draw(new Line2D.Float(tmpComp.getXAxis(j),
-							// tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
-							g2.fillOval((int) tmpComp.getXAxis(j), (int) tmpComp.getYAxis(j), 3, 3);
-						}
+						tmpComp.drawComponent(g2);
 					}
 				} else if (displayMode == 3) {
 					if (tmpComp.getIndex() == 4) {
-						for (int j = 0; j < tmpComp.getAxisSize() - 1; j++) {
-							// g2.draw(new Line2D.Float(tmpComp.getXAxis(j),
-							// tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
-							g2.fillOval((int) tmpComp.getXAxis(j), (int) tmpComp.getYAxis(j), 3, 3);
-						}
+							tmpComp.drawComponent(g2);
 					}
 				}
 			}
