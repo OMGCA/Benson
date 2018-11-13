@@ -324,7 +324,7 @@ public class Benson {
 		*/
 
 		//paintComponent(g2,displayMode);
-		groupComp(g2);
+		groupComp(g2,displayMode);
 
 		/* Figure vertex point marking */
 		g2.setColor(new Color(255, 81, 81));
@@ -544,62 +544,6 @@ public class Benson {
 		}
 	}
 
-	public void paintComponent(Graphics2D g2, int displayMode){
-		for(int i = 0; i < this.components.size(); i++){
-			Component tmpComp = this.components.get(i);
-
-			
-			if(tmpComp.getIndex() == 2){
-				g2.setColor(new Color(87, 207, 244));
-			}
-			else if(tmpComp.getIndex() == 3){
-				g2.setColor(new Color(200, 236, 89));
-			}
-			else if(tmpComp.getIndex() == 4){
-				g2.setColor(new Color(218, 157, 223));
-			}
-			//g2.setColor(randomColor());
-
-			if(tmpComp.getTicks() != 0)
-				tmpComp.resizeAxis();
-
-			if(this.timeStamp != 0)
-				tmpComp.calcLength();
-
-			if(tmpComp.getLength() > 1){
-				if(displayMode == 0){
-					for(int j = 0; j < tmpComp.getAxisSize()-1; j++){
-						//g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
-						g2.fillOval((int)tmpComp.getXAxis(j),(int)tmpComp.getYAxis(j),3,3);
-					}
-				}
-				else if (displayMode == 1){
-					if(tmpComp.getIndex() == 2){
-						for(int j = 0; j < tmpComp.getAxisSize()-1; j++){
-							//g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
-							g2.fillOval((int)tmpComp.getXAxis(j),(int)tmpComp.getYAxis(j),3,3);
-						}
-					}
-				}
-				else if (displayMode == 2){
-					if(tmpComp.getIndex() == 3){
-						for(int j = 0; j < tmpComp.getAxisSize()-1; j++){
-							//g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
-							g2.fillOval((int)tmpComp.getXAxis(j),(int)tmpComp.getYAxis(j),3,3);
-						}
-					}
-				}
-				else if (displayMode == 3){
-					if(tmpComp.getIndex() == 4){
-						for(int j = 0; j < tmpComp.getAxisSize()-1; j++){
-							//g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
-							g2.fillOval((int)tmpComp.getXAxis(j),(int)tmpComp.getYAxis(j),3,3);
-						}
-					}
-				}
-			}
-		}
-	}
 
 	public void initAllCompo(){
 		for(int i = 0 ; i < this.components.size(); i++){
@@ -607,11 +551,10 @@ public class Benson {
 				this.components.get(i).resizeAxis();
 				this.components.get(i).calcLength();
 			}
-				
 		}
 	}
 
-	public void groupComp(Graphics2D g2){
+	public void groupComp(Graphics2D g2, int displayMode){
 		initAllCompo();
 
 		ArrayList<Component> groupComponents = new ArrayList<Component>();
@@ -629,14 +572,32 @@ public class Benson {
 					}
 				}
 				groupComponents.get(l).resizeAxis();
-				for(int i = 0; i < groupComponents.get(l).getAxisSize()-1; i++){
-					g2.setColor(new Color(255,255,255));
-					g2.fillOval((int)groupComponents.get(l).getXAxis(i),(int)groupComponents.get(l).getYAxis(i),3,3);
+			}
+
+			if(displayMode == 0){
+				for(int i = 0; i < 3; i++){
+					if(i == 0)
+						g2.setColor(new Color(87, 207, 244));
+					else if(i == 1)
+						g2.setColor(new Color(200, 236, 89));
+					else if(i == 2)
+						g2.setColor(new Color(218, 157, 223));
+					groupComponents.get(i).drawComponent(g2);
 				}
 			}
-			
+			else if(displayMode == 1){
+				g2.setColor(new Color(87, 207, 244));
+				groupComponents.get(0).drawComponent(g2);
+			}
+			else if(displayMode == 2){
+				g2.setColor(new Color(200, 236, 89));
+				groupComponents.get(1).drawComponent(g2);
+			}
+			else if(displayMode == 3){
+				g2.setColor(new Color(218, 157, 223));
+				groupComponents.get(2).drawComponent(g2);
+			}
 		}
-		
 	}
 
 	public Color randomColor() {
@@ -808,5 +769,63 @@ public class Benson {
 		}
 
 		return i;
+	}
+
+	
+	public void paintComponent(Graphics2D g2, int displayMode){
+		for(int i = 0; i < this.components.size(); i++){
+			Component tmpComp = this.components.get(i);
+
+			
+			if(tmpComp.getIndex() == 2){
+				g2.setColor(new Color(87, 207, 244));
+			}
+			else if(tmpComp.getIndex() == 3){
+				g2.setColor(new Color(200, 236, 89));
+			}
+			else if(tmpComp.getIndex() == 4){
+				g2.setColor(new Color(218, 157, 223));
+			}
+			//g2.setColor(randomColor());
+
+			if(tmpComp.getTicks() != 0)
+				tmpComp.resizeAxis();
+
+			if(this.timeStamp != 0)
+				tmpComp.calcLength();
+
+			if(tmpComp.getLength() > 1){
+				if(displayMode == 0){
+					for(int j = 0; j < tmpComp.getAxisSize()-1; j++){
+						//g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
+						g2.fillOval((int)tmpComp.getXAxis(j),(int)tmpComp.getYAxis(j),3,3);
+					}
+				}
+				else if (displayMode == 1){
+					if(tmpComp.getIndex() == 2){
+						for(int j = 0; j < tmpComp.getAxisSize()-1; j++){
+							//g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
+							g2.fillOval((int)tmpComp.getXAxis(j),(int)tmpComp.getYAxis(j),3,3);
+						}
+					}
+				}
+				else if (displayMode == 2){
+					if(tmpComp.getIndex() == 3){
+						for(int j = 0; j < tmpComp.getAxisSize()-1; j++){
+							//g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
+							g2.fillOval((int)tmpComp.getXAxis(j),(int)tmpComp.getYAxis(j),3,3);
+						}
+					}
+				}
+				else if (displayMode == 3){
+					if(tmpComp.getIndex() == 4){
+						for(int j = 0; j < tmpComp.getAxisSize()-1; j++){
+							//g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
+							g2.fillOval((int)tmpComp.getXAxis(j),(int)tmpComp.getYAxis(j),3,3);
+						}
+					}
+				}
+			}
+		}
 	}
 }
