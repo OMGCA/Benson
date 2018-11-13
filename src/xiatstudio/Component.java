@@ -1,5 +1,10 @@
 package xiatstudio;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+
 public class Component {
 	float[] xAxis;
 	float[] yAxis;
@@ -58,7 +63,7 @@ public class Component {
 	public void resizeAxis() {
 		float[] newX = new float[this.ticks];
 		float[] newY = new float[this.ticks];
-		for (int i = 0; i < this.ticks; i++) {
+		for (int i = 0; i < this.ticks -1 ; i++) {
 			newX[i] = this.xAxis[i];
 			newY[i] = this.yAxis[i];
 		}
@@ -75,11 +80,11 @@ public class Component {
 	}
 
 	public void combineCompo(float[] arrX, float[] arrY){
-		float[] newX = new float[this.ticks + arrX.length];
-		float[] newY = new float[this.ticks + arrY.length];
+		float[] newX = new float[this.ticks + arrX.length-1];
+		float[] newY = new float[this.ticks + arrY.length-1];
 
 		for(int i = 0; i < newX.length - 1; i++){
-			if(i < this.ticks){
+			if(i < this.ticks-1){
 				newX[i] = this.xAxis[i];
 				newY[i] = this.yAxis[i];
 			}
@@ -89,11 +94,15 @@ public class Component {
 			}
 		}
 
+		this.ticks += arrX.length;
+
 		this.xAxis = newX;
 		this.yAxis = newY;
 
 		this.endPoint[0] = newX[newX.length - 1];
 		this.endPoint[1] = newY[newY.length - 1];
+		
+		
 	}
 
 	public double getDistanceBetweenPoints(float[] x, float[] y) {
