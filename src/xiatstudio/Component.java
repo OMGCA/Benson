@@ -3,6 +3,8 @@ package xiatstudio;
 public class Component {
 	float[] xAxis;
 	float[] yAxis;
+	float[] startPoint;
+	float[] endPoint;
 	double avgAngle;
 	double length;
 	int index;
@@ -15,6 +17,8 @@ public class Component {
 		this.yAxis = new float[20000];
 		this.avgAngle = 0;
 		this.length = 0;
+		this.startPoint = new float[2];
+		this.endPoint = new float[2];
 	}
 
 	public void updateTicks() {
@@ -25,6 +29,30 @@ public class Component {
 		this.xAxis[this.ticks] = x;
 		this.yAxis[this.ticks] = y;
 		updateTicks();
+	}
+	
+	public float getXAxis(int index) {
+		return this.xAxis[index];
+	}
+
+	public float[] getWholeX(){
+		return this.xAxis;
+	}
+
+	public float[] getWholeY(){
+		return this.yAxis;
+	}
+	
+	public float getYAxis(int index) {
+		return this.yAxis[index];
+	}
+
+	public float[] getStartPoint(){
+		return this.startPoint;
+	}
+
+	public float[] getEndPoint(){
+		return this.endPoint;
 	}
 
 	public void resizeAxis() {
@@ -37,6 +65,35 @@ public class Component {
 
 		this.xAxis = newX;
 		this.yAxis = newY;
+
+		this.startPoint[0] = newX[0];
+		this.startPoint[1] = newY[0];
+
+		this.endPoint[0] = newX[this.ticks-1];
+		this.endPoint[1] = newY[this.ticks-1];
+
+	}
+
+	public void combineCompo(float[] arrX, float[] arrY){
+		float[] newX = new float[this.ticks + arrX.length];
+		float[] newY = new float[this.ticks + arrY.length];
+
+		for(int i = 0; i < newX.length - 1; i++){
+			if(i < this.ticks){
+				newX[i] = this.xAxis[i];
+				newY[i] = this.yAxis[i];
+			}
+			else if (i >= this.ticks){
+				newX[i] = arrX[i-this.ticks];
+				newY[i] = arrY[i-this.ticks];
+			}
+		}
+
+		this.xAxis = newX;
+		this.yAxis = newY;
+
+		this.endPoint[0] = newX[newX.length - 1];
+		this.endPoint[1] = newY[newY.length - 1];
 	}
 
 	public double getDistanceBetweenPoints(float[] x, float[] y) {
@@ -49,7 +106,7 @@ public class Component {
 
 	public void calcLength() {
 		double tmpTotal = 0;
-		for (int i = 0; i < this.ticks; i++) {
+		for (int i = 0; i < this.ticks - 1; i++) {
 			float[] tmpX = { this.xAxis[i], this.xAxis[i + 1] };
 			float[] tmpY = { this.yAxis[i], this.yAxis[i + 1] };
 			tmpTotal += getDistanceBetweenPoints(tmpX, tmpY);
@@ -141,6 +198,10 @@ public class Component {
 			int[] empty = { 0, 0 };
 			return empty;
 		}
+	}
+	
+	public double getLength() {
+		return this.length;
 	}
 
 }
