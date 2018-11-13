@@ -49,6 +49,7 @@ public class Benson {
 		positionCentre();
 		// registerComponents();
 		angleBasedCompoReg();
+		
 	}
 
 	public int fetchTimeStamp(String data) {
@@ -322,7 +323,8 @@ public class Benson {
 
 		*/
 
-		paintComponent(g2,displayMode);
+		//paintComponent(g2,displayMode);
+		groupComp_TEST(g2);
 
 		/* Figure vertex point marking */
 		g2.setColor(new Color(255, 81, 81));
@@ -511,6 +513,7 @@ public class Benson {
 						compoIndex++;
 						
 					}
+					if(tmpX[0] != 0 && tmpY[0] != 0)
 					this.components.get(compoIndex - 1).addNewAxis(tmpX[0], tmpY[0]);
 
 				} else if (tmpAngle >= angleRange[1]) {
@@ -545,7 +548,7 @@ public class Benson {
 		for(int i = 0; i < this.components.size(); i++){
 			Component tmpComp = this.components.get(i);
 
-			/*
+			
 			if(tmpComp.getIndex() == 2){
 				g2.setColor(new Color(87, 207, 244));
 			}
@@ -554,10 +557,11 @@ public class Benson {
 			}
 			else if(tmpComp.getIndex() == 4){
 				g2.setColor(new Color(218, 157, 223));
-			}*/
-			g2.setColor(randomColor());
+			}
+			//g2.setColor(randomColor());
 
-			tmpComp.resizeAxis();
+			if(tmpComp.getTicks() != 0)
+				tmpComp.resizeAxis();
 
 			if(this.timeStamp != 0)
 				tmpComp.calcLength();
@@ -565,41 +569,112 @@ public class Benson {
 			if(tmpComp.getLength() > 1){
 				if(displayMode == 0){
 					for(int j = 0; j < tmpComp.getAxisSize()-1; j++){
-						g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
+						//g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
+						g2.fillOval((int)tmpComp.getXAxis(j),(int)tmpComp.getYAxis(j),3,3);
 					}
 				}
 				else if (displayMode == 1){
 					if(tmpComp.getIndex() == 2){
 						for(int j = 0; j < tmpComp.getAxisSize()-1; j++){
-							g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
+							//g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
+							g2.fillOval((int)tmpComp.getXAxis(j),(int)tmpComp.getYAxis(j),3,3);
 						}
 					}
 				}
 				else if (displayMode == 2){
 					if(tmpComp.getIndex() == 3){
 						for(int j = 0; j < tmpComp.getAxisSize()-1; j++){
-							g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
+							//g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
+							g2.fillOval((int)tmpComp.getXAxis(j),(int)tmpComp.getYAxis(j),3,3);
 						}
 					}
 				}
 				else if (displayMode == 3){
 					if(tmpComp.getIndex() == 4){
 						for(int j = 0; j < tmpComp.getAxisSize()-1; j++){
-							g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
+							//g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
+							g2.fillOval((int)tmpComp.getXAxis(j),(int)tmpComp.getYAxis(j),3,3);
 						}
 					}
 				}
 			}
-			try{
-				System.out.println("Component " + i);
-				System.out.println("Starting Point: " + tmpComp.getXAxis(0)+ "," + tmpComp.getYAxis(0));
-				System.out.println("Ending Point: " + tmpComp.getXAxis(tmpComp.getAxisSize()-1)+ "," + tmpComp.getYAxis(tmpComp.getAxisSize()-1));
-				System.out.println("-----------------------------");
-			} catch (ArrayIndexOutOfBoundsException e){
-				System.out.println("Empty component");
+		}
+	}
+
+	public void initAllCompo(){
+		for(int i = 0 ; i < this.components.size(); i++){
+			if(this.components.get(i).getTicks() != 0){
+				this.components.get(i).resizeAxis();
+				this.components.get(i).calcLength();
+			}
+				
+		}
+	}
+
+	public void groupComp_TEST(Graphics2D g2){
+		initAllCompo();
+		Component c1,c2,c3;
+		if(this.components.size() > 0){
+			int j = 0;
+			do{
+				j++;
+			}while (this.components.get(j).getIndex() != 2);
+			c1 = this.components.get(j);
+			
+
+			for(int i = j+1 ; i < this.components.size()-1; i++){
+				if(this.components.get(i).getIndex() == 2 && this.components.get(i).getLength() > 0){
+					c1.combineCompo(this.components.get(i).getWholeX(),this.components.get(i).getWholeY());
+				}
+			}
+			c1.resizeAxis();
+			for(int i = 0; i < c1.getAxisSize()-1; i++){
+				g2.setColor(new Color(255,255,255));
+				//g2.draw(new Line2D.Float(c1.getXAxis(i),c1.getYAxis(i),c1.getXAxis(i+1),c1.getYAxis(i+1)));
+				g2.fillOval((int)c1.getXAxis(i), (int)c1.getYAxis(i), 2, 2);
+			}
+
+
+			j = 0;
+			do{
+				j++;
+			}while (this.components.get(j).getIndex() != 3);
+			c2 = this.components.get(j);
+			
+
+			for(int i = j+1 ; i < this.components.size()-1; i++){
+				if(this.components.get(i).getIndex() == 3 && this.components.get(i).getLength() > 0){
+					c2.combineCompo(this.components.get(i).getWholeX(),this.components.get(i).getWholeY());
+				}
+			}
+			c2.resizeAxis();
+			for(int i = 0; i < c2.getAxisSize()-1; i++){
+				g2.setColor(new Color(255,255,255));
+				//g2.draw(new Line2D.Float(c1.getXAxis(i),c1.getYAxis(i),c1.getXAxis(i+1),c1.getYAxis(i+1)));
+				g2.fillOval((int)c2.getXAxis(i), (int)c2.getYAxis(i), 2, 2);
+			}
+
+			j = 0;
+			do{
+				j++;
+			}while (this.components.get(j).getIndex() != 4);
+			c3 = this.components.get(j);
+			
+
+			for(int i = j+1 ; i < this.components.size()-1; i++){
+				if(this.components.get(i).getIndex() == 4 && this.components.get(i).getLength() > 0){
+					c3.combineCompo(this.components.get(i).getWholeX(),this.components.get(i).getWholeY());
+				}
+			}
+			c3.resizeAxis();
+			for(int i = 0; i < c3.getAxisSize()-1; i++){
+				g2.setColor(new Color(255,255,255));
+				//g2.draw(new Line2D.Float(c1.getXAxis(i),c1.getYAxis(i),c1.getXAxis(i+1),c1.getYAxis(i+1)));
+				g2.fillOval((int)c3.getXAxis(i), (int)c3.getYAxis(i), 2, 2);
 			}
 			
 		}
+		
 	}
 
 	public Color randomColor() {
