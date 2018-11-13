@@ -49,7 +49,7 @@ public class Benson {
 		positionCentre();
 		// registerComponents();
 		angleBasedCompoReg();
-		
+
 	}
 
 	public int fetchTimeStamp(String data) {
@@ -271,23 +271,9 @@ public class Benson {
 		id = getID();
 		mode = getFigureMode();
 
-		g2.drawString("Group: " + group, 30, 40);
-		g2.drawString("ID:    " + id, 30, 65);
-		g2.drawString("Mode:  " + mode, 30, 90);
-		g2.drawString("Data Location: " + this.data, 30, 115);
-		g2.drawString("Total time spent: " + this.timeSpent / 1000 + " s", 30, 140);
-		g2.drawString("Velocity Stability: " + getVelocitySD(), 30, 165);
-		g2.drawString("Angle Stability: " + getAngleSD(), 30, 190);
-		g2.drawString("Length: " + getTotalLength(), 30, 215);
-		g2.drawString("Size: " + (int) getSize()[0] + " x " + (int) getSize()[1], 30, 240);
-		g2.drawString("Pen Off: " + penoffCount() * 100 / (this.timeStamp + 1) + " %", 30, 265);
+		infoBoard(g2, group, id, mode);
 
 		g2.setFont(new Font("Inconsolata", Font.PLAIN, 15));
-
-		/*
-		 * for(int i = 0 ; i < this.components.size(); i++){
-		 * markComponent(this.components.get(i), g2); }
-		 */
 
 		/* Rotate figure to recognizable orientation */
 		g2.rotate(Math.toRadians(180), 640, 360);
@@ -296,36 +282,27 @@ public class Benson {
 		c = new Color(0, 167, 246);
 		g2.setColor(c);
 
-		/* Drawing loop */
-		/*
-		 * for (int i = 0; i < this.timeStamp - 1; i++) { float[] tmpX =
-		 * {this.xAxis[i],this.xAxis[i+1]}; float[] tmpY =
-		 * {this.yAxis[i],this.yAxis[i+1]};
-		 * 
-		 * // Only draw with pen down if (this.penPressure[i] != 0 &&
-		 * (getPointAngle(tmpX, tmpY) < 15) ) { g2.draw(new Line2D.Float(this.xAxis[i],
-		 * this.yAxis[i], this.xAxis[i + 1], this.yAxis[i + 1])); } // Change color when
-		 * pen up else if (this.penPressure[i] == 0) { c = randomColor();
-		 * g2.setColor(c); }
-		 * 
-		 * }
-		 */
-			/*
-		int tickJump = 1;
-		for (int i = 0; i < this.timeStamp - tickJump; i++) {
-			float[] tmpX = { this.xAxis[i], this.xAxis[i + tickJump] };
-			float[] tmpY = { this.yAxis[i], this.yAxis[i + tickJump] };
-			if (this.penPressure[i] != 0) {
-				drawMode(g2, displayMode, tmpX, tmpY);
-			}
+		groupComp(g2, displayMode);
 
-		}
+		vertexPoint(g2);
+	}
 
-		*/
+	public void infoBoard(Graphics2D g2, String group, String id, String mode) {
+		int yCoorBase = 40;
+		int vertGap = 25;
+		g2.drawString("Group: " + group, 30, yCoorBase + vertGap * 0);
+		g2.drawString("ID:    " + id, 30, yCoorBase + vertGap * 1);
+		g2.drawString("Mode:  " + mode, 30, yCoorBase + vertGap * 2);
+		g2.drawString("Data Location: " + this.data, 30, yCoorBase + vertGap * 3);
+		g2.drawString("Total time spent: " + this.timeSpent / 1000 + " s", 30, yCoorBase + vertGap * 4);
+		g2.drawString("Velocity Stability: " + getVelocitySD(), 30, yCoorBase + vertGap * 5);
+		g2.drawString("Angle Stability: " + getAngleSD(), 30, yCoorBase + vertGap * 6);
+		g2.drawString("Length: " + getTotalLength(), 30, yCoorBase + vertGap * 7);
+		g2.drawString("Size: " + (int) getSize()[0] + " x " + (int) getSize()[1], 30, yCoorBase + vertGap * 8);
+		g2.drawString("Pen Off: " + penoffCount() * 100 / (this.timeStamp + 1) + " %", 30, yCoorBase + vertGap * 9);
+	}
 
-		//paintComponent(g2,displayMode);
-		groupComp(g2,displayMode);
-
+	public void vertexPoint(Graphics2D g2) {
 		/* Figure vertex point marking */
 		g2.setColor(new Color(255, 81, 81));
 		g2.fillOval((int) min(this.xAxis), (int) min(this.yAxis), 20, 20);
@@ -495,48 +472,48 @@ public class Benson {
 			mode = 0;
 	}
 
-	public void angleBasedCompoReg(){
+	public void angleBasedCompoReg() {
 		int compoGroup = 0;
 		int compoIndex = 0;
-		double[] angleRange = {10,65};
+		double[] angleRange = { 10, 65 };
 
-		for(int i = 0; i < this.timeStamp - 1; i++){
+		for (int i = 0; i < this.timeStamp - 1; i++) {
 
-			if(this.penPressure[i] != 0){
-				float[] tmpX = {this.xAxis[i], this.xAxis[i+1]};
-				float[] tmpY = {this.yAxis[i], this.yAxis[i+1]};
+			if (this.penPressure[i] != 0) {
+				float[] tmpX = { this.xAxis[i], this.xAxis[i + 1] };
+				float[] tmpY = { this.yAxis[i], this.yAxis[i + 1] };
 				double tmpAngle = getPointAngle(tmpX, tmpY);
 				if (tmpAngle <= angleRange[0]) {
-					if(compoGroup != 1){
+					if (compoGroup != 1) {
 						compoGroup = 1;
 						this.components.add(new Component(1));
 						compoIndex++;
-						
+
 					}
-					if(tmpX[0] != 0 && tmpY[0] != 0)
-					this.components.get(compoIndex - 1).addNewAxis(tmpX[0], tmpY[0]);
+					if (tmpX[0] != 0 && tmpY[0] != 0)
+						this.components.get(compoIndex - 1).addNewAxis(tmpX[0], tmpY[0]);
 
 				} else if (tmpAngle >= angleRange[1]) {
-					if(compoGroup != 2){
+					if (compoGroup != 2) {
 						compoGroup = 2;
 						this.components.add(new Component(2));
 						compoIndex++;
-						
+
 					}
 					this.components.get(compoIndex - 1).addNewAxis(tmpX[0], tmpY[0]);
 
 				} else if (tmpAngle > angleRange[0] && tmpAngle < angleRange[1]) {
-					if(compoGroup != 3){
+					if (compoGroup != 3) {
 						compoGroup = 3;
-						this.components.add(new Component(3));	
+						this.components.add(new Component(3));
 						compoIndex++;
-						
+
 					}
 					this.components.get(compoIndex - 1).addNewAxis(tmpX[0], tmpY[0]);
 				}
-			
+
 			}
-			if(this.penPressure[i] == 0 && this.penPressure[i+1] != 0){
+			if (this.penPressure[i] == 0 && this.penPressure[i + 1] != 0) {
 				this.components.add(new Component(compoGroup));
 				compoIndex++;
 			}
@@ -544,56 +521,53 @@ public class Benson {
 		}
 	}
 
-
-	public void initAllCompo(){
-		for(int i = 0 ; i < this.components.size(); i++){
-			if(this.components.get(i).getTicks() != 0){
+	public void initAllCompo() {
+		for (int i = 0; i < this.components.size(); i++) {
+			if (this.components.get(i).getTicks() != 0) {
 				this.components.get(i).resizeAxis();
 				this.components.get(i).calcLength();
 			}
 		}
 	}
 
-	public void groupComp(Graphics2D g2, int displayMode){
+	public void groupComp(Graphics2D g2, int displayMode) {
 		initAllCompo();
 
 		ArrayList<Component> groupComponents = new ArrayList<Component>();
-		if(this.components.size() > 0){
-			for(int l = 0; l < 3; l++){
+		if (this.components.size() > 0) {
+			for (int l = 0; l < 3; l++) {
 				int j = 0;
-				do{
+				do {
 					j++;
-				}while(this.components.get(j).getIndex() != l+2);
+				} while (this.components.get(j).getIndex() != l + 2);
 				groupComponents.add(this.components.get(j));
 
-				for(int i = j+1; i < this.components.size()-1; i++){
-					if(this.components.get(i).getIndex() == l+2 && this.components.get(i).getLength() > 0){
-						groupComponents.get(l).combineCompo(this.components.get(i).getWholeX(),this.components.get(i).getWholeY());
+				for (int i = j + 1; i < this.components.size() - 1; i++) {
+					if (this.components.get(i).getIndex() == l + 2 && this.components.get(i).getLength() > 0) {
+						groupComponents.get(l).combineCompo(this.components.get(i).getWholeX(),
+								this.components.get(i).getWholeY());
 					}
 				}
 				groupComponents.get(l).resizeAxis();
 			}
 
-			if(displayMode == 0){
-				for(int i = 0; i < 3; i++){
-					if(i == 0)
+			if (displayMode == 0) {
+				for (int i = 0; i < 3; i++) {
+					if (i == 0)
 						g2.setColor(new Color(87, 207, 244));
-					else if(i == 1)
+					else if (i == 1)
 						g2.setColor(new Color(200, 236, 89));
-					else if(i == 2)
+					else if (i == 2)
 						g2.setColor(new Color(218, 157, 223));
 					groupComponents.get(i).drawComponent(g2);
 				}
-			}
-			else if(displayMode == 1){
+			} else if (displayMode == 1) {
 				g2.setColor(new Color(87, 207, 244));
 				groupComponents.get(0).drawComponent(g2);
-			}
-			else if(displayMode == 2){
+			} else if (displayMode == 2) {
 				g2.setColor(new Color(200, 236, 89));
 				groupComponents.get(1).drawComponent(g2);
-			}
-			else if(displayMode == 3){
+			} else if (displayMode == 3) {
 				g2.setColor(new Color(218, 157, 223));
 				groupComponents.get(2).drawComponent(g2);
 			}
@@ -771,57 +745,54 @@ public class Benson {
 		return i;
 	}
 
-	
-	public void paintComponent(Graphics2D g2, int displayMode){
-		for(int i = 0; i < this.components.size(); i++){
+	public void paintComponent(Graphics2D g2, int displayMode) {
+		for (int i = 0; i < this.components.size(); i++) {
 			Component tmpComp = this.components.get(i);
 
-			
-			if(tmpComp.getIndex() == 2){
+			if (tmpComp.getIndex() == 2) {
 				g2.setColor(new Color(87, 207, 244));
-			}
-			else if(tmpComp.getIndex() == 3){
+			} else if (tmpComp.getIndex() == 3) {
 				g2.setColor(new Color(200, 236, 89));
-			}
-			else if(tmpComp.getIndex() == 4){
+			} else if (tmpComp.getIndex() == 4) {
 				g2.setColor(new Color(218, 157, 223));
 			}
-			//g2.setColor(randomColor());
+			// g2.setColor(randomColor());
 
-			if(tmpComp.getTicks() != 0)
+			if (tmpComp.getTicks() != 0)
 				tmpComp.resizeAxis();
 
-			if(this.timeStamp != 0)
+			if (this.timeStamp != 0)
 				tmpComp.calcLength();
 
-			if(tmpComp.getLength() > 1){
-				if(displayMode == 0){
-					for(int j = 0; j < tmpComp.getAxisSize()-1; j++){
-						//g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
-						g2.fillOval((int)tmpComp.getXAxis(j),(int)tmpComp.getYAxis(j),3,3);
+			if (tmpComp.getLength() > 1) {
+				if (displayMode == 0) {
+					for (int j = 0; j < tmpComp.getAxisSize() - 1; j++) {
+						// g2.draw(new Line2D.Float(tmpComp.getXAxis(j),
+						// tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
+						g2.fillOval((int) tmpComp.getXAxis(j), (int) tmpComp.getYAxis(j), 3, 3);
 					}
-				}
-				else if (displayMode == 1){
-					if(tmpComp.getIndex() == 2){
-						for(int j = 0; j < tmpComp.getAxisSize()-1; j++){
-							//g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
-							g2.fillOval((int)tmpComp.getXAxis(j),(int)tmpComp.getYAxis(j),3,3);
+				} else if (displayMode == 1) {
+					if (tmpComp.getIndex() == 2) {
+						for (int j = 0; j < tmpComp.getAxisSize() - 1; j++) {
+							// g2.draw(new Line2D.Float(tmpComp.getXAxis(j),
+							// tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
+							g2.fillOval((int) tmpComp.getXAxis(j), (int) tmpComp.getYAxis(j), 3, 3);
 						}
 					}
-				}
-				else if (displayMode == 2){
-					if(tmpComp.getIndex() == 3){
-						for(int j = 0; j < tmpComp.getAxisSize()-1; j++){
-							//g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
-							g2.fillOval((int)tmpComp.getXAxis(j),(int)tmpComp.getYAxis(j),3,3);
+				} else if (displayMode == 2) {
+					if (tmpComp.getIndex() == 3) {
+						for (int j = 0; j < tmpComp.getAxisSize() - 1; j++) {
+							// g2.draw(new Line2D.Float(tmpComp.getXAxis(j),
+							// tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
+							g2.fillOval((int) tmpComp.getXAxis(j), (int) tmpComp.getYAxis(j), 3, 3);
 						}
 					}
-				}
-				else if (displayMode == 3){
-					if(tmpComp.getIndex() == 4){
-						for(int j = 0; j < tmpComp.getAxisSize()-1; j++){
-							//g2.draw(new Line2D.Float(tmpComp.getXAxis(j), tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
-							g2.fillOval((int)tmpComp.getXAxis(j),(int)tmpComp.getYAxis(j),3,3);
+				} else if (displayMode == 3) {
+					if (tmpComp.getIndex() == 4) {
+						for (int j = 0; j < tmpComp.getAxisSize() - 1; j++) {
+							// g2.draw(new Line2D.Float(tmpComp.getXAxis(j),
+							// tmpComp.getYAxis(j),tmpComp.getXAxis(j+1), tmpComp.getYAxis(j+1)));
+							g2.fillOval((int) tmpComp.getXAxis(j), (int) tmpComp.getYAxis(j), 3, 3);
 						}
 					}
 				}
