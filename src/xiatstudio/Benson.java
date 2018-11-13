@@ -324,7 +324,7 @@ public class Benson {
 		*/
 
 		//paintComponent(g2,displayMode);
-		groupComp_TEST(g2);
+		groupComp(g2);
 
 		/* Figure vertex point marking */
 		g2.setColor(new Color(255, 81, 81));
@@ -611,66 +611,28 @@ public class Benson {
 		}
 	}
 
-	public void groupComp_TEST(Graphics2D g2){
+	public void groupComp(Graphics2D g2){
 		initAllCompo();
-		Component c1,c2,c3;
+
+		ArrayList<Component> groupComponents = new ArrayList<Component>();
 		if(this.components.size() > 0){
-			int j = 0;
-			do{
-				j++;
-			}while (this.components.get(j).getIndex() != 2);
-			c1 = this.components.get(j);
-			
+			for(int l = 0; l < 3; l++){
+				int j = 0;
+				do{
+					j++;
+				}while(this.components.get(j).getIndex() != l+2);
+				groupComponents.add(this.components.get(j));
 
-			for(int i = j+1 ; i < this.components.size()-1; i++){
-				if(this.components.get(i).getIndex() == 2 && this.components.get(i).getLength() > 0){
-					c1.combineCompo(this.components.get(i).getWholeX(),this.components.get(i).getWholeY());
+				for(int i = j+1; i < this.components.size()-1; i++){
+					if(this.components.get(i).getIndex() == l+2 && this.components.get(i).getLength() > 0){
+						groupComponents.get(l).combineCompo(this.components.get(i).getWholeX(),this.components.get(i).getWholeY());
+					}
 				}
-			}
-			c1.resizeAxis();
-			for(int i = 0; i < c1.getAxisSize()-1; i++){
-				g2.setColor(new Color(255,255,255));
-				//g2.draw(new Line2D.Float(c1.getXAxis(i),c1.getYAxis(i),c1.getXAxis(i+1),c1.getYAxis(i+1)));
-				g2.fillOval((int)c1.getXAxis(i), (int)c1.getYAxis(i), 2, 2);
-			}
-
-
-			j = 0;
-			do{
-				j++;
-			}while (this.components.get(j).getIndex() != 3);
-			c2 = this.components.get(j);
-			
-
-			for(int i = j+1 ; i < this.components.size()-1; i++){
-				if(this.components.get(i).getIndex() == 3 && this.components.get(i).getLength() > 0){
-					c2.combineCompo(this.components.get(i).getWholeX(),this.components.get(i).getWholeY());
+				groupComponents.get(l).resizeAxis();
+				for(int i = 0; i < groupComponents.get(l).getAxisSize()-1; i++){
+					g2.setColor(new Color(255,255,255));
+					g2.fillOval((int)groupComponents.get(l).getXAxis(i),(int)groupComponents.get(l).getYAxis(i),3,3);
 				}
-			}
-			c2.resizeAxis();
-			for(int i = 0; i < c2.getAxisSize()-1; i++){
-				g2.setColor(new Color(255,255,255));
-				//g2.draw(new Line2D.Float(c1.getXAxis(i),c1.getYAxis(i),c1.getXAxis(i+1),c1.getYAxis(i+1)));
-				g2.fillOval((int)c2.getXAxis(i), (int)c2.getYAxis(i), 2, 2);
-			}
-
-			j = 0;
-			do{
-				j++;
-			}while (this.components.get(j).getIndex() != 4);
-			c3 = this.components.get(j);
-			
-
-			for(int i = j+1 ; i < this.components.size()-1; i++){
-				if(this.components.get(i).getIndex() == 4 && this.components.get(i).getLength() > 0){
-					c3.combineCompo(this.components.get(i).getWholeX(),this.components.get(i).getWholeY());
-				}
-			}
-			c3.resizeAxis();
-			for(int i = 0; i < c3.getAxisSize()-1; i++){
-				g2.setColor(new Color(255,255,255));
-				//g2.draw(new Line2D.Float(c1.getXAxis(i),c1.getYAxis(i),c1.getXAxis(i+1),c1.getYAxis(i+1)));
-				g2.fillOval((int)c3.getXAxis(i), (int)c3.getYAxis(i), 2, 2);
 			}
 			
 		}
