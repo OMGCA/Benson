@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 #include "cgp-sls.h"
 
 double simpleThresholdClassifier(struct parameters *params, struct chromosome *chromo, struct dataSet *data);
@@ -13,12 +14,12 @@ int main(void)
 	struct dataSet *testData = NULL;
 	struct chromosome *chromo = NULL;
 
-	int numInputs = 8;
-	int numNodes = 15;
-	int numOutputs = 9;
-	int nodeArity = 2;
+	int numInputs = 13;
+	int numNodes = 20;
+	int numOutputs = 1;
+	int nodeArity = 4;
 
-	int numGens = 200000;
+	int numGens = 100000;
 	double targetFitness = 0.1;
 	int updateFrequency = 500;
 
@@ -26,17 +27,15 @@ int main(void)
 
 	setRandomNumberSeed(1234);
 
-	addNodeFunction(params, "add,sub,mul,div");
+	addNodeFunction(params, "add,sub,mul,div,sin,pow,xor");
 
 	setTargetFitness(params, targetFitness);
 
-	setMutationRate(params, 0.08);
+	setMutationRate(params, 0.1);
 
 	setCustomFitnessFunction(params, simpleThresholdClassifier, "STC");
 
 	setShortcutConnections(params, 0);
-
-	setNumThreads(params, 2);
 
 	setUpdateFrequency(params, updateFrequency);
 
@@ -54,60 +53,61 @@ int main(void)
 	saveChromosomeDot(chromo, 0, "chromo.dot");
 
 	int i;
+	int mismatchError = 0;
 	for (i = 0; i < getNumDataSetSamples(testData); i++)
 	{
-		int mismatchError = 0;
+		
 		executeChromosome(chromo, getDataSetSampleInputs(testData, i));
-		double chromoOutputs[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-		int j;
-		for (j = 0; j < 9; j++)
-		{
-			chromoOutputs[j] = getChromosomeOutput(chromo, j);
-			printf("%.2f ", chromoOutputs[j]);
-			if (fabs(chromoOutputs[j] - getDataSetSampleOutputs(testData, i)[j]) >= 0.5)
-				mismatchError++;
+		double chromoOutputs = 0;
+
+        chromoOutputs = getChromosomeOutput(chromo, 0);
+		int expectedOutput = getDataSetSampleOutputs(testData, i)[0];
+        printf("%.2f ", chromoOutputs);
+
+		switch (expectedOutput){
+			case 1:
+				if(chromoOutputs > 1){
+					mismatchError++;
+					printf(" Mismatch ");
+				}
+				else
+					printf(" Match ");
+					
+				break;
+			case 2:
+				if(chromoOutputs <= 1 || chromoOutputs > 2){
+					mismatchError++;
+					printf(" Mismatch ");
+				}
+				else
+					printf(" Match ");
+				break;
+			case 3:
+				if(chromoOutputs <= 2 || chromoOutputs > 3){
+					mismatchError++;
+					printf(" Mismatch ");
+				}
+				else
+					printf(" Match ");
+				break;
+			case 4:
+				if(chromoOutputs <= 3){
+					mismatchError++;
+					printf(" Mismatch ");
+				}
+				else
+					printf(" Match ");
+				break;
 		}
-		printf("Mismatches: %d", mismatchError);
+
+		printf(" %.2f", getDataSetSampleOutputs(testData, i)[0]);
 		printf("\n");
 	}
+
+	printf("Match Entities: %d\n", getNumDataSetSamples(testData) - mismatchError);
+	printf("Mismatch Entities: %d", mismatchError);
 
 	printf("\n");
-
-	for (i = 0; i < getNumDataSetSamples(trainingData); i++)
-	{
-		int mismatchError = 0;
-		executeChromosome(chromo, getDataSetSampleInputs(trainingData, i));
-		double chromoOutputs[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-		int j;
-		for (j = 0; j < 9; j++)
-		{
-			chromoOutputs[j] = getChromosomeOutput(chromo, j);
-			printf("%.2f ", chromoOutputs[j]);
-			if (fabs(chromoOutputs[j] - getDataSetSampleOutputs(trainingData, i)[j]) >= 0.5)
-				mismatchError++;
-		}
-		printf("Mismatches: %d", mismatchError);
-		printf("\n");
-	}
-
-	printf("\n");
-
-	for (i = 0; i < getNumDataSetSamples(validationData); i++)
-	{
-		int mismatchError = 0;
-		executeChromosome(chromo, getDataSetSampleInputs(validationData, i));
-		double chromoOutputs[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-		int j;
-		for (j = 0; j < 9; j++)
-		{
-			chromoOutputs[j] = getChromosomeOutput(chromo, j);
-			printf("%.2f ", chromoOutputs[j]);
-			if (fabs(chromoOutputs[j] - getDataSetSampleOutputs(validationData, i)[j]) >= 0.5)
-				mismatchError++;
-		}
-		printf("Mismatches: %d", mismatchError);
-		printf("\n");
-	}
 
 	freeDataSet(trainingData);
 	freeDataSet(validationData);
@@ -120,6 +120,7 @@ int main(void)
 
 double simpleThresholdClassifier(struct parameters *params, struct chromosome *chromo, struct dataSet *data)
 {
+	double thresHold[] = {1,2,3};
 
 	int i;
 	double threshError = 0;
@@ -140,30 +141,31 @@ double simpleThresholdClassifier(struct parameters *params, struct chromosome *c
 
 	for (i = 0; i < getNumDataSetSamples(data); i++)
 	{
-		int singleMismatch = 0;
 
 		executeChromosome(chromo, getDataSetSampleInputs(data, i));
-		double chromoOutputs[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+		double chromoOutput = getChromosomeOutput(chromo,0);
+		int expectedClass = getDataSetSampleOutputs(data,i)[0];
 
-		int j;
-		for (j = 0; j < 9; j++)
-		{
-			chromoOutputs[j] = getChromosomeOutput(chromo, j);
-			if (fabs(chromoOutputs[j] - getDataSetSampleOutputs(data, i)[j]) >= 0.5)
-				singleMismatch++;
+		switch(expectedClass){
+			case 1:
+				if(chromoOutput > thresHold[0])
+					threshError++;
+				break;
+			case 2:
+				if(chromoOutput > thresHold[1] || chromoOutput <= thresHold[0])
+					threshError++;
+				break;
+			case 3:
+				if(chromoOutput > thresHold[2] || chromoOutput <= thresHold[1])
+					threshError++;
+				break;
+			case 4:
+				if(chromoOutput < thresHold[2])
+					threshError++;
+				break;
 		}
 
-		if (singleMismatch == 0)
-			threshError += 0;
-		else if (singleMismatch > 0 && singleMismatch < 4)
-			threshError++;
-		else if (singleMismatch >= 4 && singleMismatch < 7)
-			threshError += 2;
-		else if (singleMismatch >= 7)
-			threshError += 3;
-		else
-			threshError += 0;
 	}
 
-	return threshError / (getNumDataSetSamples(data) * 3);
+	return threshError / (getNumDataSetSamples(data));
 }
