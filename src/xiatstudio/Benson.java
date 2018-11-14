@@ -287,6 +287,8 @@ public class Benson {
 
 		groupComp(g2, displayMode);
 
+		//divideComp(g2, displayMode);
+
 		vertexPoint(g2);
 	}
 
@@ -533,7 +535,7 @@ public class Benson {
 		}
 	}
 
-	public void groupComp(Graphics2D g2, int displayMode) {
+	public ArrayList<Component> groupComp(Graphics2D g2, int displayMode) {
 		initAllCompo();
 
 		ArrayList<Component> groupComponents = new ArrayList<Component>();
@@ -566,6 +568,32 @@ public class Benson {
 			}
 				
 		}
+
+		return groupComponents;
+	}
+
+	public void divideComp(Graphics2D g2, int displayMode) {
+		if (this.components.size() > 0) {
+			ArrayList<Component> groupCompos = groupComp(g2, displayMode);
+			Component currentCompo = groupCompos.get(0);
+			ArrayList<Component> indieCompos = new ArrayList<Component>();
+			indieCompos.add(new Component(0));
+			for (int i = 0; i < currentCompo.getAxisSize() - 1; i++) {
+				float[] tmpX = { currentCompo.getXAxis(i), currentCompo.getXAxis(i + 1) };
+				float[] tmpY = { currentCompo.getYAxis(i), currentCompo.getYAxis(i + 1) };
+				double tmpDistance = getDistanceBetweenPoints(tmpX, tmpY);
+				if (tmpX[1] != 0 && tmpY[1] != 0) {
+					if (tmpDistance < 20) {
+						indieCompos.get(indieCompos.size()-1).addNewAxis(tmpX[0], tmpY[0]);
+					} else {
+						
+						indieCompos.add(new Component(0));
+						indieCompos.get(indieCompos.size()-1).addNewAxis(tmpX[0], tmpY[0]);
+					}
+				}
+			}
+		}
+			
 	}
 
 	public Color randomColor() {
