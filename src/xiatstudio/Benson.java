@@ -286,6 +286,9 @@ public class Benson {
 		g2.rotate(Math.toRadians(180), 640, 360);
 
 		groupComp(g2, displayMode);
+		g2.setColor(new Color(255,0,0));
+
+		plotHesitation(g2);
 
 		//divideComp(g2, displayMode);
 
@@ -305,6 +308,11 @@ public class Benson {
 		g2.drawString("Length: " + getTotalLength(), 30, yCoorBase + vertGap * 7);
 		g2.drawString("Size: " + (int) getSize()[0] + " x " + (int) getSize()[1], 30, yCoorBase + vertGap * 8);
 		g2.drawString("Pen Off: " + penoffCount() * 100 / (this.timeStamp + 1) + " %", 30, yCoorBase + vertGap * 9);
+		infoMsg(g2,"Hesitation: ",getHesitation(),yCoorBase+vertGap*10);
+	}
+
+	public void infoMsg(Graphics2D g2, String infoTitle, Object info, int pos){
+		g2.drawString(infoTitle + info, 30, pos);
 	}
 
 	public void vertexPoint(Graphics2D g2) {
@@ -480,7 +488,7 @@ public class Benson {
 	public void angleBasedCompoReg() {
 		int compoGroup = 0;
 		int compoIndex = 0;
-		double[] angleRange = { 10, 65 };
+		double[] angleRange = { 15, 65 };
 
 		for (int i = 0; i < this.timeStamp - 1; i++) {
 
@@ -628,6 +636,44 @@ public class Benson {
 		return Math.sqrt((x[0] - x[1]) * (x[0] - x[1]) + (y[0] - y[1]) * (y[0] - y[1]));
 	}
 
+	public int getHesitation(){
+		int hesitation = 0;
+		int tickJump = 2;
+		
+		for(int i = 0; i < this.timeStamp - tickJump; i++){
+			if(this.penPressure[i] != 0 && this.penPressure[i+tickJump] != 0){
+				float[] tmpX = {this.xAxis[i],this.xAxis[i+tickJump]};
+				float[] tmpY = {this.yAxis[i],this.yAxis[i+tickJump]};
+				if((getDistanceBetweenPoints(tmpX, tmpY)) < 0.1){
+					hesitation++;
+				}
+			}
+		}
+		return hesitation;
+	}
+
+	public double getHesitationPortion(){
+		if(this.timeStamp != 0)
+			return (double)getHesitation() / this.timeStamp;
+		else
+			return -1;
+	}
+
+	public void plotHesitation(Graphics2D g2){
+		int tickJump = 5;
+
+		for(int i = 0; i < this.timeStamp - tickJump; i++){
+			if(this.penPressure[i] != 0 && this.penPressure[i+tickJump] != 0){
+				float[] tmpX = {this.xAxis[i],this.xAxis[i+tickJump]};
+				float[] tmpY = {this.yAxis[i],this.yAxis[i+tickJump]};
+				if((getDistanceBetweenPoints(tmpX, tmpY)) < 0.1){
+					g2.setColor(new Color(255,0,0));
+					g2.fillOval((int)tmpX[0],(int)tmpY[0],8,8);
+				}
+			}
+		}
+	}
+
 	public double getPointAngle(float[] x, float[] y) {
 		double angle = 0;
 		if (x[1] != x[0] && y[1] != y[0]) {
@@ -736,13 +782,13 @@ public class Benson {
 	}
 
 	public double penoffCount() {
-		double hesitate = 0;
+		double penOff = 0;
 		for (int i = 0; i < this.timeStamp - 1; i++) {
 			if (this.penPressure[i] == 0)
-				hesitate++;
+				penOff++;
 		}
 
-		return hesitate;
+		return penOff;
 	}
 
 	public void markPenoff(Graphics2D g2) {
