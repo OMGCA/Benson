@@ -8,9 +8,10 @@ import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -39,6 +40,7 @@ public class Main extends JFrame {
 	public static void main(String[] args) {
 		/* Load GUI component */
 		GUISetup();
+		System.gc();
 	}
 
 	public static void GUISetup() {
@@ -53,8 +55,8 @@ public class Main extends JFrame {
 		JFrame frame = new JFrame();
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menu, menu2, menu3, exportMenu, exportAllMenu;
-		JMenuItem menuItem, menuItem2, menuItem3, menuItem4, menuItem5;
-		JMenuItem mode1, mode2, mode3, mode4;
+		JMenuItem menuItem, menuItem2, menuItem3, menuItem4, menuItem5,menuItem6;
+		JMenuItem mode1, mode2, mode3, mode4,exportLibSVMData;
 		JMenuItem pen_offON, pen_offOFF;
 
 		/* Background color */
@@ -78,13 +80,16 @@ public class Main extends JFrame {
 		mode4 = new JMenuItem("Oblique");
 		exportMenu = new JMenu("Export as...");
 		exportAllMenu = new JMenu("Export all as...");
+		exportLibSVMData = new JMenuItem("Convert to LibSVM Data");
 		menuItem2 = new JMenuItem("PNG Image");
 		menuItem3 = new JMenuItem("CSV File");
 		menuItem4 = new JMenuItem("PNG Image");
 		menuItem5 = new JMenuItem("CSV File");
+		menuItem6 = new JMenuItem("CSV File (data only)");
 		menu.add(menuItem);
 		menu.add(exportMenu);
 		menu.add(exportAllMenu);
+		menu.add(exportLibSVMData);
 		menu2.add(mode1);
 		menu2.add(mode2);
 		menu2.add(mode3);
@@ -94,6 +99,7 @@ public class Main extends JFrame {
 
 		exportAllMenu.add(menuItem4);
 		exportAllMenu.add(menuItem5);
+		exportAllMenu.add(menuItem6);
 
 		panel = new GPanel();
 		frame.setJMenuBar(menuBar);
@@ -177,9 +183,28 @@ public class Main extends JFrame {
 					displayMode = 0;
 					panel.repaint();
 					frame.setTitle("Currently viewing: " + data);
+					System.gc();
 					// System.out.println(data);
 					break;
 				}
+			}
+		});
+
+		exportLibSVMData.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e){
+				JFileChooser fileChooser = new JFileChooser(".\\Sheets");
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("CSV File(*.csv)","csv");
+				fileChooser.setFileFilter(filter);
+
+				switch(fileChooser.showOpenDialog(panel)){
+					case JFileChooser.APPROVE_OPTION:
+						String dataPending = fileChooser.getSelectedFile().getPath();
+						exportLibSVMData(dataPending);
+						System.gc();
+						break;
+				}
+				
 			}
 		});
 
@@ -229,6 +254,20 @@ public class Main extends JFrame {
 						+ new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()) + ".csv");
 			}
 		});
+
+		menuItem6.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e){
+				String[] controlDataList = getDataList("M:\\eclipse-workspace\\bensonFigure\\Benson_Data\\Controls\\");
+				exportDataOnly(controlDataList, ".\\Sheets\\control_data_only"
+						+ new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()) + ".csv");
+				String[] patientDataList = getDataList("M:\\eclipse-workspace\\bensonFigure\\Benson_Data\\Patients\\");
+				exportDataOnly(patientDataList, ".\\Sheets\\patient_data_only"
+						+ new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()) + ".csv");
+			}
+		});
+
+		
 	}
 
 	public static void objectCSVFileCreation(String fileName) {
@@ -298,6 +337,92 @@ public class Main extends JFrame {
 
 		return fileList;
 	}
+	
+	public static void exportDataOnly(String[] dataList, String fileName) {
+		objectCSVFileCreation(fileName);
+		FileWriter writer;
+
+		try {
+			writer = new FileWriter(fileName, true);
+
+			for (int i = 0; i < dataList.length; i++) {
+
+				Benson b = new Benson(dataList[i].replace("\\", "/"));
+				b.calcThreeLength();
+				String[] dataPending = { b.getID(), b.getFigureMode(), String.valueOf(b.timeSpent/10000),
+						String.valueOf(b.getTotalLength()/100000), String.valueOf(b.getSize()[0] * b.getSize()[1] / 1000000),
+						String.valueOf((double) (b.getSize()[0] / b.getSize()[1] / 10)), String.valueOf(b.getVelocitySD()/10),
+						String.valueOf(b.getAngleSD()/10), String.valueOf(b.penoffCount() / (b.getTimeStamp() + 1)),
+						String.valueOf((double)(b.getHoriPortion())),String.valueOf((double)b.getVertPortion()), String.valueOf((double)b.getObliPortion()),
+						String.valueOf((double)b.getThreeSD()[0]), String.valueOf((double)b.getThreeSD()[1]),String.valueOf((double)b.getThreeSD()[2]),
+						String.valueOf((double)b.getHesitation()/1000),String.valueOf((double)b.getHesitationPortion())};
+
+				System.out.println("Exporting data from " + b.getID() + "_" + b.getFigureMode());
+
+				writeData(writer, dataPending);
+
+				writer.append("\r\n");
+
+			}
+
+			System.out.println("File " + fileName + " created");
+			System.out.println(" ");
+
+			writer.flush();
+			writer.close();
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void exportLibSVMData(String fileName){
+		String libsvmFilename = fileName + ".libsvm";
+		objectCSVFileCreation(libsvmFilename);
+		FileWriter writer;
+		String line = "";
+		BufferedReader br = null;
+
+		try{
+			writer = new FileWriter(libsvmFilename,true);
+			br = new BufferedReader(new FileReader(fileName));
+
+			while((line = br.readLine()) != null){
+				String[] tmpArray = line.split(",");
+				if(Integer.parseInt(tmpArray[tmpArray.length-1]) > 2){
+					writer.append("+1");
+					writer.append(" ");
+				}
+				else{
+					writer.append("-1");
+					writer.append(" ");
+				}
+				for(int i = 1; i < tmpArray.length-1; i++){
+					writer.append(i+":" + tmpArray[i]);
+					writer.append(" ");
+				}
+
+				writer.append("\r\n");
+			}
+
+			writer.flush();
+			writer.close();
+		} catch (FileNotFoundException e) {
+			System.out.println("ERROR: Specific data file can not be found.");
+		} catch (IOException e) {
+			System.out.println("ERROR: Specific data file can not be accessed.");
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 
 	public static void exportAllData(String[] dataList, String fileName) {
 		objectCSVFileCreation(fileName);
@@ -307,7 +432,7 @@ public class Main extends JFrame {
 			writer = new FileWriter(fileName, true);
 			String[] title = { "Subject ID", "Mode", "Total time", "Total length", "Size", "Aspect Ratio",
 					"Velocity Stability", "Angular Stability", "Pen Off %","Hori Portion","Vert Portion","Obli Portion",
-					"Hori SD","Vert SD","Obli SD"};
+					"Hori SD","Vert SD","Obli SD","Hesitation Count","Hesitation Portion"};
 			writeData(writer, title);
 			writer.append("\r\n");
 
@@ -315,12 +440,13 @@ public class Main extends JFrame {
 
 				Benson b = new Benson(dataList[i].replace("\\", "/"));
 				b.calcThreeLength();
-				String[] dataPending = { b.getID(), b.getFigureMode(), String.valueOf(b.timeSpent),
-						String.valueOf(b.getTotalLength()), String.valueOf(b.getSize()[0] * b.getSize()[1]),
-						String.valueOf((double) (b.getSize()[0] / b.getSize()[1])), String.valueOf(b.getVelocitySD()),
-						String.valueOf(b.getAngleSD()), String.valueOf(b.penoffCount() / (b.getTimeStamp() + 1)),
+				String[] dataPending = { b.getID(), b.getFigureMode(), String.valueOf(b.timeSpent/10000),
+						String.valueOf(b.getTotalLength()/10000), String.valueOf(b.getSize()[0] * b.getSize()[1] / 1000000),
+						String.valueOf((double) (b.getSize()[0] / b.getSize()[1] / 10)), String.valueOf(b.getVelocitySD()/10),
+						String.valueOf(b.getAngleSD()/10), String.valueOf(b.penoffCount() / (b.getTimeStamp() + 1)),
 						String.valueOf((double)(b.getHoriPortion())),String.valueOf((double)b.getVertPortion()), String.valueOf((double)b.getObliPortion()),
-						String.valueOf((double)b.getThreeSD()[0]), String.valueOf((double)b.getThreeSD()[1]),String.valueOf((double)b.getThreeSD()[2])};
+						String.valueOf((double)b.getThreeSD()[0]), String.valueOf((double)b.getThreeSD()[1]),String.valueOf((double)b.getThreeSD()[2]),
+						String.valueOf(b.getHesitation()/1000),String.valueOf((double)b.getHesitationPortion())};
 
 				System.out.println("Exporting data from " + b.getID() + "_" + b.getFigureMode());
 
@@ -345,6 +471,7 @@ public class Main extends JFrame {
 
 	public static void writeData(FileWriter writer, String[] data) throws IOException {
 		for (int i = 0; i < data.length; i++) {
+		
 			writer.append(data[i]);
 			writer.append(',');
 		}
