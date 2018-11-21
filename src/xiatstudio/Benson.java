@@ -96,8 +96,8 @@ public class Benson {
 			br = new BufferedReader(new FileReader(ratingSheet));
 			while((line = br.readLine()) != null){
 				String[] ratingPair = line.split(",");
-				if(ratingPair[0].equals(getID())){
-					this.rating = Integer.parseInt(ratingPair[1]);
+				if(ratingPair[0].equals(getID()) && ratingPair[1].equals(getFigureMode())){
+					this.rating = Integer.parseInt(ratingPair[2]);
 					break;
 				}
 			}
