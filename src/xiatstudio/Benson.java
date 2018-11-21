@@ -28,6 +28,7 @@ public class Benson {
 	double obliLength;
 	float timeSpent;
 	int timeStamp;
+	int rating;
 	String data;
 	ArrayList<Component> components;
 
@@ -45,6 +46,7 @@ public class Benson {
 		this.vertLength = 0;
 		this.obliLength = 0;
 		this.timeSpent = 0;
+		registerRating(".\\Sheets\\rating.csv");
 		this.penPressure = new float[timeStamp];
 		this.components = new ArrayList<Component>();
 
@@ -85,6 +87,37 @@ public class Benson {
 		}
 
 		return counter;
+	}
+
+	public void registerRating(String ratingSheet){
+		BufferedReader br = null;
+		String line = "";
+		try{
+			br = new BufferedReader(new FileReader(ratingSheet));
+			while((line = br.readLine()) != null){
+				String[] ratingPair = line.split(",");
+				if(ratingPair[0].equals(getID())){
+					this.rating = Integer.parseInt(ratingPair[1]);
+					break;
+				}
+			}
+		} catch (FileNotFoundException e) {
+			System.out.println("ERROR: Specific data file can not be found.");
+		} catch (IOException e) {
+			System.out.println("ERROR: Specific data file can not be accessed.");
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public int getRating(){
+		return this.rating;
 	}
 
 	public void initData() {
@@ -488,7 +521,7 @@ public class Benson {
 	public void angleBasedCompoReg() {
 		int compoGroup = 0;
 		int compoIndex = 0;
-		double[] angleRange = { 15, 65 };
+		double[] angleRange = { 10, 70 };
 
 		for (int i = 0; i < this.timeStamp - 1; i++) {
 
@@ -571,8 +604,18 @@ public class Benson {
 					groupComponents.get(i).drawComponent(g2);
 				}
 			} else{
-				g2.setColor(colorSet.get(displayMode-1));
-				groupComponents.get(displayMode-1).drawComponent(g2);
+				if(displayMode < 4){
+					g2.setColor(colorSet.get(displayMode-1));
+					groupComponents.get(displayMode-1).drawComponent(g2);
+				}
+				else{
+					for (int i = 0; i < 3; i++) {
+						g2.setColor(colorSet.get(i));
+						groupComponents.get(i).drawComponent(g2);
+					}
+					markPenoff(g2);
+				}
+				
 			}
 				
 		}
@@ -594,7 +637,6 @@ public class Benson {
 					if (tmpDistance < 20) {
 						indieCompos.get(indieCompos.size()-1).addNewAxis(tmpX[0], tmpY[0]);
 					} else {
-						
 						indieCompos.add(new Component(0));
 						indieCompos.get(indieCompos.size()-1).addNewAxis(tmpX[0], tmpY[0]);
 					}
@@ -823,7 +865,8 @@ public class Benson {
 			if (tmpComp.getLength() > 1) {
 				if (displayMode == 0) {
 					for (int j = 0; j < tmpComp.getAxisSize() - 1; j++) {
-						tmpComp.drawComponent(g2);					}
+						tmpComp.drawComponent(g2);
+					}
 				} else if (displayMode == 1) {
 					if (tmpComp.getIndex() == 2) {
 							tmpComp.drawComponent(g2);	
@@ -836,6 +879,11 @@ public class Benson {
 					if (tmpComp.getIndex() == 4) {
 							tmpComp.drawComponent(g2);
 					}
+				} else if (displayMode == 4) {
+					for (int j = 0; j < tmpComp.getAxisSize() - 1; j++) {
+						tmpComp.drawComponent(g2);
+					}
+					markPenoff(g2);
 				}
 			}
 		}
