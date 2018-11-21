@@ -2,8 +2,9 @@
 #include <math.h>
 #include <stdlib.h>
 #include "cgp-sls.h"
+#include <time.h>
 
-double thresHold[] = {100,200,300};
+double thresHold[] = {10,20,30};
 double simpleThresholdClassifier(struct parameters *params, struct chromosome *chromo, struct dataSet *data);
 
 int main(void)
@@ -16,13 +17,13 @@ int main(void)
 	struct chromosome *chromo = NULL;
 
 	int numInputs = 15;
-	int numNodes = 20;
+	int numNodes = 15;
 	int numOutputs = 1;
-	int nodeArity = 6;
+	int nodeArity = 5;
 
-	int numGens = 200000;
+	int numGens = 125150;
 	double targetFitness = 0.1;
-	int updateFrequency = 500;
+	int updateFrequency = 50;
 
 	params = initialiseParameters(numInputs, numNodes, numOutputs, nodeArity);
 
@@ -32,7 +33,7 @@ int main(void)
 
 	setTargetFitness(params, targetFitness);
 
-	setMutationRate(params, 0.05);
+	setMutationRate(params, 0.08);
 
 	setShortcutConnections(params,0);
 
@@ -47,7 +48,7 @@ int main(void)
 	// Note: you may need to check this path such that it is relative to your executable
 	trainingData = initialiseDataSetFromFile("./01_training.csv");
 	validationData = initialiseDataSetFromFile("./02_validation.csv");
-	testData = initialiseDataSetFromFile("./03_test.csv");
+	testData = initialiseDataSetFromFile("./03_testing.csv");
 
 	chromo = runValiTestCGP(params, trainingData, validationData, testData, numGens);
 
@@ -65,9 +66,9 @@ int main(void)
 		executeChromosome(chromo, getDataSetSampleInputs(testData, i));
 		double chromoOutput = 0;
 
-        	chromoOutput = getChromosomeOutput(chromo, 0);
+        chromoOutput = getChromosomeOutput(chromo, 0);
 		int expectedOutput = getDataSetSampleOutputs(testData, i)[0];
-        	printf("%.2f ", chromoOutput);
+        printf("%.2f ", chromoOutput);
 
 		switch (expectedOutput){
 			case 1:
