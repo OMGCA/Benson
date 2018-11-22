@@ -6,10 +6,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.LayoutManager;
 import java.awt.RenderingHints;
-import java.awt.TextArea;
 import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,13 +18,11 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 
 import javax.imageio.ImageIO;
@@ -283,70 +278,115 @@ public class Main extends JFrame {
 		menuItem7.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String dataSetFolder = exportCGPDataSet();
-				Path sourceDir = Paths.get(dataSetFolder);
-				Path targetDir = Paths.get(".\\Algorithm_Training\\");
 				JFrame popUp = new JFrame();
-				JLabel msg = new JLabel("Cover existing data set?");
-				
+				popUp.setVisible(true);
+				popUp.setSize(400, 150);
+				popUp.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				popUp.setLayout(new GridBagLayout());
+				popUp.setTitle("Exporting CGP compatible data set");
 				GridBagConstraints c = new GridBagConstraints();
 				c.fill = GridBagConstraints.HORIZONTAL;
-				c.ipadx = 400;
+
+				JLabel ratioPrompt = new JLabel("Ratio for training data (in %)");
+				TextField trRatio = new TextField(10);
+				JButton exportData = new JButton("Export");
+
 				c.gridx = 0;
 				c.gridy = 0;
-				popUp.add(msg,c);
-				
-				JButton confirm = new JButton("Yes");
-				c.fill = GridBagConstraints.HORIZONTAL;
-				c.weightx = 0.5;
+				popUp.add(ratioPrompt, c);
+
+				c.gridx = 1;
+				c.gridy = 0;
+				popUp.add(trRatio, c);
+
+				c.gridx = 2;
+				c.gridy = 0;
+
+				popUp.add(exportData, c);
+
+				JLabel msg = new JLabel("Cover existing data set?");
 				c.gridx = 0;
 				c.gridy = 1;
-				popUp.add(confirm,c);
-				
-				JButton noConfirm = new JButton("No");
-				c.fill = GridBagConstraints.HORIZONTAL;
-				c.weightx = 0.4;
+				popUp.add(msg, c);
+
+				JButton confirm = new JButton("Yes");
+				c.weightx = 0.5;
 				c.gridx = 1;
 				c.gridy = 1;
-				popUp.add(noConfirm,c);
-				noConfirm.setSize(50,30);
-				confirm.setSize(50,30);
-				
-				popUp.setVisible(true);
-				popUp.setSize(400,150);
-				popUp.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				
-				confirm.addActionListener(new ActionListener() {
+				popUp.add(confirm, c);
+
+				JButton noConfirm = new JButton("No");
+				c.weightx = 0.4;
+				c.gridx = 2;
+				c.gridy = 1;
+				popUp.add(noConfirm, c);
+				noConfirm.setSize(50, 30);
+				confirm.setSize(50, 30);
+
+				msg.setVisible(false);
+				confirm.setVisible(false);
+				noConfirm.setVisible(false);
+
+				TextField statusBar = new TextField(400);
+				statusBar.setEditable(false);
+				c.weightx = 0.2;
+				c.gridwidth = 3;
+				c.ipadx = 400;
+				c.gridx = 0;
+				c.gridy = 2;
+				popUp.add(statusBar, c);
+
+				exportData.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						File prevTraining = new File(".//Algorithm_Training//01_training.csv");
-						File prevValidation = new File(".//Algorithm_Training//02_validation.csv");
-						File prevTesting = new File(".//Algorithm_Training//03_testing.csv");
-						
-						File training = new File(dataSetFolder + "01_training.csv");
-						File validation = new File(dataSetFolder + "02_validation.csv");
-						File testing = new File(dataSetFolder + "03_testing.csv");
-						
-						try {
-							copyFile(training, prevTraining);
-							copyFile(validation, prevValidation);
-							copyFile(testing, prevTesting);
-						} catch (IOException e1) {
-							e1.printStackTrace();
-						}
+						double trainingRatio = Double.parseDouble(trRatio.getText()) / 100;
+						statusBar.setText("Exporting data set.");
+						String dataSetFolder = exportCGPDataSet(trainingRatio);
+						statusBar.setText("Data set exported to " + dataSetFolder + " folder.");
+
+						msg.setVisible(true);
+						confirm.setVisible(true);
+						noConfirm.setVisible(true);
+
+						confirm.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								File prevTraining = new File(".//Algorithm_Training//01_training.csv");
+								File prevValidation = new File(".//Algorithm_Training//02_validation.csv");
+								File prevTesting = new File(".//Algorithm_Training//03_testing.csv");
+
+								File training = new File(dataSetFolder + "01_training.csv");
+								File validation = new File(dataSetFolder + "02_validation.csv");
+								File testing = new File(dataSetFolder + "03_testing.csv");
+
+								try {
+									copyFile(training, prevTraining);
+									copyFile(validation, prevValidation);
+									copyFile(testing, prevTesting);
+									statusBar.setText("Data set copied to training root folder.");
+								} catch (IOException e1) {
+									e1.printStackTrace();
+								}
+							}
+						});
+
+						noConfirm.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								statusBar.setText("Operation cancelled, previous data set not covered.");
+							}
+						});
 					}
 				});
+
 			}
 		});
 
 	}
-	
 
 	public static void copyFile(File source, File dest) throws IOException {
-		Files.copy(source.toPath(), dest.toPath(),StandardCopyOption.REPLACE_EXISTING);
+		Files.copy(source.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
 	}
-
 
 	public static void objectCSVFileCreation(String fileName) {
 		File f = new File(fileName);
@@ -554,7 +594,7 @@ public class Main extends JFrame {
 		}
 	}
 
-	public static String exportCGPDataSet() {
+	public static String exportCGPDataSet(double trainingRatio) {
 		File newDataFolder = new File(
 				".\\Sheets\\DataSet\\" + new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()));
 		newDataFolder.mkdir();
@@ -562,25 +602,23 @@ public class Main extends JFrame {
 		String training = newDataFolder.getPath() + "\\01_training" + ".csv";
 		String validation = newDataFolder.getPath() + "\\02_validation" + ".csv";
 		String testing = newDataFolder.getPath() + "\\03_testing" + ".csv";
-		
+
 		objectCSVFileCreation(overall);
 		objectCSVFileCreation(training);
 		objectCSVFileCreation(validation);
 		objectCSVFileCreation(testing);
 
-		double classTotal[] = {23,59,52,29};
-		double trainingRatio = 0.7;
+		double classTotal[] = { 23, 59, 52, 29 };
 
 		int trainingClasses[] = new int[4];
 		int validationClasses[] = new int[4];
 		int testingClasses[] = new int[4];
 
-		for(int i = 0; i < 4; i++){
-			trainingClasses[i] = (int)Math.floor(classTotal[i]*trainingRatio);
-			validationClasses[i] = (int)Math.floor(classTotal[i]*(1-trainingRatio)/2);
-			testingClasses[i] = (int)(classTotal[i] - trainingClasses[i] - validationClasses[i]);
+		for (int i = 0; i < 4; i++) {
+			trainingClasses[i] = (int) Math.floor(classTotal[i] * trainingRatio);
+			validationClasses[i] = (int) Math.floor(classTotal[i] * (1 - trainingRatio) / 2);
+			testingClasses[i] = (int) (classTotal[i] - trainingClasses[i] - validationClasses[i]);
 		}
-		
 
 		int trainingCounter[] = { 0, 0, 0, 0 };
 		int validationCounter[] = { 0, 0, 0, 0 };
@@ -599,11 +637,13 @@ public class Main extends JFrame {
 					+ (trainingClasses[0] + trainingClasses[1] + trainingClasses[2] + trainingClasses[3]) + ",");
 			fwTraining.append("\r\n");
 
-			fwValidation
-					.append(cgpIOPair + (validationClasses[0] + validationClasses[1] + validationClasses[2] + validationClasses[3]) + ",");
+			fwValidation.append(cgpIOPair
+					+ (validationClasses[0] + validationClasses[1] + validationClasses[2] + validationClasses[3])
+					+ ",");
 			fwValidation.append("\r\n");
 
-			fwTesting.append(cgpIOPair + (testingClasses[0] + testingClasses[1] + testingClasses[2] + testingClasses[3]) + ",");
+			fwTesting.append(
+					cgpIOPair + (testingClasses[0] + testingClasses[1] + testingClasses[2] + testingClasses[3]) + ",");
 			fwTesting.append("\r\n");
 
 			String[] controlDataList = getDataList(".\\Benson_Data\\Controls\\");
@@ -627,7 +667,7 @@ public class Main extends JFrame {
 						String.valueOf((double) b.getObliPortion()), String.valueOf((double) b.getThreeSD()[0]),
 						String.valueOf((double) b.getThreeSD()[1]), String.valueOf((double) b.getThreeSD()[2]),
 						String.valueOf((double) b.getHesitation() / 1000),
-						String.valueOf((double) b.getHesitationPortion()*10), String.valueOf(b.getRating()) };
+						String.valueOf((double) b.getHesitationPortion() * 10), String.valueOf(b.getRating()) };
 
 				writeData(fwOverall, dataPending);
 				fwOverall.append("\r\n");
@@ -676,7 +716,7 @@ public class Main extends JFrame {
 			e.printStackTrace();
 		}
 
-		return newDataFolder.getPath()+"\\";
+		return newDataFolder.getPath() + "\\";
 
 	}
 
