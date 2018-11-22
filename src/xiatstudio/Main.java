@@ -55,8 +55,8 @@ public class Main extends JFrame {
 		JFrame frame = new JFrame();
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menu, menu2, menu3, exportMenu, exportAllMenu;
-		JMenuItem menuItem, menuItem2, menuItem3, menuItem4, menuItem5,menuItem6, menuItem7;
-		JMenuItem mode1, mode2, mode3, mode4,exportLibSVMData;
+		JMenuItem menuItem, menuItem2, menuItem3, menuItem4, menuItem5, menuItem6, menuItem7;
+		JMenuItem mode1, mode2, mode3, mode4, exportLibSVMData;
 		JMenuItem pen_offON, pen_offOFF;
 
 		/* Background color */
@@ -191,21 +191,21 @@ public class Main extends JFrame {
 			}
 		});
 
-		exportLibSVMData.addActionListener(new ActionListener(){
+		exportLibSVMData.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e){
+			public void actionPerformed(ActionEvent e) {
 				JFileChooser fileChooser = new JFileChooser(".\\Sheets");
-				FileNameExtensionFilter filter = new FileNameExtensionFilter("CSV File(*.csv)","csv");
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("CSV File(*.csv)", "csv");
 				fileChooser.setFileFilter(filter);
 
-				switch(fileChooser.showOpenDialog(panel)){
-					case JFileChooser.APPROVE_OPTION:
-						String dataPending = fileChooser.getSelectedFile().getPath();
-						exportLibSVMData(dataPending);
-						System.gc();
-						break;
+				switch (fileChooser.showOpenDialog(panel)) {
+				case JFileChooser.APPROVE_OPTION:
+					String dataPending = fileChooser.getSelectedFile().getPath();
+					exportLibSVMData(dataPending);
+					System.gc();
+					break;
 				}
-				
+
 			}
 		});
 
@@ -256,9 +256,9 @@ public class Main extends JFrame {
 			}
 		});
 
-		menuItem6.addActionListener(new ActionListener(){
+		menuItem6.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e){
+			public void actionPerformed(ActionEvent e) {
 				String[] controlDataList = getDataList("M:\\eclipse-workspace\\bensonFigure\\Benson_Data\\Controls\\");
 				exportDataOnly(controlDataList, ".\\Sheets\\control_data_only_"
 						+ new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()) + ".csv");
@@ -268,14 +268,13 @@ public class Main extends JFrame {
 			}
 		});
 
-		menuItem7.addActionListener(new ActionListener(){
+		menuItem7.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e){
+			public void actionPerformed(ActionEvent e) {
 				exportCGPDataSet();
 			}
 		});
 
-		
 	}
 
 	public static void objectCSVFileCreation(String fileName) {
@@ -345,7 +344,7 @@ public class Main extends JFrame {
 
 		return fileList;
 	}
-	
+
 	public static void exportDataOnly(String[] dataList, String fileName) {
 		objectCSVFileCreation(fileName);
 		FileWriter writer;
@@ -357,14 +356,17 @@ public class Main extends JFrame {
 
 				Benson b = new Benson(dataList[i].replace("\\", "/"));
 				b.calcThreeLength();
-				String[] dataPending = { b.getID(), b.getFigureMode(), String.valueOf(b.timeSpent/100000),
-						String.valueOf((double)(b.getTotalLength()/10000)), String.valueOf(b.getSize()[0] * b.getSize()[1] / 1000000),
-						String.valueOf((double) (b.getSize()[0] / b.getSize()[1] / 10)), String.valueOf(b.getVelocitySD()/10),
-						String.valueOf(b.getAngleSD()/10), String.valueOf(b.penoffCount() / (b.getTimeStamp() + 1)),
-						String.valueOf((double)(b.getHoriPortion())),String.valueOf((double)b.getVertPortion()), String.valueOf((double)b.getObliPortion()),
-						String.valueOf((double)b.getThreeSD()[0]), String.valueOf((double)b.getThreeSD()[1]),String.valueOf((double)b.getThreeSD()[2]),
-						String.valueOf((double)b.getHesitation()/1000),String.valueOf((double)b.getHesitationPortion()),
-						String.valueOf(b.getRating())};
+				String[] dataPending = { b.getID(), b.getFigureMode(), String.valueOf(b.timeSpent / 100000),
+						String.valueOf((double) (b.getTotalLength() / 10000)),
+						String.valueOf(b.getSize()[0] * b.getSize()[1] / 1000000),
+						String.valueOf((double) (b.getSize()[0] / b.getSize()[1] / 10)),
+						String.valueOf(b.getVelocitySD() / 10), String.valueOf(b.getAngleSD() / 10),
+						String.valueOf(b.penoffCount() / (b.getTimeStamp() + 1)),
+						String.valueOf((double) (b.getHoriPortion())), String.valueOf((double) b.getVertPortion()),
+						String.valueOf((double) b.getObliPortion()), String.valueOf((double) b.getThreeSD()[0]),
+						String.valueOf((double) b.getThreeSD()[1]), String.valueOf((double) b.getThreeSD()[2]),
+						String.valueOf((double) b.getHesitation() / 1000),
+						String.valueOf((double) b.getHesitationPortion()), String.valueOf(b.getRating()) };
 
 				System.out.println("Exporting data from " + b.getID() + "_" + b.getFigureMode());
 
@@ -387,29 +389,28 @@ public class Main extends JFrame {
 		}
 	}
 
-	public static void exportLibSVMData(String fileName){
+	public static void exportLibSVMData(String fileName) {
 		String libsvmFilename = fileName + ".libsvm";
 		objectCSVFileCreation(libsvmFilename);
 		FileWriter writer;
 		String line = "";
 		BufferedReader br = null;
 
-		try{
-			writer = new FileWriter(libsvmFilename,true);
+		try {
+			writer = new FileWriter(libsvmFilename, true);
 			br = new BufferedReader(new FileReader(fileName));
 
-			while((line = br.readLine()) != null){
+			while ((line = br.readLine()) != null) {
 				String[] tmpArray = line.split(",");
-				if(Integer.parseInt(tmpArray[tmpArray.length-1]) > 2){
+				if (Integer.parseInt(tmpArray[tmpArray.length - 1]) > 2) {
 					writer.append("+1");
 					writer.append(" ");
-				}
-				else{
+				} else {
 					writer.append("-1");
 					writer.append(" ");
 				}
-				for(int i = 1; i < tmpArray.length-1; i++){
-					writer.append(i+":" + tmpArray[i]);
+				for (int i = 1; i < tmpArray.length - 1; i++) {
+					writer.append(i + ":" + tmpArray[i]);
 					writer.append(" ");
 				}
 
@@ -440,8 +441,8 @@ public class Main extends JFrame {
 		try {
 			writer = new FileWriter(fileName, true);
 			String[] title = { "Subject ID", "Mode", "Total time", "Total length", "Size", "Aspect Ratio",
-					"Velocity Stability", "Angular Stability", "Pen Off %","Hori Portion","Vert Portion","Obli Portion",
-					"Hori SD","Vert SD","Obli SD","Hesitation Count","Hesitation Portion"};
+					"Velocity Stability", "Angular Stability", "Pen Off %", "Hori Portion", "Vert Portion",
+					"Obli Portion", "Hori SD", "Vert SD", "Obli SD", "Hesitation Count", "Hesitation Portion" };
 			writeData(writer, title);
 			writer.append("\r\n");
 
@@ -449,14 +450,17 @@ public class Main extends JFrame {
 
 				Benson b = new Benson(dataList[i].replace("\\", "/"));
 				b.calcThreeLength();
-				String[] dataPending = { b.getID(), b.getFigureMode(), String.valueOf(b.timeSpent/10000),
-						String.valueOf(b.getTotalLength()/10000), String.valueOf(b.getSize()[0] * b.getSize()[1] / 1000000),
-						String.valueOf((double) (b.getSize()[0] / b.getSize()[1] / 10)), String.valueOf(b.getVelocitySD()/10),
-						String.valueOf(b.getAngleSD()/10), String.valueOf(b.penoffCount() / (b.getTimeStamp() + 1)),
-						String.valueOf((double)(b.getHoriPortion())),String.valueOf((double)b.getVertPortion()), String.valueOf((double)b.getObliPortion()),
-						String.valueOf((double)b.getThreeSD()[0]), String.valueOf((double)b.getThreeSD()[1]),String.valueOf((double)b.getThreeSD()[2]),
-						String.valueOf((double)b.getHesitation()/1000),String.valueOf((double)b.getHesitationPortion()),
-						String.valueOf(b.getRating())};
+				String[] dataPending = { b.getID(), b.getFigureMode(), String.valueOf(b.timeSpent / 10000),
+						String.valueOf(b.getTotalLength() / 10000),
+						String.valueOf(b.getSize()[0] * b.getSize()[1] / 1000000),
+						String.valueOf((double) (b.getSize()[0] / b.getSize()[1] / 10)),
+						String.valueOf(b.getVelocitySD() / 10), String.valueOf(b.getAngleSD() / 10),
+						String.valueOf(b.penoffCount() / (b.getTimeStamp() + 1)),
+						String.valueOf((double) (b.getHoriPortion())), String.valueOf((double) b.getVertPortion()),
+						String.valueOf((double) b.getObliPortion()), String.valueOf((double) b.getThreeSD()[0]),
+						String.valueOf((double) b.getThreeSD()[1]), String.valueOf((double) b.getThreeSD()[2]),
+						String.valueOf((double) b.getHesitation() / 1000),
+						String.valueOf((double) b.getHesitationPortion()), String.valueOf(b.getRating()) };
 
 				System.out.println("Exporting data from " + b.getID() + "_" + b.getFigureMode());
 
@@ -479,8 +483,9 @@ public class Main extends JFrame {
 		}
 	}
 
-	public static void exportCGPDataSet(){
-		File newDataFolder = new File(".\\Sheets\\DataSet\\"+new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()));
+	public static void exportCGPDataSet() {
+		File newDataFolder = new File(
+				".\\Sheets\\DataSet\\" + new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()));
 		newDataFolder.mkdir();
 		String overall = newDataFolder.getPath() + "\\00_overall" + ".csv";
 		String training = newDataFolder.getPath() + "\\01_training" + ".csv";
@@ -492,70 +497,90 @@ public class Main extends JFrame {
 		objectCSVFileCreation(validation);
 		objectCSVFileCreation(testing);
 
-		int trainingClasses[] = {17,45,36,21};
-		int otherClasses[] = {3,7,8,4};
+		double classTotal[] = {23,59,52,29};
+		double trainingRatio = 0.6;
 
-		int trainingCounter[] = {0,0,0,0};
-		int validationCounter[] = {0,0,0,0};
-		int testingCounter[] = {0,0,0,0};
+		int trainingClasses[] = new int[4];
+		int validationClasses[] = new int[4];
+		int testingClasses[] = new int[4];
 
+		for(int i = 0; i < 4; i++){
+			trainingClasses[i] = (int)Math.floor(classTotal[i]*trainingRatio);
+			validationClasses[i] = (int)Math.floor(classTotal[i]*(1-trainingRatio)/2);
+			testingClasses[i] = (int)(classTotal[i] - trainingClasses[i] - validationClasses[i]);
+		}
+		
 
-		FileWriter fwOverall,fwTraining, fwValidation, fwTesting;
-		try{
-			fwOverall = new FileWriter(overall,true);
+		int trainingCounter[] = { 0, 0, 0, 0 };
+		int validationCounter[] = { 0, 0, 0, 0 };
+		int testingCounter[] = { 0, 0, 0, 0 };
+
+		String cgpIOPair = "15,1,";
+
+		FileWriter fwOverall, fwTraining, fwValidation, fwTesting;
+		try {
+			fwOverall = new FileWriter(overall, true);
 			fwTraining = new FileWriter(training, true);
 			fwValidation = new FileWriter(validation, true);
 			fwTesting = new FileWriter(testing, true);
 
-			fwTraining.append("15,1,"+(trainingClasses[0]+trainingClasses[1]+trainingClasses[2]+trainingClasses[3])+",");
+			fwTraining.append(cgpIOPair
+					+ (trainingClasses[0] + trainingClasses[1] + trainingClasses[2] + trainingClasses[3]) + ",");
 			fwTraining.append("\r\n");
-			fwValidation.append("15,1,"+(otherClasses[0]+otherClasses[1]+otherClasses[2]+otherClasses[3])+",");
+
+			fwValidation
+					.append(cgpIOPair + (validationClasses[0] + validationClasses[1] + validationClasses[2] + validationClasses[3]) + ",");
 			fwValidation.append("\r\n");
-			fwTesting.append("15,1,"+(otherClasses[0]+otherClasses[1]+otherClasses[2]+otherClasses[3])+",");
+
+			fwTesting.append(cgpIOPair + (testingClasses[0] + testingClasses[1] + testingClasses[2] + testingClasses[3]) + ",");
 			fwTesting.append("\r\n");
 
-			String[] controlDataList = getDataList("M:\\eclipse-workspace\\bensonFigure\\Benson_Data\\Controls\\");
-			String[] patientDataList = getDataList("M:\\eclipse-workspace\\bensonFigure\\Benson_Data\\Patients\\");
+			String[] controlDataList = getDataList(".\\Benson_Data\\Controls\\");
+			String[] patientDataList = getDataList(".\\Benson_Data\\Patients\\");
 			String[] overallDataList = new String[controlDataList.length + patientDataList.length];
-			for(int i = 0; i < overallDataList.length; i++){
-				if(i < controlDataList.length)
+			for (int i = 0; i < overallDataList.length; i++) {
+				if (i < controlDataList.length)
 					overallDataList[i] = controlDataList[i];
 				else
-					overallDataList[i] = patientDataList[i-controlDataList.length];
-				
-				Benson b = new Benson(overallDataList[i].replace("\\","/"));
+					overallDataList[i] = patientDataList[i - controlDataList.length];
+
+				Benson b = new Benson(overallDataList[i].replace("\\", "/"));
 				b.calcThreeLength();
-				String[] dataPending = {String.valueOf(b.timeSpent/10000),
-					String.valueOf(b.getTotalLength()/10000), String.valueOf(b.getSize()[0] * b.getSize()[1] / 1000000),
-					String.valueOf((double) (b.getSize()[0] / b.getSize()[1] / 10)), String.valueOf(b.getVelocitySD()/10),
-					String.valueOf(b.getAngleSD()/10), String.valueOf(b.penoffCount() / (b.getTimeStamp() + 1)),
-					String.valueOf((double)(b.getHoriPortion())),String.valueOf((double)b.getVertPortion()), String.valueOf((double)b.getObliPortion()),
-					String.valueOf((double)b.getThreeSD()[0]), String.valueOf((double)b.getThreeSD()[1]),String.valueOf((double)b.getThreeSD()[2]),
-					String.valueOf((double)b.getHesitation()/1000),String.valueOf((double)b.getHesitationPortion()),
-					String.valueOf(b.getRating())};
-				
-				writeData(fwOverall,dataPending);
+				String[] dataPending = { String.valueOf(b.timeSpent / 100000),
+						String.valueOf(b.getTotalLength() / 10000),
+						String.valueOf(b.getSize()[0] * b.getSize()[1] / 1000000),
+						String.valueOf((double) (b.getSize()[0] / b.getSize()[1] / 10)),
+						String.valueOf(b.getVelocitySD() / 10), String.valueOf(b.getAngleSD() / 10),
+						String.valueOf(b.penoffCount() / (b.getTimeStamp() + 1)),
+						String.valueOf((double) (b.getHoriPortion())), String.valueOf((double) b.getVertPortion()),
+						String.valueOf((double) b.getObliPortion()), String.valueOf((double) b.getThreeSD()[0]),
+						String.valueOf((double) b.getThreeSD()[1]), String.valueOf((double) b.getThreeSD()[2]),
+						String.valueOf((double) b.getHesitation() / 1000),
+						String.valueOf((double) b.getHesitationPortion()*10), String.valueOf(b.getRating()) };
+
+				writeData(fwOverall, dataPending);
 				fwOverall.append("\r\n");
 
-				if(trainingCounter[b.getRating()-1] != trainingClasses[b.getRating()-1]){
+				if (trainingCounter[b.getRating() - 1] != trainingClasses[b.getRating() - 1]) {
 					writeData(fwTraining, dataPending);
 					fwTraining.append("\r\n");
-					trainingCounter[b.getRating()-1]++;
-					System.out.println("Data " + b.getID() + "_" + b.getFigureMode() +" exported to training data set.");
-				}
-				else if (validationCounter[b.getRating()-1] != otherClasses[b.getRating()-1]){
-					writeData(fwValidation,dataPending);
+					trainingCounter[b.getRating() - 1]++;
+					System.out
+							.println("Data " + b.getID() + "_" + b.getFigureMode() + " exported to training data set.");
+				} else if (validationCounter[b.getRating() - 1] != validationClasses[b.getRating() - 1]) {
+					writeData(fwValidation, dataPending);
 					fwValidation.append("\r\n");
-					validationCounter[b.getRating()-1]++;
-					System.out.println("Data " + b.getID() + "_" + b.getFigureMode() +" exported to validation data set.");
-				}
-				else if(testingCounter[b.getRating()-1] != otherClasses[b.getRating()-1]){
-					writeData(fwTesting,dataPending);
+					validationCounter[b.getRating() - 1]++;
+					System.out.println(
+							"Data " + b.getID() + "_" + b.getFigureMode() + " exported to validation data set.");
+				} else if (testingCounter[b.getRating() - 1] != testingClasses[b.getRating() - 1]) {
+					writeData(fwTesting, dataPending);
 					fwTesting.append("\r\n");
-					testingCounter[b.getRating()-1]++;
-					System.out.println("Data " + b.getID() + "_" + b.getFigureMode() +" exported to testing data set.");
+					testingCounter[b.getRating() - 1]++;
+					System.out
+							.println("Data " + b.getID() + "_" + b.getFigureMode() + " exported to testing data set.");
 				}
-				
+
 			}
 
 			System.out.println("Data set export complete.");
@@ -573,19 +598,18 @@ public class Main extends JFrame {
 			fwTesting.close();
 
 			System.gc();
-			
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-
 	}
 
 	public static void writeData(FileWriter writer, String[] data) throws IOException {
 		for (int i = 0; i < data.length; i++) {
-		
+
 			writer.append(data[i]);
 			writer.append(',');
 		}
