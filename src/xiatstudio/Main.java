@@ -608,7 +608,28 @@ public class Main extends JFrame {
 		objectCSVFileCreation(validation);
 		objectCSVFileCreation(testing);
 
-		double classTotal[] = { 23, 59, 52, 29 };
+		double classTotal[] = { 0, 0, 0, 0 };
+
+		BufferedReader br = null;
+		String line = "";
+		try{
+			br = new BufferedReader(new FileReader(".\\Sheets\\rating.csv"));
+			while((line = br.readLine()) != null){
+				classTotal[Integer.parseInt(line.split(",")[2]) - 1]++;
+			}
+		} catch (FileNotFoundException e) {
+			System.out.println("ERROR: Specific data file can not be found.");
+		} catch (IOException e) {
+			System.out.println("ERROR: Specific data file can not be accessed.");
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 
 		int trainingClasses[] = new int[4];
 		int validationClasses[] = new int[4];
