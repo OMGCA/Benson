@@ -2,6 +2,7 @@ package xiatstudio;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
@@ -11,6 +12,8 @@ import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.awt.Image;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,6 +21,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,6 +39,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
+import javax.swing.ImageIcon;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 @SuppressWarnings("serial")
@@ -63,7 +68,7 @@ public class Main extends JFrame {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menu, menu2, menu3, exportMenu, exportAllMenu;
 		JMenuItem menuItem, menuItem2, menuItem3, menuItem4, menuItem5, menuItem6, menuItem7;
-		JMenuItem mode1, mode2, mode3, mode4, exportLibSVMData;
+		JMenuItem mode1, mode2, mode3, mode4, exportLibSVMData, setCGPParams;
 		JMenuItem pen_offON, pen_offOFF;
 
 		/* Background color */
@@ -88,6 +93,7 @@ public class Main extends JFrame {
 		exportMenu = new JMenu("Export as...");
 		exportAllMenu = new JMenu("Export all as...");
 		exportLibSVMData = new JMenuItem("Convert to LibSVM Data");
+		setCGPParams = new JMenuItem("Set CGP Parameters");
 		menuItem2 = new JMenuItem("PNG Image");
 		menuItem3 = new JMenuItem("CSV File");
 		menuItem4 = new JMenuItem("PNG Image");
@@ -98,6 +104,7 @@ public class Main extends JFrame {
 		menu.add(exportMenu);
 		menu.add(exportAllMenu);
 		menu.add(exportLibSVMData);
+		menu.add(setCGPParams);
 		menu2.add(mode1);
 		menu2.add(mode2);
 		menu2.add(mode3);
@@ -117,6 +124,8 @@ public class Main extends JFrame {
 		frame.setSize(1280, 720);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
+		ImageIcon xt_logo = new ImageIcon("xt_logo.png");
+		frame.setIconImage(xt_logo.getImage());
 
 		mode1.addActionListener(new ActionListener() {
 			@Override
@@ -198,6 +207,73 @@ public class Main extends JFrame {
 			}
 		});
 
+		setCGPParams.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e){
+				JLabel params[] = new JLabel[9];
+				TextField cgpParams[] = new TextField[9];
+				JFrame frame = new JFrame();
+				frame.setSize(600,400);
+				frame.setTitle("Set CGP Parameters");
+				frame.setVisible(true);
+				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				frame.setLayout(new GridBagLayout());
+				frame.setIconImage(xt_logo.getImage());
+				GridBagConstraints c = new GridBagConstraints();
+				c.fill = GridBagConstraints.HORIZONTAL;
+
+				String cgpTags[] = {"Threshold 1","Threshold 2","Threshold 3",
+				"Nodes", "Arity","Max Generations","Update Frequency","Random number seed","Mutation Rate"};
+
+				String defaultValue[] = {"10","20","30","20","3","100000","500","1234","0.08"};
+
+				for(int i = 0; i < 9; i++){
+					c.gridx = 0;
+					c.gridy = i;
+					params[i] = new JLabel(cgpTags[i]);
+					params[i].setFont(new Font("Segoe UI", Font.PLAIN, 12));
+					frame.add(params[i],c);
+
+					c.gridx = 1;
+					c.gridy = i;
+					cgpParams[i] = new TextField(10);
+					cgpParams[i].setFont(new Font("Segoe UI", Font.PLAIN, 12));
+					cgpParams[i].setText(defaultValue[i]);
+					
+					frame.add(cgpParams[i],c);
+				}
+
+				JButton export = new JButton("Save parameter");
+				export.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+				c.gridx = 0;
+				c.gridy = 9;
+				frame.add(export,c);
+
+				export.addActionListener(new ActionListener(){
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						FileWriter writer;
+						try{
+							File cgp_Param = new File(".\\Algorithm_Training\\cgp_params.txt");
+							writer = new FileWriter(cgp_Param,false);
+							for(int i = 0; i < 9; i++){
+								writer.append(cgpParams[i].getText());
+								writer.append("\n");
+							}
+
+							writer.flush();
+							writer.close();
+						} catch (IOException e2){
+							e2.printStackTrace();
+						}
+
+						
+					}
+				});
+
+			}
+		});
+
 		exportLibSVMData.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -244,9 +320,9 @@ public class Main extends JFrame {
 		menuItem4.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String[] controlDataList = getDataList("M:\\eclipse-workspace\\bensonFigure\\Benson_Data\\Controls\\");
+				String[] controlDataList = getDataList(".\\Benson_Data\\Controls\\");
 				outputPNGInBatch(controlDataList, panel);
-				String[] patientDataList = getDataList("M:\\eclipse-workspace\\bensonFigure\\Benson_Data\\Patients\\");
+				String[] patientDataList = getDataList(".\\Benson_Data\\Patients\\");
 				outputPNGInBatch(patientDataList, panel);
 			}
 		});
@@ -254,10 +330,10 @@ public class Main extends JFrame {
 		menuItem5.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String[] controlDataList = getDataList("M:\\eclipse-workspace\\bensonFigure\\Benson_Data\\Controls\\");
+				String[] controlDataList = getDataList(".\\Benson_Data\\Controls\\");
 				exportAllData(controlDataList, ".\\Sheets\\control_"
 						+ new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()) + ".csv");
-				String[] patientDataList = getDataList("M:\\eclipse-workspace\\bensonFigure\\Benson_Data\\Patients\\");
+				String[] patientDataList = getDataList(".\\Benson_Data\\Patients\\");
 				exportAllData(patientDataList, ".\\Sheets\\patient_"
 						+ new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()) + ".csv");
 			}
@@ -266,10 +342,10 @@ public class Main extends JFrame {
 		menuItem6.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String[] controlDataList = getDataList("M:\\eclipse-workspace\\bensonFigure\\Benson_Data\\Controls\\");
+				String[] controlDataList = getDataList(".\\Benson_Data\\Controls\\");
 				exportDataOnly(controlDataList, ".\\Sheets\\control_data_only_"
 						+ new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()) + ".csv");
-				String[] patientDataList = getDataList("M:\\eclipse-workspace\\bensonFigure\\Benson_Data\\Patients\\");
+				String[] patientDataList = getDataList(".\\Benson_Data\\Patients\\");
 				exportDataOnly(patientDataList, ".\\Sheets\\patient_data_only_"
 						+ new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()) + ".csv");
 			}
@@ -284,12 +360,15 @@ public class Main extends JFrame {
 				popUp.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				popUp.setLayout(new GridBagLayout());
 				popUp.setTitle("Exporting CGP compatible data set");
+				popUp.setIconImage(xt_logo.getImage());
 				GridBagConstraints c = new GridBagConstraints();
 				c.fill = GridBagConstraints.HORIZONTAL;
 
 				JLabel ratioPrompt = new JLabel("Ratio for training data (in %)");
+				ratioPrompt.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 				TextField trRatio = new TextField(10);
 				JButton exportData = new JButton("Export");
+				exportData.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 
 				c.gridx = 0;
 				c.gridy = 0;
@@ -305,17 +384,20 @@ public class Main extends JFrame {
 				popUp.add(exportData, c);
 
 				JLabel msg = new JLabel("Cover existing data set?");
+				msg.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 				c.gridx = 0;
 				c.gridy = 1;
 				popUp.add(msg, c);
 
 				JButton confirm = new JButton("Yes");
+				confirm.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 				c.weightx = 0.5;
 				c.gridx = 1;
 				c.gridy = 1;
 				popUp.add(confirm, c);
 
 				JButton noConfirm = new JButton("No");
+				noConfirm.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 				c.weightx = 0.4;
 				c.gridx = 2;
 				c.gridy = 1;
@@ -328,6 +410,7 @@ public class Main extends JFrame {
 				noConfirm.setVisible(false);
 
 				TextField statusBar = new TextField(400);
+				statusBar.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 				statusBar.setEditable(false);
 				c.weightx = 0.2;
 				c.gridwidth = 3;
