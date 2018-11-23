@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
+#include <conio.h>
 #include "cgp-sls.h"
 #include <time.h>
 
-double thresHold[] = {10,20,30};
+double thresHold[] = {1,2,3};
 double simpleThresholdClassifier(struct parameters *params, struct chromosome *chromo, struct dataSet *data);
+char** importCGPParams(void);
 
 int main(void)
 {
@@ -16,24 +19,29 @@ int main(void)
 	struct dataSet *testData = NULL;
 	struct chromosome *chromo = NULL;
 
-	int numInputs = 15;
-	int numNodes = 15;
-	int numOutputs = 1;
-	int nodeArity = 5;
+	char** cgp_params = importCGPParams();
+	thresHold[0] = atof(cgp_params[0]);
+	thresHold[1] = atof(cgp_params[1]);
+	thresHold[2] = atof(cgp_params[2]);
 
-	int numGens = 125150;
+	int numInputs = 15;
+	int numNodes = atoi(cgp_params[3]);
+	int numOutputs = 1;
+	int nodeArity = atoi(cgp_params[4]);
+
+	int numGens = atoi(cgp_params[5]);
 	double targetFitness = 0.1;
-	int updateFrequency = 50;
+	int updateFrequency = atoi(cgp_params[6]);
 
 	params = initialiseParameters(numInputs, numNodes, numOutputs, nodeArity);
 
-	setRandomNumberSeed(1234);
+	setRandomNumberSeed(atoi(cgp_params[7]));
 
 	addNodeFunction(params, "add,sub,mul,div");
 
 	setTargetFitness(params, targetFitness);
 
-	setMutationRate(params, 0.08);
+	setMutationRate(params, atof(cgp_params[8]));
 
 	setShortcutConnections(params,0);
 
@@ -114,6 +122,8 @@ int main(void)
 
 	printf("\n");
 
+	getch();
+
 	freeDataSet(trainingData);
 	freeDataSet(validationData);
 	freeDataSet(testData);
@@ -171,4 +181,33 @@ double simpleThresholdClassifier(struct parameters *params, struct chromosome *c
 	}
 
 	return threshError / (getNumDataSetSamples(data));
+}
+
+char** importCGPParams(void){
+    FILE* fp;
+    char line[256];
+    int i = 0;
+
+    char **cgp_params = malloc(9*sizeof(char*));
+
+    fp = fopen("cgp_params.txt","r");
+
+    if(fp == NULL){
+        printf("File not found");
+        return 0;
+    }
+
+    for(i = 0; i < 9; i++){
+        cgp_params[i] = malloc(10*sizeof(char));
+    }
+    i = 0;
+
+    while(fgets(line, sizeof(line), fp)){
+        strcpy(cgp_params[i],line);
+        i++;
+    }
+
+    fclose(fp);
+
+    return cgp_params;
 }
