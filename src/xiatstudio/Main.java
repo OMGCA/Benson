@@ -886,7 +886,9 @@ public class Main extends JFrame {
 					overallDataList[i] = controlDataList[i];
 				else
 					overallDataList[i] = patientDataList[i - controlDataList.length];
+			}
 
+			for (int i = 0; i < overallDataList.length; i++) {
 				Benson b = new Benson(overallDataList[i].replace("\\", "/"));
 				b.calcThreeLength();
 
@@ -904,27 +906,34 @@ public class Main extends JFrame {
 						String.valueOf((double) b.getHesitationPortion() * 10),
 						String.valueOf((double) b.getPenUpHesiPortion() * 10), String.valueOf(b.getRating()) };
 
-				List<String> list = new ArrayList<String>(Arrays.asList(dataPending));
+				if (dataWriteHandshake(mode, b, ".\\Sheets\\rating.csv")) {
+					List<String> list = new ArrayList<String>(Arrays.asList(dataPending));
 
-				String alterRating[] = { "0", "0", "0", "0" };
-				alterRating[b.getRating() - 1] = "1";
+					String alterRating[] = { "0", "0", "0", "0" };
+					alterRating[b.getRating() - 1] = "1";
 
-				for (int j = 0; j < selections.length; j++) {
-					if (!selections[j]) {
-						list.remove(j);
+					for (int j = 0; j < selections.length; j++) {
+						if (!selections[j]) {
+							list.remove(j);
+						}
 					}
-				}
-				if (outputMode == 1) {
-					list.remove(dataPending.length - 1);
-					for (int j = 0; j < 4; j++) {
-						list.add(alterRating[j]);
+
+					if (outputMode == 1) {
+						list.remove(dataPending.length - 1);
+						for (int j = 0; j < 4; j++) {
+							list.add(alterRating[j]);
+						}
+
+						if (outputMode == 0) {
+							for (int j = 0; j < 4; j++) {
+								list.remove(dataPending.length - 1);
+							}
+							list.add(String.valueOf(b.getRating()));
+						}
 					}
-				}
-				dataPending = list.toArray(dataPending);
+					dataPending = list.toArray(dataPending);
 
-				String dataToWrite[] = removeNull(dataPending);
-
-				if (dataWriteHandshake(mode, b.getFigureMode())) {
+					String dataToWrite[] = removeNull(dataPending);
 					writeData(fwOverall, dataToWrite);
 					fwOverall.append("\r\n");
 
@@ -995,22 +1004,42 @@ public class Main extends JFrame {
 		}
 	}
 
-	public static boolean dataWriteHandshake(int mode, String dataMode) {
-		switch (mode) {
-		case 0:
-			return true;
-		case 1:
-			if (dataMode.equals("Copy"))
+	public static boolean dataWriteHandshake(int mode, Benson b, String ratingSheet) {
+		BufferedReader br = null;
+		String line = "";
+		ArrayList<String> writeQueue = new ArrayList<String>();
+		try {
+			br = new BufferedReader(new FileReader(ratingSheet));
+
+			while ((line = br.readLine()) != null) {
+				writeQueue.add(line.split(",")[0] + line.split(",")[1]);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		boolean writeApprove = false;
+		if (writeQueue.contains(b.getID() + b.getFigureMode()))
+			writeApprove = true;
+
+		if (writeApprove) {
+			switch (mode) {
+			case 0:
 				return true;
-			else
-				return false;
-		case 2:
-			if (dataMode.equals("Recall"))
+			case 1:
+				if (b.getFigureMode().equals("Copy"))
+					return true;
+				else
+					return false;
+			case 2:
+				if (b.getFigureMode().equals("Recall"))
+					return true;
+				else
+					return false;
+			default:
 				return true;
-			else
-				return false;
-		default:
-			return true;
+			}
+		} else {
+			return false;
 		}
 	}
 
