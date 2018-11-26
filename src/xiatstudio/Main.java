@@ -29,8 +29,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
@@ -378,7 +380,7 @@ public class Main extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				JFrame popUp = new JFrame();
 				popUp.setVisible(true);
-				popUp.setSize(400, 150);
+				popUp.setSize(640, 220);
 				popUp.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 				popUp.setLayout(new GridBagLayout());
 				popUp.setTitle("Exporting CGP compatible data set");
@@ -389,10 +391,17 @@ public class Main extends JFrame {
 				JLabel ratioPrompt = new JLabel("Ratio for training data (in %)");
 				ratioPrompt.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 				TextField trRatio = new TextField(10);
+				trRatio.setText("60");
 				JButton exportData = new JButton("Export");
 				exportData.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 				JCheckBox copyData = new JCheckBox("Copy");
 				JCheckBox recallData = new JCheckBox("Recall");
+
+				String featureTag[] = { "Total Time", "Total Length", "Size", "Aspect Ratio", "Velocity SD", "Angle SD",
+						"Pen-Up Portion", "Horizontal Portion", "Vertical Portion", "Oblique Portion", "Horizontal SD",
+						"Vertical SD", "Oblique SD", "Hesitation Counts", "Hesitation Portion" };
+
+				JCheckBox featureSelection[] = new JCheckBox[featureTag.length];
 
 				c.gridx = 0;
 				c.gridy = 0;
@@ -414,24 +423,42 @@ public class Main extends JFrame {
 				c.gridy = 1;
 				popUp.add(recallData, c);
 
+				int x = -1;
+				int y = 2;
+				for (int i = 0; i < featureTag.length; i++) {
+					x++;
+					featureSelection[i] = new JCheckBox(featureTag[i]);
+					featureSelection[i].setSelected(true);
+					featureSelection[i].setFont(new Font("Segoe UI", Font.PLAIN, 12));
+					c.gridx = x;
+					c.gridy = y;
+					if (x == 4) {
+						y++;
+						x = -1;
+					}
+					popUp.add(featureSelection[i], c);
+				}
+
+				boolean featureSelected[] = new boolean[featureTag.length];
+
 				JLabel msg = new JLabel("Cover existing data set?");
 				msg.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 				c.gridx = 0;
-				c.gridy = 2;
+				c.gridy = y + 1;
 				popUp.add(msg, c);
 
 				JButton confirm = new JButton("Yes");
 				confirm.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 				c.weightx = 0.5;
 				c.gridx = 1;
-				c.gridy = 2;
+				c.gridy = y + 1;
 				popUp.add(confirm, c);
 
 				JButton noConfirm = new JButton("No");
 				noConfirm.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 				c.weightx = 0.4;
 				c.gridx = 2;
-				c.gridy = 2;
+				c.gridy = y + 1;
 				popUp.add(noConfirm, c);
 				noConfirm.setSize(50, 30);
 				confirm.setSize(50, 30);
@@ -447,7 +474,7 @@ public class Main extends JFrame {
 				c.gridwidth = 3;
 				c.ipadx = 400;
 				c.gridx = 0;
-				c.gridy = 3;
+				c.gridy = y + 2;
 				popUp.add(statusBar, c);
 
 				exportData.addActionListener(new ActionListener() {
@@ -462,9 +489,13 @@ public class Main extends JFrame {
 						else if (!copyData.isSelected() && recallData.isSelected())
 							outputMode = 2;
 
+						for (int i = 0; i < featureTag.length; i++) {
+							featureSelected[i] = featureSelection[i].isSelected();
+						}
+
 						double trainingRatio = Double.parseDouble(trRatio.getText()) / 100;
 						statusBar.setText("Exporting data set.");
-						String dataSetFolder = exportCGPDataSet(trainingRatio, outputMode);
+						String dataSetFolder = exportCGPDataSet(trainingRatio, outputMode, featureSelected);
 						statusBar.setText("Data set exported to " + dataSetFolder + " folder.");
 
 						msg.setVisible(true);
@@ -717,7 +748,7 @@ public class Main extends JFrame {
 		}
 	}
 
-	public static String exportCGPDataSet(double trainingRatio, int mode) {
+	public static String exportCGPDataSet(double trainingRatio, int mode, boolean[] selections) {
 		File newDataFolder = new File(
 				".\\Sheets\\DataSet\\" + new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()));
 		newDataFolder.mkdir();
@@ -787,14 +818,22 @@ public class Main extends JFrame {
 		int validationCounter[] = { 0, 0, 0, 0 };
 		int testingCounter[] = { 0, 0, 0, 0 };
 
-		String cgpIOPair = "15,1,";
-
 		FileWriter fwOverall, fwTraining, fwValidation, fwTesting;
 		try {
 			fwOverall = new FileWriter(overall, true);
 			fwTraining = new FileWriter(training, true);
 			fwValidation = new FileWriter(validation, true);
 			fwTesting = new FileWriter(testing, true);
+
+			String[] controlDataList = getDataList(".\\Benson_Data\\Controls\\");
+			String[] patientDataList = getDataList(".\\Benson_Data\\Patients\\");
+			String[] overallDataList = new String[controlDataList.length + patientDataList.length];
+			int selectedCount = 0;
+			for (int i = 0; i < selections.length; i++) {
+				if (selections[i])
+					selectedCount++;
+			}
+			String cgpIOPair = String.valueOf(selectedCount) + ",1,";
 
 			fwTraining.append(cgpIOPair + (trainingClasses[0][mode] + trainingClasses[1][mode]
 					+ trainingClasses[2][mode] + trainingClasses[3][mode]) + ",");
@@ -807,10 +846,6 @@ public class Main extends JFrame {
 			fwTesting.append(cgpIOPair + (testingClasses[0][mode] + testingClasses[1][mode] + testingClasses[2][mode]
 					+ testingClasses[3][mode]) + ",");
 			fwTesting.append("\r\n");
-
-			String[] controlDataList = getDataList(".\\Benson_Data\\Controls\\");
-			String[] patientDataList = getDataList(".\\Benson_Data\\Patients\\");
-			String[] overallDataList = new String[controlDataList.length + patientDataList.length];
 
 			for (int i = 0; i < overallDataList.length; i++) {
 				if (i < controlDataList.length)
@@ -833,24 +868,35 @@ public class Main extends JFrame {
 						String.valueOf((double) b.getHesitation() / 1000),
 						String.valueOf((double) b.getHesitationPortion() * 10), String.valueOf(b.getRating()) };
 
+				List<String> list = new ArrayList<String>(Arrays.asList(dataPending));
+
+				for (int j = 0; j < selections.length; j++) {
+					if (!selections[j]) {
+						list.remove(j);
+					}
+				}
+				dataPending = list.toArray(dataPending);
+
+				String dataToWrite[] = removeNull(dataPending);
+
 				if (dataWriteHandshake(mode, b.getFigureMode())) {
-					writeData(fwOverall, dataPending);
+					writeData(fwOverall, dataToWrite);
 					fwOverall.append("\r\n");
 
 					if (trainingCounter[b.getRating() - 1] != trainingClasses[b.getRating() - 1][mode]) {
-						writeData(fwTraining, dataPending);
+						writeData(fwTraining, dataToWrite);
 						fwTraining.append("\r\n");
 						trainingCounter[b.getRating() - 1]++;
 						System.out.println(
 								"Data " + b.getID() + "_" + b.getFigureMode() + " exported to training data set.");
 					} else if (validationCounter[b.getRating() - 1] != validationClasses[b.getRating() - 1][mode]) {
-						writeData(fwValidation, dataPending);
+						writeData(fwValidation, dataToWrite);
 						fwValidation.append("\r\n");
 						validationCounter[b.getRating() - 1]++;
 						System.out.println(
 								"Data " + b.getID() + "_" + b.getFigureMode() + " exported to validation data set.");
 					} else if (testingCounter[b.getRating() - 1] != testingClasses[b.getRating() - 1][mode]) {
-						writeData(fwTesting, dataPending);
+						writeData(fwTesting, dataToWrite);
 						fwTesting.append("\r\n");
 						testingCounter[b.getRating() - 1]++;
 						System.out.println(
@@ -883,6 +929,14 @@ public class Main extends JFrame {
 
 		return newDataFolder.getPath() + "\\";
 
+	}
+
+	public static String[] removeNull(String[] a) {
+		ArrayList<String> removedNull = new ArrayList<String>();
+		for (String str : a)
+			if (str != null)
+				removedNull.add(str);
+		return removedNull.toArray(new String[0]);
 	}
 
 	public static void updateCGPDataSetFirstLine(String fileName, String newLine) {
