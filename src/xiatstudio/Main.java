@@ -216,8 +216,8 @@ public class Main extends JFrame {
 		setCGPParams.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				JLabel params[] = new JLabel[9];
-				TextField cgpParams[] = new TextField[9];
+				
+				
 				JFrame frame = new JFrame();
 				frame.setSize(275, 375);
 				frame.setTitle("Set CGP Parameters");
@@ -229,11 +229,13 @@ public class Main extends JFrame {
 				c.fill = GridBagConstraints.HORIZONTAL;
 
 				String cgpTags[] = { "Threshold 1", "Threshold 2", "Threshold 3", "Nodes", "Arity", "Max Generations",
-						"Update Frequency", "Random number seed", "Mutation Rate" };
+						"Update Frequency", "Random number seed", "Mutation Rate","Input(s)","Output(s)" };
 
-				String defaultValue[] = { "10", "20", "30", "20", "3", "100000", "500", "1234", "0.08" };
+				String defaultValue[] = { "10", "20", "30", "20", "3", "100000", "500", "1234", "0.08","17","1" };
+				JLabel params[] = new JLabel[defaultValue.length];
+				TextField cgpParams[] = new TextField[defaultValue.length];
 
-				for (int i = 0; i < 9; i++) {
+				for (int i = 0; i < defaultValue.length; i++) {
 					c.gridx = 0;
 					c.gridy = i;
 					params[i] = new JLabel(cgpTags[i]);
@@ -253,12 +255,12 @@ public class Main extends JFrame {
 				JButton launchCGP = new JButton("Launch CGP");
 				export.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 				c.gridx = 0;
-				c.gridy = 9;
+				c.gridy = defaultValue.length;
 				frame.add(export, c);
 
 				launchCGP.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 				c.gridx = 1;
-				c.gridy = 9;
+				c.gridy = defaultValue.length;
 				frame.add(launchCGP, c);
 
 				export.addActionListener(new ActionListener() {
@@ -268,7 +270,7 @@ public class Main extends JFrame {
 						try {
 							File cgp_Param = new File(".\\Algorithm_Training\\cgp_params.txt");
 							writer = new FileWriter(cgp_Param, false);
-							for (int i = 0; i < 9; i++) {
+							for (int i = 0; i < cgpTags.length; i++) {
 								writer.append(cgpParams[i].getText());
 								writer.append("\n");
 							}
