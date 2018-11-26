@@ -8,7 +8,10 @@
 
 double thresHold[] = {1,2,3};
 double simpleThresholdClassifier(struct parameters *params, struct chromosome *chromo, struct dataSet *data);
+double fourOutputFitnessFunction(struct parameters *params, struct chromosome *chromo, struct dataSet *data);
+int maxIndex(double* arr);
 char** importCGPParams(void);
+
 
 int main(void)
 {
@@ -45,7 +48,10 @@ int main(void)
 
 	setShortcutConnections(params,0);
 
-	setCustomFitnessFunction(params, simpleThresholdClassifier, "STC");
+	if(numOutputs == 1)
+		setCustomFitnessFunction(params, simpleThresholdClassifier, "STC");
+	else if(numOutputs == 4)
+		setCustomFitnessFunction(params, fourOutputFitnessFunction, "XT4");
 
 	setShortcutConnections(params, 0);
 
@@ -66,21 +72,25 @@ int main(void)
 
 	saveChromosomeDot(chromo, 0, "chromo.dot");
 
-	int i;
-	int mismatchError = 0;
-	for (i = 0; i < getNumDataSetSamples(testData); i++)
+	if (numOutputs == 1)
 	{
+		int i;
+		int mismatchError = 0;
+		for (i = 0; i < getNumDataSetSamples(testData); i++)
+		{
 
-		executeChromosome(chromo, getDataSetSampleInputs(testData, i));
-		double chromoOutput = 0;
+			executeChromosome(chromo, getDataSetSampleInputs(testData, i));
+			double chromoOutput = 0;
 
-        chromoOutput = getChromosomeOutput(chromo, 0);
-		int expectedOutput = getDataSetSampleOutputs(testData, i)[0];
-        printf("%.2f ", chromoOutput);
+			chromoOutput = getChromosomeOutput(chromo, 0);
+			int expectedOutput = getDataSetSampleOutputs(testData, i)[0];
+			printf("%.2f ", chromoOutput);
 
-		switch (expectedOutput){
+			switch (expectedOutput)
+			{
 			case 1:
-				if(chromoOutput > thresHold[0]){
+				if (chromoOutput > thresHold[0])
+				{
 					mismatchError++;
 					printf("Mismatch");
 				}
@@ -89,7 +99,8 @@ int main(void)
 
 				break;
 			case 2:
-				if(chromoOutput > thresHold[1] || chromoOutput <= thresHold[0]){
+				if (chromoOutput > thresHold[1] || chromoOutput <= thresHold[0])
+				{
 					mismatchError++;
 					printf("Mismatch");
 				}
@@ -97,7 +108,8 @@ int main(void)
 					printf("Match");
 				break;
 			case 3:
-				if(chromoOutput > thresHold[2] || chromoOutput <= thresHold[1]){
+				if (chromoOutput > thresHold[2] || chromoOutput <= thresHold[1])
+				{
 					mismatchError++;
 					printf("Mismatch");
 				}
@@ -105,23 +117,55 @@ int main(void)
 					printf("Match");
 				break;
 			case 4:
-				if(chromoOutput < thresHold[2]){
+				if (chromoOutput < thresHold[2])
+				{
 					mismatchError++;
 					printf("Mismatch");
 				}
 				else
 					printf("Match");
 				break;
+			}
+
+			printf(" %.2f", getDataSetSampleOutputs(testData, i)[0]);
+			printf("\n");
 		}
 
-		printf(" %.2f", getDataSetSampleOutputs(testData, i)[0]);
+		printf("Accuracy = %.4f (%d/%d)", 100 - ((float)mismatchError * 100 / getNumDataSetSamples(testData)), (getNumDataSetSamples(testData) - mismatchError), getNumDataSetSamples(testData));
+
 		printf("\n");
 	}
 
-	printf("Accuracy = %.4f (%d/%d)",100-((float)mismatchError*100/getNumDataSetSamples(testData)),(getNumDataSetSamples(testData)-mismatchError),getNumDataSetSamples(testData));
+	else if (numOutputs == 4){
+		int i;
+		int mismatchError = 0;
+		for(i = 0;i < getNumDataSetSamples(testData);i++){
+			executeChromosome(chromo, getDataSetSampleInputs(testData,i));
+			double *chromoOutput = malloc(4*sizeof(double));
+			double *expectedOutput = getDataSetSampleOutputs(testData,i);
+			int j = 0;
+			for(j = 0; j < 4; j++){
+                chromoOutput[j] = getChromosomeOutput(chromo,j);
+				printf("%.2f ", chromoOutput[j]);
+			}
+			if(maxIndex(chromoOutput) != maxIndex(expectedOutput)){
+				printf("Mismatch ");
+				mismatchError++;
+			}
 
-	printf("\n");
+			else
+				printf("Match ");
 
+			for(j = 0; j < 4; j++){
+				printf("%.2f ", expectedOutput[j]);
+			}
+
+			printf("\n");
+
+		}
+        printf("Accuracy = %.4f (%d/%d)", 100 - ((float)mismatchError * 100 / getNumDataSetSamples(testData)), (getNumDataSetSamples(testData) - mismatchError), getNumDataSetSamples(testData));
+
+	}
 	getch();
 
 	freeDataSet(trainingData);
@@ -131,6 +175,59 @@ int main(void)
 	freeParameters(params);
 
 	return 0;
+}
+
+int maxIndex(double* arr){
+	int i = 0;
+	int max = 0;
+	double tmp = arr[0];
+
+	for(i = 0; i < 4; i++){
+		if(tmp < arr[i]){
+			tmp = arr[i];
+			max = i;
+		}
+
+	}
+
+	return max;
+}
+
+double fourOutputFitnessFunction(struct parameters *params, struct chromosome *chromo, struct dataSet *data){
+    int i;
+	double threshError = 0;
+
+	if (getNumChromosomeInputs(chromo) != getNumDataSetInputs(data))
+	{
+		printf("Error: the number of chromosome inputs must match the number of inputs specified in the dataSet.\n");
+		printf("Terminating.\n");
+		exit(0);
+	}
+
+	if (getNumChromosomeOutputs(chromo) != getNumDataSetOutputs(data))
+	{
+		printf("Error: the number of chromosome outputs must match the number of outputs specified in the dataSet.\n");
+		printf("Terminating.\n");
+		exit(0);
+	}
+
+	for(i = 0; i < getNumDataSetSamples(data); i++){
+		executeChromosome(chromo, getDataSetSampleInputs(data,i));
+		double *chromoOutput = malloc(4*sizeof(double));
+		double *expectedOutput = getDataSetSampleOutputs(data,i);
+
+
+		int j = 0;
+		for(j = 0; j < 4; j++){
+			chromoOutput[j] = getChromosomeOutput(chromo,j);
+			//threshError += pow(chromoOutput[j] - expectedOutput[j],2);
+		}
+
+		if(maxIndex(chromoOutput) != maxIndex(expectedOutput))
+			threshError++;
+	}
+
+	return threshError / (getNumDataSetSamples(data));
 }
 
 double simpleThresholdClassifier(struct parameters *params, struct chromosome *chromo, struct dataSet *data)
