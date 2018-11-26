@@ -24,9 +24,9 @@ int main(void)
 	thresHold[1] = atof(cgp_params[1]);
 	thresHold[2] = atof(cgp_params[2]);
 
-	int numInputs = 15;
+	int numInputs = atoi(cgp_params[9]);
 	int numNodes = atoi(cgp_params[3]);
-	int numOutputs = 1;
+	int numOutputs = atoi(cgp_params[10]);
 	int nodeArity = atoi(cgp_params[4]);
 
 	int numGens = atoi(cgp_params[5]);
@@ -188,7 +188,7 @@ char** importCGPParams(void){
     char line[256];
     int i = 0;
 
-    char **cgp_params = malloc(9*sizeof(char*));
+    char **cgp_params = malloc(11*sizeof(char*));
 
     fp = fopen("cgp_params.txt","r");
 
@@ -197,7 +197,7 @@ char** importCGPParams(void){
         return 0;
     }
 
-    for(i = 0; i < 9; i++){
+    for(i = 0; i < 11; i++){
         cgp_params[i] = malloc(10*sizeof(char));
     }
     i = 0;
