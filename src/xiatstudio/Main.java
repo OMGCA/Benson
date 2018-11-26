@@ -214,7 +214,7 @@ public class Main extends JFrame {
 		setCGPParams.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
+				/* New pop up windows */
 				JFrame frame = new JFrame();
 				frame.setSize(275, 375);
 				frame.setTitle("Set CGP Parameters");
@@ -222,6 +222,8 @@ public class Main extends JFrame {
 				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 				frame.setLayout(new GridBagLayout());
 				frame.setIconImage(xt_logo.getImage());
+
+				/* Set Layout Manager */
 				GridBagConstraints c = new GridBagConstraints();
 				c.fill = GridBagConstraints.HORIZONTAL;
 
@@ -232,6 +234,7 @@ public class Main extends JFrame {
 				JLabel params[] = new JLabel[defaultValue.length];
 				TextField cgpParams[] = new TextField[defaultValue.length];
 
+				/* Adding components above to the menu */
 				for (int i = 0; i < defaultValue.length; i++) {
 					c.gridx = 0;
 					c.gridy = i;
@@ -266,7 +269,8 @@ public class Main extends JFrame {
 						FileWriter writer;
 						try {
 							File cgp_Param = new File(".\\Algorithm_Training\\cgp_params.txt");
-							writer = new FileWriter(cgp_Param, false);
+							writer = new FileWriter(cgp_Param, false);// false parameter will overwrite previous file
+
 							for (int i = 0; i < cgpTags.length; i++) {
 								writer.append(cgpParams[i].getText());
 								writer.append("\n");
@@ -321,7 +325,6 @@ public class Main extends JFrame {
 				BufferedImage imagebuf = null;
 				imagebuf = new BufferedImage(panel.getWidth(), panel.getHeight(), BufferedImage.TYPE_INT_RGB);
 
-				// Graphics2D g2d = imagebuf.getGraphics();
 				panel.paint(imagebuf.getGraphics());
 				try {
 					ImageIO.write(imagebuf, "png", new File(data + ".png"));
@@ -377,6 +380,7 @@ public class Main extends JFrame {
 		menuItem7.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				/* New pop up windows */
 				JFrame popUp = new JFrame();
 				popUp.setVisible(true);
 				popUp.setSize(750, 230);
@@ -384,23 +388,32 @@ public class Main extends JFrame {
 				popUp.setLayout(new GridBagLayout());
 				popUp.setTitle("Exporting CGP compatible data set");
 				popUp.setIconImage(xt_logo.getImage());
+
 				GridBagConstraints c = new GridBagConstraints();
 				c.fill = GridBagConstraints.HORIZONTAL;
 
+				/* GUI components */
 				JLabel ratioPrompt = new JLabel("Ratio for training data (in %)");
 				ratioPrompt.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+
 				TextField trRatio = new TextField(10);
 				trRatio.setText("60");
+
 				JButton exportData = new JButton("Export");
 				exportData.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+
 				JCheckBox copyData = new JCheckBox("Copy");
 				JCheckBox recallData = new JCheckBox("Recall");
+
 				JRadioButton singleOutput = new JRadioButton("Single Output");
-				singleOutput.setSelected(true);
 				JRadioButton fourOutputs = new JRadioButton("Four Outputs");
+
 				ButtonGroup bGroup = new ButtonGroup();
+
+				/* Only one option allow each time */
 				bGroup.add(singleOutput);
 				bGroup.add(fourOutputs);
+				singleOutput.setSelected(true);
 
 				String featureTag[] = { "Total Time", "Total Length", "Size", "Aspect Ratio", "Velocity SD", "Angle SD",
 						"Pen-Up Portion", "Horizontal Portion", "Vertical Portion", "Oblique Portion", "Horizontal SD",
@@ -494,8 +507,9 @@ public class Main extends JFrame {
 				exportData.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						int outputMode = 0;
+						int outputMode = 0;// 0: all, 1:copy only, 2:recall only
 						String dataSetFolder = "";
+
 						if (copyData.isSelected() && recallData.isSelected())
 							outputMode = 0;
 						else if (copyData.isSelected() && !recallData.isSelected())
@@ -503,7 +517,7 @@ public class Main extends JFrame {
 						else if (!copyData.isSelected() && recallData.isSelected())
 							outputMode = 2;
 
-						int cgpoutputMode = 0;
+						int cgpoutputMode = 0;// 0:One output, 1:Four outputs
 
 						if (fourOutputs.isSelected())
 							cgpoutputMode = 1;
@@ -519,6 +533,7 @@ public class Main extends JFrame {
 						dataSetFolder = exportCGPDataSet(trainingRatio, outputMode, featureSelected, cgpoutputMode);
 						statusBar.setText("Data set exported to " + dataSetFolder + " folder.");
 
+						/* Provide data overwrite option when exporting is done */
 						msg.setVisible(true);
 						confirm.setVisible(true);
 						noConfirm.setVisible(true);
@@ -526,11 +541,15 @@ public class Main extends JFrame {
 						confirm.addActionListener(new ActionListener() {
 							@Override
 							public void actionPerformed(ActionEvent e) {
+								/* Get previous data set */
 								File prevTraining = new File(".//Algorithm_Training//01_training.csv");
 								File prevValidation = new File(".//Algorithm_Training//02_validation.csv");
 								File prevTesting = new File(".//Algorithm_Training//03_testing.csv");
 								File tmpPath = new File(".\\Sheets\\DataSet");
 
+								/*
+								 * Get folder of new data set, typically the newest folder in the DataSet folder
+								 */
 								String tmpDirs[] = tmpPath.list(new FilenameFilter() {
 									@Override
 									public boolean accept(File current, String name) {
@@ -539,12 +558,12 @@ public class Main extends JFrame {
 								});
 
 								String tmpFolder = ".\\Sheets\\DataSet\\" + tmpDirs[tmpDirs.length - 1];
-								System.out.println(tmpFolder);
 								File training = new File(tmpFolder + "\\01_training.csv");
 								File validation = new File(tmpFolder + "\\02_validation.csv");
 								File testing = new File(tmpFolder + "\\03_testing.csv");
 
 								try {
+									/* Overwrite new data set to the cgp root folder */
 									copyFile(training, prevTraining);
 									copyFile(validation, prevValidation);
 									copyFile(testing, prevTesting);
@@ -605,6 +624,7 @@ public class Main extends JFrame {
 		}
 	}
 
+	/* This function cannot be used to find folders in a directory */
 	public static String[] getDataList(String path) {
 		File folder = new File(path);
 
@@ -809,6 +829,7 @@ public class Main extends JFrame {
 		try {
 			br = new BufferedReader(new FileReader(".\\Sheets\\rating.csv"));
 			while ((line = br.readLine()) != null) {
+				/* Counting total objects in all, copy only and recall only */
 				classTotal[Integer.parseInt(line.split(",")[2]) - 1]++;
 
 				if (line.split(",")[1].equals("Copy"))
@@ -831,6 +852,7 @@ public class Main extends JFrame {
 		}
 
 		for (int i = 0; i < 4; i++) {
+			/* Calculate number of objects required for each data set segment */
 			trainingClasses[i][0] = (int) Math.floor(classTotal[i] * trainingRatio);
 			trainingClasses[i][1] = (int) Math.floor(copyTotal[i] * trainingRatio);
 			trainingClasses[i][2] = (int) Math.floor(recallTotal[i] * trainingRatio);
@@ -850,6 +872,7 @@ public class Main extends JFrame {
 		int testingCounter[] = { 0, 0, 0, 0 };
 
 		FileWriter fwOverall, fwTraining, fwValidation, fwTesting;
+
 		try {
 			fwOverall = new FileWriter(overall, true);
 			fwTraining = new FileWriter(training, true);
@@ -861,9 +884,11 @@ public class Main extends JFrame {
 			String[] overallDataList = new String[controlDataList.length + patientDataList.length];
 			int selectedCount = 0;
 			for (int i = 0; i < selections.length; i++) {
+				/* Counting how many features are selected */
 				if (selections[i])
 					selectedCount++;
 			}
+			/* Data set header */
 			String cgpIOPair = String.valueOf(selectedCount) + ",1,";
 
 			if (outputMode == 1)
@@ -906,12 +931,14 @@ public class Main extends JFrame {
 						String.valueOf((double) b.getHesitationPortion() * 10),
 						String.valueOf((double) b.getPenUpHesiPortion() * 10), String.valueOf(b.getRating()) };
 
+				/* Check whether this data is entitled to be exported */
 				if (dataWriteHandshake(mode, b, ".\\Sheets\\rating.csv")) {
 					List<String> list = new ArrayList<String>(Arrays.asList(dataPending));
 
 					String alterRating[] = { "0", "0", "0", "0" };
 					alterRating[b.getRating() - 1] = "1";
 
+					/* Remove unselected feature */
 					for (int j = 0; j < selections.length; j++) {
 						if (!selections[j]) {
 							list.remove(j);
@@ -923,7 +950,8 @@ public class Main extends JFrame {
 						for (int j = 0; j < 4; j++) {
 							list.add(alterRating[j]);
 						}
-
+						/* Update 2018-11-26 */
+						/* Allow user to switch output mode back */
 						if (outputMode == 0) {
 							for (int j = 0; j < 4; j++) {
 								list.remove(dataPending.length - 1);
@@ -1005,6 +1033,7 @@ public class Main extends JFrame {
 	}
 
 	public static boolean dataWriteHandshake(int mode, Benson b, String ratingSheet) {
+		/* Part I: Check the rating sheet */
 		BufferedReader br = null;
 		String line = "";
 		ArrayList<String> writeQueue = new ArrayList<String>();
@@ -1018,9 +1047,11 @@ public class Main extends JFrame {
 			e.printStackTrace();
 		}
 		boolean writeApprove = false;
+
 		if (writeQueue.contains(b.getID() + b.getFigureMode()))
 			writeApprove = true;
 
+		/* Part II: Check mode */
 		if (writeApprove) {
 			switch (mode) {
 			case 0:
