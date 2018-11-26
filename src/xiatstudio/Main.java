@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 import javax.imageio.ImageIO;
@@ -210,13 +211,13 @@ public class Main extends JFrame {
 			}
 		});
 
-		setCGPParams.addActionListener(new ActionListener(){
+		setCGPParams.addActionListener(new ActionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e){
+			public void actionPerformed(ActionEvent e) {
 				JLabel params[] = new JLabel[9];
 				TextField cgpParams[] = new TextField[9];
 				JFrame frame = new JFrame();
-				frame.setSize(275,375);
+				frame.setSize(275, 375);
 				frame.setTitle("Set CGP Parameters");
 				frame.setVisible(true);
 				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -225,25 +226,25 @@ public class Main extends JFrame {
 				GridBagConstraints c = new GridBagConstraints();
 				c.fill = GridBagConstraints.HORIZONTAL;
 
-				String cgpTags[] = {"Threshold 1","Threshold 2","Threshold 3",
-				"Nodes", "Arity","Max Generations","Update Frequency","Random number seed","Mutation Rate"};
+				String cgpTags[] = { "Threshold 1", "Threshold 2", "Threshold 3", "Nodes", "Arity", "Max Generations",
+						"Update Frequency", "Random number seed", "Mutation Rate" };
 
-				String defaultValue[] = {"10","20","30","20","3","100000","500","1234","0.08"};
+				String defaultValue[] = { "10", "20", "30", "20", "3", "100000", "500", "1234", "0.08" };
 
-				for(int i = 0; i < 9; i++){
+				for (int i = 0; i < 9; i++) {
 					c.gridx = 0;
 					c.gridy = i;
 					params[i] = new JLabel(cgpTags[i]);
 					params[i].setFont(new Font("Segoe UI", Font.PLAIN, 12));
-					frame.add(params[i],c);
+					frame.add(params[i], c);
 
 					c.gridx = 1;
 					c.gridy = i;
 					cgpParams[i] = new TextField(10);
 					cgpParams[i].setFont(new Font("Segoe UI", Font.PLAIN, 12));
 					cgpParams[i].setText(defaultValue[i]);
-					
-					frame.add(cgpParams[i],c);
+
+					frame.add(cgpParams[i], c);
 				}
 
 				JButton export = new JButton("Save parameter");
@@ -251,43 +252,42 @@ public class Main extends JFrame {
 				export.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 				c.gridx = 0;
 				c.gridy = 9;
-				frame.add(export,c);
+				frame.add(export, c);
 
 				launchCGP.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 				c.gridx = 1;
 				c.gridy = 9;
-				frame.add(launchCGP,c);
+				frame.add(launchCGP, c);
 
-				export.addActionListener(new ActionListener(){
+				export.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						FileWriter writer;
-						try{
+						try {
 							File cgp_Param = new File(".\\Algorithm_Training\\cgp_params.txt");
-							writer = new FileWriter(cgp_Param,false);
-							for(int i = 0; i < 9; i++){
+							writer = new FileWriter(cgp_Param, false);
+							for (int i = 0; i < 9; i++) {
 								writer.append(cgpParams[i].getText());
 								writer.append("\n");
 							}
 
 							writer.flush();
 							writer.close();
-						} catch (IOException e2){
+						} catch (IOException e2) {
 							e2.printStackTrace();
 						}
 
-						
 					}
 				});
 
-				launchCGP.addActionListener(new ActionListener(){
+				launchCGP.addActionListener(new ActionListener() {
 					@Override
-					public void actionPerformed(ActionEvent e){
+					public void actionPerformed(ActionEvent e) {
 						ProcessBuilder p = new ProcessBuilder();
 						p.command(".\\Algorithm_Training\\Algorithm_Training.exe");
-						try{
+						try {
 							p.start();
-						} catch(Exception e1){
+						} catch (Exception e1) {
 							e1.printStackTrace();
 						}
 					}
@@ -408,11 +408,11 @@ public class Main extends JFrame {
 
 				c.gridx = 0;
 				c.gridy = 1;
-				popUp.add(copyData,c);
+				popUp.add(copyData, c);
 
 				c.gridx = 1;
 				c.gridy = 1;
-				popUp.add(recallData,c);
+				popUp.add(recallData, c);
 
 				JLabel msg = new JLabel("Cover existing data set?");
 				msg.setFont(new Font("Segoe UI", Font.PLAIN, 12));
@@ -455,16 +455,16 @@ public class Main extends JFrame {
 					public void actionPerformed(ActionEvent e) {
 						int outputMode = 0;
 
-						if(copyData.isSelected() && recallData.isSelected())
+						if (copyData.isSelected() && recallData.isSelected())
 							outputMode = 0;
 						else if (copyData.isSelected() && !recallData.isSelected())
 							outputMode = 1;
 						else if (!copyData.isSelected() && recallData.isSelected())
 							outputMode = 2;
-						
+
 						double trainingRatio = Double.parseDouble(trRatio.getText()) / 100;
 						statusBar.setText("Exporting data set.");
-						String dataSetFolder = exportCGPDataSet(trainingRatio,outputMode);
+						String dataSetFolder = exportCGPDataSet(trainingRatio, outputMode);
 						statusBar.setText("Data set exported to " + dataSetFolder + " folder.");
 
 						msg.setVisible(true);
@@ -732,8 +732,8 @@ public class Main extends JFrame {
 		objectCSVFileCreation(testing);
 
 		double classTotal[] = { 0, 0, 0, 0 };
-		double copyTotal[] = {0,0,0,0};
-		double recallTotal[] = {0,0,0,0};
+		double copyTotal[] = { 0, 0, 0, 0 };
+		double recallTotal[] = { 0, 0, 0, 0 };
 
 		BufferedReader br = null;
 		String line = "";
@@ -744,15 +744,15 @@ public class Main extends JFrame {
 
 		int testingClasses[][] = new int[4][3];
 
-		try{
+		try {
 			br = new BufferedReader(new FileReader(".\\Sheets\\rating.csv"));
-			while((line = br.readLine()) != null){
+			while ((line = br.readLine()) != null) {
 				classTotal[Integer.parseInt(line.split(",")[2]) - 1]++;
 
-				if(line.split(",")[1].equals("Copy"))
+				if (line.split(",")[1].equals("Copy"))
 					copyTotal[Integer.parseInt(line.split(",")[2]) - 1]++;
-				if(line.split(",")[1].equals("Copy"))
-					copyTotal[Integer.parseInt(line.split(",")[2]) - 1]++;
+				if (line.split(",")[1].equals("Recall"))
+					recallTotal[Integer.parseInt(line.split(",")[2]) - 1]++;
 			}
 		} catch (FileNotFoundException e) {
 			System.out.println("ERROR: Specific data file can not be found.");
@@ -770,8 +770,17 @@ public class Main extends JFrame {
 
 		for (int i = 0; i < 4; i++) {
 			trainingClasses[i][0] = (int) Math.floor(classTotal[i] * trainingRatio);
+			trainingClasses[i][1] = (int) Math.floor(copyTotal[i] * trainingRatio);
+			trainingClasses[i][2] = (int) Math.floor(recallTotal[i] * trainingRatio);
+
 			validationClasses[i][0] = (int) Math.floor(classTotal[i] * (1 - trainingRatio) / 2);
+			validationClasses[i][1] = (int) Math.floor(copyTotal[i] * (1 - trainingRatio) / 2);
+			validationClasses[i][2] = (int) Math.floor(recallTotal[i] * (1 - trainingRatio) / 2);
+
 			testingClasses[i][0] = (int) (classTotal[i] - trainingClasses[i][0] - validationClasses[i][0]);
+			testingClasses[i][1] = (int) (copyTotal[i] - trainingClasses[i][1] - validationClasses[i][1]);
+			testingClasses[i][2] = (int) (recallTotal[i] - trainingClasses[i][2] - validationClasses[i][2]);
+
 		}
 
 		int trainingCounter[] = { 0, 0, 0, 0 };
@@ -787,19 +796,16 @@ public class Main extends JFrame {
 			fwValidation = new FileWriter(validation, true);
 			fwTesting = new FileWriter(testing, true);
 
-			int objectCount[] = {0,0,0};
-
-			fwTraining.append(cgpIOPair
-					+ (trainingClasses[0] + trainingClasses[1] + trainingClasses[2] + trainingClasses[3]) + ",");
+			fwTraining.append(cgpIOPair + (trainingClasses[0][mode] + trainingClasses[1][mode]
+					+ trainingClasses[2][mode] + trainingClasses[3][mode]) + ",");
 			fwTraining.append("\r\n");
 
-			fwValidation.append(cgpIOPair
-					+ (validationClasses[0] + validationClasses[1] + validationClasses[2] + validationClasses[3])
-					+ ",");
+			fwValidation.append(cgpIOPair + (validationClasses[0][mode] + validationClasses[1][mode]
+					+ validationClasses[2][mode] + validationClasses[3][mode]) + ",");
 			fwValidation.append("\r\n");
 
-			fwTesting.append(
-					cgpIOPair + (testingClasses[0] + testingClasses[1] + testingClasses[2] + testingClasses[3]) + ",");
+			fwTesting.append(cgpIOPair + (testingClasses[0][mode] + testingClasses[1][mode] + testingClasses[2][mode]
+					+ testingClasses[3][mode]) + ",");
 			fwTesting.append("\r\n");
 
 			String[] controlDataList = getDataList(".\\Benson_Data\\Controls\\");
@@ -807,11 +813,14 @@ public class Main extends JFrame {
 			String[] overallDataList = new String[controlDataList.length + patientDataList.length];
 
 			for (int i = 0; i < overallDataList.length; i++) {
-				
+				if (i < controlDataList.length)
+					overallDataList[i] = controlDataList[i];
+				else
+					overallDataList[i] = patientDataList[i - controlDataList.length];
 
 				Benson b = new Benson(overallDataList[i].replace("\\", "/"));
 				b.calcThreeLength();
-				
+
 				String[] dataPending = { String.valueOf(b.timeSpent / 100000),
 						String.valueOf(b.getTotalLength() / 10000),
 						String.valueOf(b.getSize()[0] * b.getSize()[1] / 1000000),
@@ -824,55 +833,37 @@ public class Main extends JFrame {
 						String.valueOf((double) b.getHesitation() / 1000),
 						String.valueOf((double) b.getHesitationPortion() * 10), String.valueOf(b.getRating()) };
 
-				if(dataWriteHandshake(mode, b.getFigureMode())){
+				if (dataWriteHandshake(mode, b.getFigureMode())) {
 					writeData(fwOverall, dataPending);
-					fwOverall.append("\r\n");	
+					fwOverall.append("\r\n");
 
-					if (trainingCounter[b.getRating() - 1] != trainingClasses[b.getRating() - 1]) {
+					if (trainingCounter[b.getRating() - 1] != trainingClasses[b.getRating() - 1][mode]) {
 						writeData(fwTraining, dataPending);
 						fwTraining.append("\r\n");
 						trainingCounter[b.getRating() - 1]++;
-						objectCount[0]++;
-						System.out
-								.println("Data " + b.getID() + "_" + b.getFigureMode() + " exported to training data set.");
-					} else if (validationCounter[b.getRating() - 1] != validationClasses[b.getRating() - 1]) {
+						System.out.println(
+								"Data " + b.getID() + "_" + b.getFigureMode() + " exported to training data set.");
+					} else if (validationCounter[b.getRating() - 1] != validationClasses[b.getRating() - 1][mode]) {
 						writeData(fwValidation, dataPending);
 						fwValidation.append("\r\n");
 						validationCounter[b.getRating() - 1]++;
-						objectCount[1]++;
 						System.out.println(
 								"Data " + b.getID() + "_" + b.getFigureMode() + " exported to validation data set.");
-					} else if (testingCounter[b.getRating() - 1] != testingClasses[b.getRating() - 1]) {
+					} else if (testingCounter[b.getRating() - 1] != testingClasses[b.getRating() - 1][mode]) {
 						writeData(fwTesting, dataPending);
 						fwTesting.append("\r\n");
 						testingCounter[b.getRating() - 1]++;
-						objectCount[2]++;
-						System.out
-								.println("Data " + b.getID() + "_" + b.getFigureMode() + " exported to testing data set.");
+						System.out.println(
+								"Data " + b.getID() + "_" + b.getFigureMode() + " exported to testing data set.");
 					}
 				}
 			}
 
-			RandomAccessFile raf1 = new RandomAccessFile(training, "rw");
-			raf1.seek(0);
-			raf1.writeBytes(cgpIOPair+objectCount[0]+",");
-			raf1.close();
-
 			fwTraining.flush();
 			fwTraining.close();
 
-			RandomAccessFile raf2 = new RandomAccessFile(validation, "rw");
-			raf2.seek(0);
-			raf2.writeBytes(cgpIOPair+objectCount[1]+",");
-			raf2.close();
-
 			fwValidation.flush();
 			fwValidation.close();
-
-			RandomAccessFile raf3 = new RandomAccessFile(testing, "rw");
-			raf3.seek(0);
-			raf3.writeBytes(cgpIOPair+objectCount[2]+",");
-			raf3.close();
 
 			fwTesting.flush();
 			fwTesting.close();
@@ -894,35 +885,36 @@ public class Main extends JFrame {
 
 	}
 
-	public static void updateCGPDataSetFirstLine(String fileName, String newLine){
-		try{
+	public static void updateCGPDataSetFirstLine(String fileName, String newLine) {
+		try {
 			RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
 			raf.seek(0);
 			raf.writeBytes(newLine);
 			raf.close();
-		} catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static boolean dataWriteHandshake(int mode, String dataMode){
-		switch(mode){
-			case 0:
+	public static boolean dataWriteHandshake(int mode, String dataMode) {
+		switch (mode) {
+		case 0:
+			return true;
+		case 1:
+			if (dataMode.equals("Copy"))
 				return true;
-			case 1:
-				if(dataMode.equals("Copy"))
-					return true;
-				else
-					return false;
-			case 2:
-				if(dataMode.equals("Recall"))
-					return true;
-				else
-					return false;
-			default:
+			else
+				return false;
+		case 2:
+			if (dataMode.equals("Recall"))
 				return true;
+			else
+				return false;
+		default:
+			return true;
 		}
 	}
+
 	public static void writeData(FileWriter writer, String[] data) throws IOException {
 		for (int i = 0; i < data.length; i++) {
 
