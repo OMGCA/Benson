@@ -12,7 +12,6 @@ import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.awt.Image;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,10 +22,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,7 +39,9 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.UIManager;
+import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -216,8 +214,7 @@ public class Main extends JFrame {
 		setCGPParams.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
-				
+
 				JFrame frame = new JFrame();
 				frame.setSize(275, 375);
 				frame.setTitle("Set CGP Parameters");
@@ -229,9 +226,9 @@ public class Main extends JFrame {
 				c.fill = GridBagConstraints.HORIZONTAL;
 
 				String cgpTags[] = { "Threshold 1", "Threshold 2", "Threshold 3", "Nodes", "Arity", "Max Generations",
-						"Update Frequency", "Random number seed", "Mutation Rate","Input(s)","Output(s)" };
+						"Update Frequency", "Random number seed", "Mutation Rate", "Input(s)", "Output(s)" };
 
-				String defaultValue[] = { "10", "20", "30", "20", "3", "100000", "500", "1234", "0.08","17","1" };
+				String defaultValue[] = { "10", "20", "30", "20", "3", "100000", "500", "1234", "0.08", "17", "1" };
 				JLabel params[] = new JLabel[defaultValue.length];
 				TextField cgpParams[] = new TextField[defaultValue.length];
 
@@ -398,6 +395,12 @@ public class Main extends JFrame {
 				exportData.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 				JCheckBox copyData = new JCheckBox("Copy");
 				JCheckBox recallData = new JCheckBox("Recall");
+				JRadioButton singleOutput = new JRadioButton("Single Output");
+				singleOutput.setSelected(true);
+				JRadioButton fourOutputs = new JRadioButton("Four Outputs");
+				ButtonGroup bGroup = new ButtonGroup();
+				bGroup.add(singleOutput);
+				bGroup.add(fourOutputs);
 
 				String featureTag[] = { "Total Time", "Total Length", "Size", "Aspect Ratio", "Velocity SD", "Angle SD",
 						"Pen-Up Portion", "Horizontal Portion", "Vertical Portion", "Oblique Portion", "Horizontal SD",
@@ -425,6 +428,14 @@ public class Main extends JFrame {
 				c.gridx = 1;
 				c.gridy = 1;
 				popUp.add(recallData, c);
+
+				c.gridx = 2;
+				c.gridy = 1;
+				popUp.add(singleOutput, c);
+
+				c.gridx = 3;
+				c.gridy = 1;
+				popUp.add(fourOutputs, c);
 
 				int x = -1;
 				int y = 2;
@@ -484,7 +495,7 @@ public class Main extends JFrame {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						int outputMode = 0;
-
+						String dataSetFolder = "";
 						if (copyData.isSelected() && recallData.isSelected())
 							outputMode = 0;
 						else if (copyData.isSelected() && !recallData.isSelected())
@@ -492,13 +503,20 @@ public class Main extends JFrame {
 						else if (!copyData.isSelected() && recallData.isSelected())
 							outputMode = 2;
 
+						int cgpoutputMode = 0;
+
+						if (fourOutputs.isSelected())
+							cgpoutputMode = 1;
+						else
+							cgpoutputMode = 0;
+
 						for (int i = 0; i < featureTag.length; i++) {
 							featureSelected[i] = featureSelection[i].isSelected();
 						}
 
 						double trainingRatio = Double.parseDouble(trRatio.getText()) / 100;
 						statusBar.setText("Exporting data set.");
-						String dataSetFolder = exportCGPDataSet(trainingRatio, outputMode, featureSelected);
+						dataSetFolder = exportCGPDataSet(trainingRatio, outputMode, featureSelected, cgpoutputMode);
 						statusBar.setText("Data set exported to " + dataSetFolder + " folder.");
 
 						msg.setVisible(true);
@@ -511,10 +529,20 @@ public class Main extends JFrame {
 								File prevTraining = new File(".//Algorithm_Training//01_training.csv");
 								File prevValidation = new File(".//Algorithm_Training//02_validation.csv");
 								File prevTesting = new File(".//Algorithm_Training//03_testing.csv");
+								File tmpPath = new File(".\\Sheets\\DataSet");
 
-								File training = new File(dataSetFolder + "01_training.csv");
-								File validation = new File(dataSetFolder + "02_validation.csv");
-								File testing = new File(dataSetFolder + "03_testing.csv");
+								String tmpDirs[] = tmpPath.list(new FilenameFilter() {
+									@Override
+									public boolean accept(File current, String name) {
+										return new File(current, name).isDirectory();
+									}
+								});
+
+								String tmpFolder = ".\\Sheets\\DataSet\\" + tmpDirs[tmpDirs.length - 1];
+								System.out.println(tmpFolder);
+								File training = new File(tmpFolder + "\\01_training.csv");
+								File validation = new File(tmpFolder + "\\02_validation.csv");
+								File testing = new File(tmpFolder + "\\03_testing.csv");
 
 								try {
 									copyFile(training, prevTraining);
@@ -751,7 +779,7 @@ public class Main extends JFrame {
 		}
 	}
 
-	public static String exportCGPDataSet(double trainingRatio, int mode, boolean[] selections) {
+	public static String exportCGPDataSet(double trainingRatio, int mode, boolean[] selections, int outputMode) {
 		File newDataFolder = new File(
 				".\\Sheets\\DataSet\\" + new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()));
 		newDataFolder.mkdir();
@@ -838,6 +866,9 @@ public class Main extends JFrame {
 			}
 			String cgpIOPair = String.valueOf(selectedCount) + ",1,";
 
+			if (outputMode == 1)
+				cgpIOPair = String.valueOf(selectedCount) + ",4,";
+
 			fwTraining.append(cgpIOPair + (trainingClasses[0][mode] + trainingClasses[1][mode]
 					+ trainingClasses[2][mode] + trainingClasses[3][mode]) + ",");
 			fwTraining.append("\r\n");
@@ -875,9 +906,18 @@ public class Main extends JFrame {
 
 				List<String> list = new ArrayList<String>(Arrays.asList(dataPending));
 
+				String alterRating[] = { "0", "0", "0", "0" };
+				alterRating[b.getRating() - 1] = "1";
+
 				for (int j = 0; j < selections.length; j++) {
 					if (!selections[j]) {
 						list.remove(j);
+					}
+				}
+				if (outputMode == 1) {
+					list.remove(dataPending.length - 1);
+					for (int j = 0; j < 4; j++) {
+						list.add(alterRating[j]);
 					}
 				}
 				dataPending = list.toArray(dataPending);
