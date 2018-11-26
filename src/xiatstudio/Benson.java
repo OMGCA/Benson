@@ -33,7 +33,6 @@ public class Benson {
 	ArrayList<Component> components;
 
 	ArrayList<Color> colorSet = new ArrayList<Color>();
-	
 
 	public Benson(String data) {
 		this.data = data;
@@ -50,9 +49,9 @@ public class Benson {
 		this.penPressure = new float[timeStamp];
 		this.components = new ArrayList<Component>();
 
-		colorSet.add(new Color(87,207,244));
-		colorSet.add(new Color(200,236,89));
-		colorSet.add(new Color(218,157,223));
+		colorSet.add(new Color(87, 207, 244));
+		colorSet.add(new Color(200, 236, 89));
+		colorSet.add(new Color(218, 157, 223));
 
 		initData();
 		positionCentre();
@@ -89,14 +88,14 @@ public class Benson {
 		return counter;
 	}
 
-	public void registerRating(String ratingSheet){
+	public void registerRating(String ratingSheet) {
 		BufferedReader br = null;
 		String line = "";
-		try{
+		try {
 			br = new BufferedReader(new FileReader(ratingSheet));
-			while((line = br.readLine()) != null){
+			while ((line = br.readLine()) != null) {
 				String[] ratingPair = line.split(",");
-				if(ratingPair[0].equals(getID()) && ratingPair[1].equals(getFigureMode())){
+				if (ratingPair[0].equals(getID()) && ratingPair[1].equals(getFigureMode())) {
 					this.rating = Integer.parseInt(ratingPair[2]);
 					break;
 				}
@@ -116,7 +115,7 @@ public class Benson {
 		}
 	}
 
-	public int getRating(){
+	public int getRating() {
 		return this.rating;
 	}
 
@@ -319,11 +318,11 @@ public class Benson {
 		g2.rotate(Math.toRadians(180), 640, 360);
 
 		groupComp(g2, displayMode);
-		g2.setColor(new Color(255,0,0));
+		g2.setColor(new Color(255, 0, 0));
 
 		plotHesitation(g2);
 
-		//divideComp(g2, displayMode);
+		// divideComp(g2, displayMode);
 
 		vertexPoint(g2);
 	}
@@ -341,10 +340,10 @@ public class Benson {
 		g2.drawString("Length: " + getTotalLength(), 30, yCoorBase + vertGap * 7);
 		g2.drawString("Size: " + (int) getSize()[0] + " x " + (int) getSize()[1], 30, yCoorBase + vertGap * 8);
 		g2.drawString("Pen Off: " + penoffCount() * 100 / (this.timeStamp + 1) + " %", 30, yCoorBase + vertGap * 9);
-		infoMsg(g2,"Hesitation: ",getHesitation(),yCoorBase+vertGap*10);
+		infoMsg(g2, "Hesitation: ", getHesitation(), yCoorBase + vertGap * 10);
 	}
 
-	public void infoMsg(Graphics2D g2, String infoTitle, Object info, int pos){
+	public void infoMsg(Graphics2D g2, String infoTitle, Object info, int pos) {
 		g2.drawString(infoTitle + info, 30, pos);
 	}
 
@@ -580,7 +579,7 @@ public class Benson {
 		initAllCompo();
 
 		ArrayList<Component> groupComponents = new ArrayList<Component>();
-		
+
 		if (this.components.size() > 0) {
 			for (int l = 0; l < 3; l++) {
 				int j = 0;
@@ -597,27 +596,26 @@ public class Benson {
 				}
 				groupComponents.get(l).resizeAxis();
 			}
-			
+
 			if (displayMode == 0) {
 				for (int i = 0; i < 3; i++) {
 					g2.setColor(colorSet.get(i));
 					groupComponents.get(i).drawComponent(g2);
 				}
-			} else{
-				if(displayMode < 4){
-					g2.setColor(colorSet.get(displayMode-1));
-					groupComponents.get(displayMode-1).drawComponent(g2);
-				}
-				else{
+			} else {
+				if (displayMode < 4) {
+					g2.setColor(colorSet.get(displayMode - 1));
+					groupComponents.get(displayMode - 1).drawComponent(g2);
+				} else {
 					for (int i = 0; i < 3; i++) {
 						g2.setColor(colorSet.get(i));
 						groupComponents.get(i).drawComponent(g2);
 					}
 					markPenoff(g2);
 				}
-				
+
 			}
-				
+
 		}
 
 		return groupComponents;
@@ -635,15 +633,15 @@ public class Benson {
 				double tmpDistance = getDistanceBetweenPoints(tmpX, tmpY);
 				if (tmpX[1] != 0 && tmpY[1] != 0) {
 					if (tmpDistance < 20) {
-						indieCompos.get(indieCompos.size()-1).addNewAxis(tmpX[0], tmpY[0]);
+						indieCompos.get(indieCompos.size() - 1).addNewAxis(tmpX[0], tmpY[0]);
 					} else {
 						indieCompos.add(new Component(0));
-						indieCompos.get(indieCompos.size()-1).addNewAxis(tmpX[0], tmpY[0]);
+						indieCompos.get(indieCompos.size() - 1).addNewAxis(tmpX[0], tmpY[0]);
 					}
 				}
 			}
 		}
-			
+
 	}
 
 	public Color randomColor() {
@@ -678,15 +676,15 @@ public class Benson {
 		return Math.sqrt((x[0] - x[1]) * (x[0] - x[1]) + (y[0] - y[1]) * (y[0] - y[1]));
 	}
 
-	public int getHesitation(){
+	public int getHesitation() {
 		int hesitation = 0;
 		int tickJump = 2;
-		
-		for(int i = 0; i < this.timeStamp - tickJump; i++){
-			if(this.penPressure[i] != 0 && this.penPressure[i+tickJump] != 0){
-				float[] tmpX = {this.xAxis[i],this.xAxis[i+tickJump]};
-				float[] tmpY = {this.yAxis[i],this.yAxis[i+tickJump]};
-				if((getDistanceBetweenPoints(tmpX, tmpY)) < 0.1){
+
+		for (int i = 0; i < this.timeStamp - tickJump; i++) {
+			if (this.penPressure[i] != 0 && this.penPressure[i + tickJump] != 0) {
+				float[] tmpX = { this.xAxis[i], this.xAxis[i + tickJump] };
+				float[] tmpY = { this.yAxis[i], this.yAxis[i + tickJump] };
+				if ((getDistanceBetweenPoints(tmpX, tmpY)) < 0.1) {
 					hesitation++;
 				}
 			}
@@ -694,23 +692,46 @@ public class Benson {
 		return hesitation;
 	}
 
-	public double getHesitationPortion(){
-		if(this.timeStamp != 0)
-			return (double)getHesitation() / this.timeStamp;
+	public int getPenUpHesitation() {
+		int hesitation = 0;
+		int tickJump = 2;
+
+		for (int i = 0; i < this.timeStamp - tickJump; i++) {
+			if (this.penPressure[i] == 0 && this.penPressure[i + tickJump] == 0) {
+				float[] tmpX = { this.xAxis[i], this.xAxis[i + tickJump] };
+				float[] tmpY = { this.yAxis[i], this.yAxis[i + tickJump] };
+				if ((getDistanceBetweenPoints(tmpX, tmpY)) < 0.1) {
+					hesitation++;
+				}
+			}
+		}
+		return hesitation;
+	}
+
+	public double getHesitationPortion() {
+		if (this.timeStamp != 0)
+			return (double) getHesitation() / this.timeStamp;
 		else
 			return -1;
 	}
 
-	public void plotHesitation(Graphics2D g2){
+	public double getPenUpHesiPortion() {
+		if (this.timeStamp != 0)
+			return (double) getPenUpHesitation() / this.timeStamp;
+		else
+			return -1;
+	}
+
+	public void plotHesitation(Graphics2D g2) {
 		int tickJump = 5;
 
-		for(int i = 0; i < this.timeStamp - tickJump; i++){
-			if(this.penPressure[i] != 0 && this.penPressure[i+tickJump] != 0){
-				float[] tmpX = {this.xAxis[i],this.xAxis[i+tickJump]};
-				float[] tmpY = {this.yAxis[i],this.yAxis[i+tickJump]};
-				if((getDistanceBetweenPoints(tmpX, tmpY)) < 0.1){
-					g2.setColor(new Color(255,0,0));
-					g2.fillOval((int)tmpX[0],(int)tmpY[0],8,8);
+		for (int i = 0; i < this.timeStamp - tickJump; i++) {
+			if (this.penPressure[i] != 0 && this.penPressure[i + tickJump] != 0) {
+				float[] tmpX = { this.xAxis[i], this.xAxis[i + tickJump] };
+				float[] tmpY = { this.yAxis[i], this.yAxis[i + tickJump] };
+				if ((getDistanceBetweenPoints(tmpX, tmpY)) < 0.1) {
+					g2.setColor(new Color(255, 0, 0));
+					g2.fillOval((int) tmpX[0], (int) tmpY[0], 8, 8);
 				}
 			}
 		}
@@ -858,7 +879,7 @@ public class Benson {
 	public void paintComponent(Graphics2D g2, int displayMode) {
 		for (int i = 0; i < this.components.size(); i++) {
 			Component tmpComp = this.components.get(i);
-			g2.setColor(colorSet.get(tmpComp.getIndex()-2));
+			g2.setColor(colorSet.get(tmpComp.getIndex() - 2));
 
 			initAllCompo();
 
@@ -869,7 +890,7 @@ public class Benson {
 					}
 				} else if (displayMode == 1) {
 					if (tmpComp.getIndex() == 2) {
-							tmpComp.drawComponent(g2);	
+						tmpComp.drawComponent(g2);
 					}
 				} else if (displayMode == 2) {
 					if (tmpComp.getIndex() == 3) {
@@ -877,7 +898,7 @@ public class Benson {
 					}
 				} else if (displayMode == 3) {
 					if (tmpComp.getIndex() == 4) {
-							tmpComp.drawComponent(g2);
+						tmpComp.drawComponent(g2);
 					}
 				} else if (displayMode == 4) {
 					for (int j = 0; j < tmpComp.getAxisSize() - 1; j++) {
