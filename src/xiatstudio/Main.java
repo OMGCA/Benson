@@ -455,6 +455,7 @@ public class Main extends JFrame {
 				TextField tierRange[] = new TextField[8];
 				JLabel tier[] = new JLabel[4];
 				JLabel tierTitle = new JLabel("Tier definition");
+				tierTitle.setFont(new Font("Segoe UI", Font.PLAIN, 15));
 				c.gridx = 0;
 				c.gridy = 2;
 				popUp.add(tierTitle, c);
@@ -480,6 +481,7 @@ public class Main extends JFrame {
 					popUp.add(tierRange[i * 2 + 1], c);
 				}
 				JLabel featureTitle = new JLabel("Feature selection");
+				featureTitle.setFont(new Font("Segoe UI", Font.PLAIN, 15));
 				c.gridx = 0;
 				c.gridy++;
 				popUp.add(featureTitle, c);
@@ -980,11 +982,15 @@ public class Main extends JFrame {
 					alterRating[b.getRating() - 1] = "1";
 
 					/* Remove unselected feature */
+					/* 2018-11-27: Bug, list remove not done cleanly */
+					/* Bug fixed */
 					for (int j = 0; j < selections.length; j++) {
 						if (!selections[j]) {
 							list.remove(j);
+							dataPending = list.toArray(new String[0]);
 						}
 					}
+					
 
 					if (outputMode == 1) {
 						list.remove(dataPending.length - 1);
@@ -1000,8 +1006,7 @@ public class Main extends JFrame {
 							list.add(String.valueOf(b.getRating()));
 						}
 					}
-					dataPending = list.toArray(dataPending);
-
+					
 					String dataToWrite[] = removeNull(dataPending);
 					writeData(fwOverall, dataToWrite);
 					fwOverall.append("\r\n");
