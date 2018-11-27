@@ -383,7 +383,7 @@ public class Main extends JFrame {
 				/* New pop up windows */
 				JFrame popUp = new JFrame();
 				popUp.setVisible(true);
-				popUp.setSize(750, 230);
+				popUp.setSize(750, 320);
 				popUp.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 				popUp.setLayout(new GridBagLayout());
 				popUp.setTitle("Exporting CGP compatible data set");
@@ -403,7 +403,9 @@ public class Main extends JFrame {
 				exportData.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 
 				JCheckBox copyData = new JCheckBox("Copy");
+				copyData.setSelected(true);
 				JCheckBox recallData = new JCheckBox("Recall");
+				recallData.setSelected(true);
 
 				JRadioButton singleOutput = new JRadioButton("Single Output");
 				JRadioButton fourOutputs = new JRadioButton("Four Outputs");
@@ -450,8 +452,40 @@ public class Main extends JFrame {
 				c.gridy = 1;
 				popUp.add(fourOutputs, c);
 
+				TextField tierRange[] = new TextField[8];
+				JLabel tier[] = new JLabel[4];
+				JLabel tierTitle = new JLabel("Tier definition");
+				c.gridx = 0;
+				c.gridy = 2;
+				popUp.add(tierTitle, c);
+
+				for (int i = 0; i < 4; i++) {
+					tierRange[i * 2] = new TextField(2);
+					tierRange[i * 2].setText(String.valueOf(i * 5));
+					tierRange[i * 2 + 1] = new TextField(2);
+					tierRange[i * 2 + 1].setText(String.valueOf(i * 5 + 4));
+
+					if (i * 5 + 4 > 17)
+						tierRange[i * 2 + 1].setText(String.valueOf(17));
+
+					tier[i] = new JLabel("Class " + String.valueOf(i + 1));
+					c.gridx = i;
+					c.gridy = 3;
+					popUp.add(tierRange[i * 2], c);
+
+					c.gridy = 4;
+					popUp.add(tier[i], c);
+
+					c.gridy = 5;
+					popUp.add(tierRange[i * 2 + 1], c);
+				}
+				JLabel featureTitle = new JLabel("Feature selection");
+				c.gridx = 0;
+				c.gridy++;
+				popUp.add(featureTitle, c);
+
 				int x = -1;
-				int y = 2;
+				int y = 7;
 				for (int i = 0; i < featureTag.length; i++) {
 					x++;
 					featureSelection[i] = new JCheckBox(featureTag[i]);
@@ -528,7 +562,14 @@ public class Main extends JFrame {
 							featureSelected[i] = featureSelection[i].isSelected();
 						}
 
+						int tierDef[] = new int[8];
+						for (int i = 0; i < 8; i++) {
+							tierDef[i] = Integer.parseInt(tierRange[i].getText());
+						}
+
 						double trainingRatio = Double.parseDouble(trRatio.getText()) / 100;
+						statusBar.setText("Setting tiers.");
+						exportCustomTier(tierDef);
 						statusBar.setText("Exporting data set.");
 						dataSetFolder = exportCGPDataSet(trainingRatio, outputMode, featureSelected, cgpoutputMode);
 						statusBar.setText("Data set exported to " + dataSetFolder + " folder.");
@@ -1027,6 +1068,35 @@ public class Main extends JFrame {
 			raf.seek(0);
 			raf.writeBytes(newLine);
 			raf.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void exportCustomTier(int[] customTier) {
+		File ratingSheet = new File(".\\Sheets\\rating.csv");
+		FileWriter fwRating;
+		BufferedReader br;
+		String line = "";
+		try {
+			br = new BufferedReader(new FileReader(".\\Sheets\\original_rating.csv"));
+			fwRating = new FileWriter(ratingSheet, false);
+			while ((line = br.readLine()) != null) {
+				int tmpRate = Integer.parseInt(line.split(",")[2]);
+				for (int i = 1; i <= 7; i += 2) {
+					if (tmpRate >= customTier[i - 1] && tmpRate <= customTier[i]) {
+						fwRating.append(line.split(",")[0]);
+						fwRating.append(",");
+						fwRating.append(line.split(",")[1]);
+						fwRating.append(",");
+						fwRating.append(String.valueOf((i + 1) / 2));
+						fwRating.append("\r\n");
+					}
+				}
+			}
+
+			fwRating.flush();
+			fwRating.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
