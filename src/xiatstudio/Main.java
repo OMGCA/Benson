@@ -996,14 +996,17 @@ public class Main extends JFrame {
 						list.remove(dataPending.length - 1);
 						for (int j = 0; j < 4; j++) {
 							list.add(alterRating[j]);
+							dataPending = list.toArray(new String[0]);
 						}
 						/* Update 2018-11-26 */
 						/* Allow user to switch output mode back */
 						if (outputMode == 0) {
 							for (int j = 0; j < 4; j++) {
 								list.remove(dataPending.length - 1);
+								dataPending = list.toArray(new String[0]);
 							}
 							list.add(String.valueOf(b.getRating()));
+							dataPending = list.toArray(new String[0]);
 						}
 					}
 					
