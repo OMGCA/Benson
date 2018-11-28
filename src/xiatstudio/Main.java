@@ -53,6 +53,8 @@ public class Main extends JFrame {
 	static String data = "./Benson_Data/empty.txt";
 	static JPanel panel;
 	static int displayMode = 0;
+	static GridBagConstraints c = new GridBagConstraints();
+	static Font xtDefault = new Font("Segoe UI", Font.PLAIN, 12);
 
 	public static void main(String[] args) {
 		/* Load GUI component */
@@ -73,7 +75,8 @@ public class Main extends JFrame {
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menu, menu2, menu3, exportMenu, exportAllMenu;
 		JMenuItem menuItem, menuItem2, menuItem3, menuItem4, menuItem5, menuItem6, menuItem7;
-		JMenuItem mode1, mode2, mode3, mode4, exportLibSVMData, setCGPParams;
+		JMenuItem exportLibSVMData, setCGPParams;
+		JMenuItem displayModeMenu[] = new JMenuItem[4];
 		JMenuItem pen_offON, pen_offOFF;
 
 		/* Background color */
@@ -91,10 +94,7 @@ public class Main extends JFrame {
 		menuBar.add(menu2);
 		menuBar.add(menu3);
 		menuItem = new JMenuItem("Open");
-		mode1 = new JMenuItem("All");
-		mode2 = new JMenuItem("Horizontal");
-		mode3 = new JMenuItem("Vertical");
-		mode4 = new JMenuItem("Oblique");
+
 		exportMenu = new JMenu("Export as...");
 		exportAllMenu = new JMenu("Export all as...");
 		exportLibSVMData = new JMenuItem("Convert to LibSVM Data");
@@ -105,15 +105,13 @@ public class Main extends JFrame {
 		menuItem5 = new JMenuItem("CSV File");
 		menuItem6 = new JMenuItem("CSV File (data only)");
 		menuItem7 = new JMenuItem("Training Data Set");
+
 		menu.add(menuItem);
 		menu.add(exportMenu);
 		menu.add(exportAllMenu);
 		menu.add(exportLibSVMData);
 		menu.add(setCGPParams);
-		menu2.add(mode1);
-		menu2.add(mode2);
-		menu2.add(mode3);
-		menu2.add(mode4);
+
 		exportMenu.add(menuItem2);
 		exportMenu.add(menuItem3);
 		exportAllMenu.add(menuItem4);
@@ -132,48 +130,25 @@ public class Main extends JFrame {
 		ImageIcon xt_logo = new ImageIcon("xt_logo.png");
 		frame.setIconImage(xt_logo.getImage());
 
-		mode1.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				displayMode = 0;
-				panel.repaint();
-
-			}
-		});
-
-		mode2.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				displayMode = 1;
-				panel.repaint();
-
-			}
-		});
-
-		mode3.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				displayMode = 2;
-				panel.repaint();
-
-			}
-		});
-
-		mode4.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				displayMode = 3;
-				panel.repaint();
-
-			}
-		});
+		String displayMenuSet[] = { "All", "Horizontal", "Vertical", "Oblique" };
+		for (int i = 0; i < 4; i++) {
+			displayModeMenu[i] = new JMenuItem(displayMenuSet[i]);
+			menu2.add(displayModeMenu[i]);
+			final int tmpIndex = i;
+			displayModeMenu[i].addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					displayMode = tmpIndex;
+					panel.repaint();
+				}
+			});
+		}
 
 		pen_offON.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				displayMode = 4;
 				panel.repaint();
-
 			}
 		});
 
@@ -217,7 +192,7 @@ public class Main extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				/* New pop up windows */
 				JFrame frame = new JFrame();
-				frame.setSize(450,370);
+				frame.setSize(450, 370);
 				frame.setTitle("Set CGP Parameters");
 				frame.setVisible(true);
 				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -237,38 +212,28 @@ public class Main extends JFrame {
 
 				/* Adding components above to the menu */
 				for (int i = 0; i < defaultValue.length; i++) {
-					c.gridx = 0;
-					c.gridy = i;
 					params[i] = new JLabel(cgpTags[i]);
-					params[i].setFont(new Font("Segoe UI", Font.PLAIN, 12));
-					frame.add(params[i], c);
+					params[i].setFont(xtDefault);
+					windowAddComponent(frame, 0, i, params[i]);
 
-					c.gridx = 1;
-					c.gridy = i;
 					cgpParams[i] = new TextField(10);
-					cgpParams[i].setFont(new Font("Segoe UI", Font.PLAIN, 12));
+					cgpParams[i].setFont(xtDefault);
 					cgpParams[i].setText(defaultValue[i]);
-
-					frame.add(cgpParams[i], c);
+					windowAddComponent(frame, i, i, cgpParams[i]);
 				}
 
 				JButton export = new JButton("Save parameter");
 				JButton launchCGP = new JButton("Launch CGP (in YARCC)");
 				JButton localCGP = new JButton("Launch CGP (in local)");
-				export.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-				c.gridx = 0;
-				c.gridy = defaultValue.length;
-				frame.add(export, c);
 
-				launchCGP.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-				c.gridx = 1;
-				c.gridy = defaultValue.length;
-				frame.add(launchCGP, c);
+				export.setFont(xtDefault);
+				windowAddComponent(frame, 0, defaultValue.length, export);
 
-				localCGP.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-				c.gridx = 2;
-				c.gridy = defaultValue.length;
-				frame.add(localCGP, c);
+				launchCGP.setFont(xtDefault);
+				windowAddComponent(frame, 1, defaultValue.length, launchCGP);
+
+				localCGP.setFont(xtDefault);
+				windowAddComponent(frame, 2, defaultValue.length, localCGP);
 
 				export.addActionListener(new ActionListener() {
 					@Override
@@ -296,49 +261,39 @@ public class Main extends JFrame {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						JFrame yarccLogin = new JFrame();
-						yarccLogin.setSize(400,200);
+						yarccLogin.setSize(400, 200);
 						yarccLogin.setVisible(true);
+						yarccLogin.setLayout(new GridBagLayout());
+						yarccLogin.setTitle("Logging in to YARCC");
+
 						JLabel userName = new JLabel("User Name");
+						userName.setFont(xtDefault);
+						windowAddComponent(yarccLogin, 0, 0, userName);
+
 						JLabel pw = new JLabel("Password");
+						pw.setFont(xtDefault);
+						windowAddComponent(yarccLogin, 0, 1, pw);
+
 						TextField userInput = new TextField(10);
 						JPasswordField pwInput = new JPasswordField(10);
-						yarccLogin.setLayout(new GridBagLayout());
-						GridBagConstraints c = new GridBagConstraints();
-						c.fill = GridBagConstraints.HORIZONTAL;
-
-						c.gridx = 0;
-						c.gridy = 0;
-						yarccLogin.add(userName,c);
-
-						c.gridx = 1;
-						c.gridy = 0;
-						yarccLogin.add(userInput,c);
-
-						c.gridx = 0;
-						c.gridy = 1;
-						yarccLogin.add(pw,c);
-
-						c.gridx = 1;
-						c.gridy = 1;
-						yarccLogin.add(pwInput,c);
+						windowAddComponent(yarccLogin, 1, 0, userInput);
+						windowAddComponent(yarccLogin, 1, 1, pwInput);
 
 						JButton loginConfirm = new JButton("Log In");
+						windowAddComponent(yarccLogin, 0, 2, loginConfirm);
 
-						c.gridx = 0;
-						c.gridy = 2;
-						yarccLogin.add(loginConfirm,c);
-
-						loginConfirm.addActionListener(new ActionListener(){
+						loginConfirm.addActionListener(new ActionListener() {
 							@Override
-							public void actionPerformed(ActionEvent e){
-								try {	
+							public void actionPerformed(ActionEvent e) {
+								try {
 									yarccLogin.dispose();
-									Runtime.getRuntime().exec("putty.exe " + userInput.getText() + "@[REDACTED] -pw "+ pwInput.getText());
+									Runtime.getRuntime().exec("putty.exe " + userInput.getText()
+											+ "@research2.york.ac.uk -pw " + pwInput.getText());
 								} catch (Exception e1) {
 									e1.printStackTrace();
 								}
 							}
-						});	
+						});
 					}
 				});
 
@@ -346,7 +301,8 @@ public class Main extends JFrame {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						try {
-							Runtime.getRuntime().exec("cmd /c start cmd.exe /K \" cd Algorithm_Training && Algorithm_Training.exe\"");
+							Runtime.getRuntime().exec(
+									"cmd /c start cmd.exe /K \" cd Algorithm_Training && Algorithm_Training.exe\"");
 						} catch (Exception e1) {
 							e1.printStackTrace();
 						}
@@ -444,26 +400,31 @@ public class Main extends JFrame {
 				popUp.setTitle("Exporting CGP compatible data set");
 				popUp.setIconImage(xt_logo.getImage());
 
-				GridBagConstraints c = new GridBagConstraints();
-				c.fill = GridBagConstraints.HORIZONTAL;
-
 				/* GUI components */
 				JLabel ratioPrompt = new JLabel("Ratio for training data (in %)");
-				ratioPrompt.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+				ratioPrompt.setFont(xtDefault);
+				windowAddComponent(popUp, 0, 0, ratioPrompt);
 
 				TextField trRatio = new TextField(10);
 				trRatio.setText("60");
+				windowAddComponent(popUp, 1, 0, trRatio);
 
 				JButton exportData = new JButton("Export");
-				exportData.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+				exportData.setFont(xtDefault);
+				windowAddComponent(popUp, 2, 0, exportData);
 
 				JCheckBox copyData = new JCheckBox("Copy");
 				copyData.setSelected(true);
+				windowAddComponent(popUp, 0, 1, copyData);
+
 				JCheckBox recallData = new JCheckBox("Recall");
 				recallData.setSelected(true);
+				windowAddComponent(popUp, 1, 1, recallData);
 
 				JRadioButton singleOutput = new JRadioButton("Single Output");
+				windowAddComponent(popUp, 2, 1, singleOutput);
 				JRadioButton fourOutputs = new JRadioButton("Four Outputs");
+				windowAddComponent(popUp, 3, 1, fourOutputs);
 
 				ButtonGroup bGroup = new ButtonGroup();
 
@@ -479,41 +440,11 @@ public class Main extends JFrame {
 
 				JCheckBox featureSelection[] = new JCheckBox[featureTag.length];
 
-				c.gridx = 0;
-				c.gridy = 0;
-				popUp.add(ratioPrompt, c);
-
-				c.gridx = 1;
-				c.gridy = 0;
-				popUp.add(trRatio, c);
-
-				c.gridx = 2;
-				c.gridy = 0;
-				popUp.add(exportData, c);
-
-				c.gridx = 0;
-				c.gridy = 1;
-				popUp.add(copyData, c);
-
-				c.gridx = 1;
-				c.gridy = 1;
-				popUp.add(recallData, c);
-
-				c.gridx = 2;
-				c.gridy = 1;
-				popUp.add(singleOutput, c);
-
-				c.gridx = 3;
-				c.gridy = 1;
-				popUp.add(fourOutputs, c);
-
 				TextField tierRange[] = new TextField[8];
 				JLabel tier[] = new JLabel[4];
 				JLabel tierTitle = new JLabel("Tier definition");
 				tierTitle.setFont(new Font("Segoe UI", Font.PLAIN, 15));
-				c.gridx = 0;
-				c.gridy = 2;
-				popUp.add(tierTitle, c);
+				windowAddComponent(popUp, 0, 2, tierTitle);
 
 				for (int i = 0; i < 4; i++) {
 					tierRange[i * 2] = new TextField(2);
@@ -525,21 +456,17 @@ public class Main extends JFrame {
 						tierRange[i * 2 + 1].setText(String.valueOf(17));
 
 					tier[i] = new JLabel("Class " + String.valueOf(i + 1));
-					c.gridx = i;
-					c.gridy = 3;
-					popUp.add(tierRange[i * 2], c);
 
-					c.gridy = 4;
-					popUp.add(tier[i], c);
+					windowAddComponent(popUp, i, 3, tierRange[i * 2]);
 
-					c.gridy = 5;
-					popUp.add(tierRange[i * 2 + 1], c);
+					windowAddComponent(popUp, i, 4, tier[i]);
+
+					windowAddComponent(popUp, i, 5, tierRange[i * 2 + 1]);
+
 				}
 				JLabel featureTitle = new JLabel("Feature selection");
 				featureTitle.setFont(new Font("Segoe UI", Font.PLAIN, 15));
-				c.gridx = 0;
-				c.gridy++;
-				popUp.add(featureTitle, c);
+				windowAddComponent(popUp, 0, 6, featureTitle);
 
 				int x = -1;
 				int y = 7;
@@ -547,53 +474,43 @@ public class Main extends JFrame {
 					x++;
 					featureSelection[i] = new JCheckBox(featureTag[i]);
 					featureSelection[i].setSelected(true);
-					featureSelection[i].setFont(new Font("Segoe UI", Font.PLAIN, 12));
-					c.gridx = x;
-					c.gridy = y;
+					featureSelection[i].setFont(xtDefault);
+					windowAddComponent(popUp, x, y, featureSelection[i]);
 					if (x == 4) {
 						y++;
 						x = -1;
 					}
-					popUp.add(featureSelection[i], c);
 				}
 
 				boolean featureSelected[] = new boolean[featureTag.length];
 
 				JLabel msg = new JLabel("Cover existing data set?");
-				msg.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-				c.gridx = 0;
-				c.gridy = y + 1;
-				popUp.add(msg, c);
+				msg.setFont(xtDefault);
+
+				windowAddComponent(popUp, 0, y + 1, msg);
 
 				JButton confirm = new JButton("Yes");
-				confirm.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+				confirm.setFont(xtDefault);
 				c.weightx = 0.5;
-				c.gridx = 1;
-				c.gridy = y + 1;
-				popUp.add(confirm, c);
+				windowAddComponent(popUp, 1, y + 1, confirm);
+				confirm.setSize(50, 30);
 
 				JButton noConfirm = new JButton("No");
-				noConfirm.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+				noConfirm.setFont(xtDefault);
 				c.weightx = 0.4;
-				c.gridx = 2;
-				c.gridy = y + 1;
-				popUp.add(noConfirm, c);
+				windowAddComponent(popUp, 2, y + 1, noConfirm);
 				noConfirm.setSize(50, 30);
-				confirm.setSize(50, 30);
 
 				msg.setVisible(false);
 				confirm.setVisible(false);
 				noConfirm.setVisible(false);
 
 				TextField statusBar = new TextField(400);
-				statusBar.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+				statusBar.setFont(xtDefault);
 				statusBar.setEditable(false);
 				c.weightx = 0.2;
 				c.gridwidth = 3;
-				c.ipadx = 400;
-				c.gridx = 0;
-				c.gridy = y + 2;
-				popUp.add(statusBar, c);
+				windowAddComponent(popUp, 0, y + 2, statusBar);
 
 				exportData.addActionListener(new ActionListener() {
 					@Override
@@ -720,6 +637,13 @@ public class Main extends JFrame {
 				System.out.println("error");
 			}
 		}
+	}
+
+	public static void windowAddComponent(JFrame frame, int gridX, int gridY, java.awt.Component o) {
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = gridX;
+		c.gridy = gridY;
+		frame.add(o, c);
 	}
 
 	/* This function cannot be used to find folders in a directory */
@@ -935,18 +859,8 @@ public class Main extends JFrame {
 				if (line.split(",")[1].equals("Recall"))
 					recallTotal[Integer.parseInt(line.split(",")[2]) - 1]++;
 			}
-		} catch (FileNotFoundException e) {
-			System.out.println("ERROR: Specific data file can not be found.");
-		} catch (IOException e) {
-			System.out.println("ERROR: Specific data file can not be accessed.");
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+		} catch (Exception e) {
+			System.out.println("ERROR: File not found or can not be accessed.");
 		}
 
 		for (int i = 0; i < 4; i++) {
@@ -955,9 +869,9 @@ public class Main extends JFrame {
 			trainingClasses[i][1] = (int) Math.floor(copyTotal[i] * trainingRatio);
 			trainingClasses[i][2] = (int) Math.floor(recallTotal[i] * trainingRatio);
 
-			validationClasses[i][0] = (int) Math.floor(classTotal[i] * (1 - trainingRatio) / 2);
-			validationClasses[i][1] = (int) Math.floor(copyTotal[i] * (1 - trainingRatio) / 2);
-			validationClasses[i][2] = (int) Math.floor(recallTotal[i] * (1 - trainingRatio) / 2);
+			validationClasses[i][0] = (int) Math.floor((classTotal[i] - trainingClasses[i][0]) / 2);
+			validationClasses[i][1] = (int) Math.floor((copyTotal[i] - trainingClasses[i][1]) / 2);
+			validationClasses[i][2] = (int) Math.floor((recallTotal[i] - trainingClasses[i][2]) / 2);
 
 			testingClasses[i][0] = (int) (classTotal[i] - trainingClasses[i][0] - validationClasses[i][0]);
 			testingClasses[i][1] = (int) (copyTotal[i] - trainingClasses[i][1] - validationClasses[i][1]);
@@ -1121,17 +1035,6 @@ public class Main extends JFrame {
 			if (str != null)
 				removedNull.add(str);
 		return removedNull.toArray(new String[0]);
-	}
-
-	public static void updateCGPDataSetFirstLine(String fileName, String newLine) {
-		try {
-			RandomAccessFile raf = new RandomAccessFile(fileName, "rw");
-			raf.seek(0);
-			raf.writeBytes(newLine);
-			raf.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	public static void exportCustomTier(int[] customTier) {
