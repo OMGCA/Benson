@@ -976,22 +976,20 @@ public class Main extends JFrame {
 
 				/* Check whether this data is entitled to be exported */
 				if (dataWriteHandshake(mode, b, ".\\Sheets\\rating.csv")) {
-					List<String> list = new ArrayList<String>(Arrays.asList(dataPending));
-
 					String alterRating[] = { "0", "0", "0", "0" };
 					alterRating[b.getRating() - 1] = "1";
 
 					/* Remove unselected feature */
-					/* 2018-11-27: Bug, list remove not done cleanly */
-					/* Bug fixed */
+					/* 2018-11-27: Bug, when deselect features for the second time*/
+					/* IndexOutOfBoundsException at line 989 */
+					/* 2018-11-28: Bug fix */
 					for (int j = 0; j < selections.length; j++) {
 						if (!selections[j]) {
-							list.remove(j);
-							dataPending = list.toArray(new String[0]);
+							dataPending[j] = null;
 						}
 					}
+					List<String> list = new ArrayList<String>(Arrays.asList(dataPending));
 					
-
 					if (outputMode == 1) {
 						list.remove(dataPending.length - 1);
 						for (int j = 0; j < 4; j++) {
