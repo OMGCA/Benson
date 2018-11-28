@@ -39,6 +39,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.UIManager;
 import javax.swing.ButtonGroup;
@@ -294,11 +295,50 @@ public class Main extends JFrame {
 				launchCGP.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						try {
-							Runtime.getRuntime().exec("putty.exe [redacted]@[redacted] -pw [redacted]");
-						} catch (Exception e1) {
-							e1.printStackTrace();
-						}
+						JFrame yarccLogin = new JFrame();
+						yarccLogin.setSize(400,200);
+						yarccLogin.setVisible(true);
+						JLabel userName = new JLabel("User Name");
+						JLabel pw = new JLabel("Password");
+						TextField userInput = new TextField(10);
+						JPasswordField pwInput = new JPasswordField(10);
+						yarccLogin.setLayout(new GridBagLayout());
+						GridBagConstraints c = new GridBagConstraints();
+						c.fill = GridBagConstraints.HORIZONTAL;
+
+						c.gridx = 0;
+						c.gridy = 0;
+						yarccLogin.add(userName,c);
+
+						c.gridx = 1;
+						c.gridy = 0;
+						yarccLogin.add(userInput,c);
+
+						c.gridx = 0;
+						c.gridy = 1;
+						yarccLogin.add(pw,c);
+
+						c.gridx = 1;
+						c.gridy = 1;
+						yarccLogin.add(pwInput,c);
+
+						JButton loginConfirm = new JButton("Log In");
+
+						c.gridx = 0;
+						c.gridy = 2;
+						yarccLogin.add(loginConfirm,c);
+
+						loginConfirm.addActionListener(new ActionListener(){
+							@Override
+							public void actionPerformed(ActionEvent e){
+								try {	
+									yarccLogin.dispose();
+									Runtime.getRuntime().exec("putty.exe " + userInput.getText() + "@[REDACTED] -pw "+ pwInput.getText());
+								} catch (Exception e1) {
+									e1.printStackTrace();
+								}
+							}
+						});	
 					}
 				});
 
