@@ -288,10 +288,8 @@ public class Main extends JFrame {
 				launchCGP.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
-						ProcessBuilder p = new ProcessBuilder();
-						p.command(".\\Algorithm_Training\\Algorithm_Training.exe");
 						try {
-							p.start();
+							Runtime.getRuntime().exec("cmd /c start cmd.exe /K \" cd Algorithm_Training && Algorithm_Training.exe\"");
 						} catch (Exception e1) {
 							e1.printStackTrace();
 						}
@@ -980,7 +978,7 @@ public class Main extends JFrame {
 					alterRating[b.getRating() - 1] = "1";
 
 					/* Remove unselected feature */
-					/* 2018-11-27: Bug, when deselect features for the second time*/
+					/* 2018-11-27: Bug, when deselect features for the second time */
 					/* IndexOutOfBoundsException at line 989 */
 					/* 2018-11-28: Bug fix */
 					for (int j = 0; j < selections.length; j++) {
@@ -989,7 +987,7 @@ public class Main extends JFrame {
 						}
 					}
 					List<String> list = new ArrayList<String>(Arrays.asList(dataPending));
-					
+
 					if (outputMode == 1) {
 						list.remove(dataPending.length - 1);
 						for (int j = 0; j < 4; j++) {
@@ -1007,7 +1005,7 @@ public class Main extends JFrame {
 							dataPending = list.toArray(new String[0]);
 						}
 					}
-					
+
 					String dataToWrite[] = removeNull(dataPending);
 					writeData(fwOverall, dataToWrite);
 					fwOverall.append("\r\n");
