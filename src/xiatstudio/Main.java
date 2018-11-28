@@ -54,6 +54,7 @@ public class Main extends JFrame {
 	static int displayMode = 0;
 	static GridBagConstraints c = new GridBagConstraints();
 	static Font xtDefault = new Font("Segoe UI", Font.PLAIN, 12);
+	static String yarccAddress = "[REDACTED]";
 
 	public static void main(String[] args) {
 		/* Load GUI component */
@@ -260,7 +261,7 @@ public class Main extends JFrame {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						JFrame yarccLogin = new JFrame();
-						yarccLogin.setSize(400, 200);
+						yarccLogin.setSize(300, 140);
 						yarccLogin.setVisible(true);
 						yarccLogin.setLayout(new GridBagLayout());
 						yarccLogin.setTitle("Logging in to YARCC");
@@ -291,7 +292,7 @@ public class Main extends JFrame {
 								try {
 									yarccLogin.dispose();
 									Runtime.getRuntime().exec("putty.exe " + userInput.getText()
-											+ "@[REDACTED] -pw " + pwInput.getText());
+											+ yarccAddress+ " -pw " + pwInput.getText());
 								} catch (Exception e1) {
 									infoBoard.setText("PuTTY.exe missing.");
 								}
