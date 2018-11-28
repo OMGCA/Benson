@@ -219,7 +219,7 @@ public class Main extends JFrame {
 					cgpParams[i] = new TextField(10);
 					cgpParams[i].setFont(xtDefault);
 					cgpParams[i].setText(defaultValue[i]);
-					windowAddComponent(frame, i, i, cgpParams[i]);
+					windowAddComponent(frame, 1, i, cgpParams[i]);
 				}
 
 				JButton export = new JButton("Save parameter");
