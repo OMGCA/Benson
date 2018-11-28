@@ -20,10 +20,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +30,10 @@ import java.util.Date;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -42,9 +44,6 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.UIManager;
-import javax.swing.ButtonGroup;
-import javax.swing.ImageIcon;
-import javax.swing.JCheckBox;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 @SuppressWarnings("serial")
@@ -266,21 +265,25 @@ public class Main extends JFrame {
 						yarccLogin.setLayout(new GridBagLayout());
 						yarccLogin.setTitle("Logging in to YARCC");
 
+						JLabel infoBoard = new JLabel("After login, type ./cgp_run.sh");
+						infoBoard.setFont(xtDefault);
+						windowAddComponent(yarccLogin, 0, 0, infoBoard);
+
 						JLabel userName = new JLabel("User Name");
 						userName.setFont(xtDefault);
-						windowAddComponent(yarccLogin, 0, 0, userName);
+						windowAddComponent(yarccLogin, 0, 1, userName);
 
 						JLabel pw = new JLabel("Password");
 						pw.setFont(xtDefault);
-						windowAddComponent(yarccLogin, 0, 1, pw);
+						windowAddComponent(yarccLogin, 0, 2, pw);
 
 						TextField userInput = new TextField(10);
 						JPasswordField pwInput = new JPasswordField(10);
-						windowAddComponent(yarccLogin, 1, 0, userInput);
-						windowAddComponent(yarccLogin, 1, 1, pwInput);
+						windowAddComponent(yarccLogin, 1, 1, userInput);
+						windowAddComponent(yarccLogin, 1, 2, pwInput);
 
 						JButton loginConfirm = new JButton("Log In");
-						windowAddComponent(yarccLogin, 0, 2, loginConfirm);
+						windowAddComponent(yarccLogin, 0, 3, loginConfirm);
 
 						loginConfirm.addActionListener(new ActionListener() {
 							@Override
@@ -288,9 +291,9 @@ public class Main extends JFrame {
 								try {
 									yarccLogin.dispose();
 									Runtime.getRuntime().exec("putty.exe " + userInput.getText()
-											+ "@research2.york.ac.uk -pw " + pwInput.getText());
+											+ "@[REDACTED] -pw " + pwInput.getText());
 								} catch (Exception e1) {
-									e1.printStackTrace();
+									infoBoard.setText("PuTTY.exe missing.");
 								}
 							}
 						});
@@ -394,7 +397,7 @@ public class Main extends JFrame {
 				/* New pop up windows */
 				JFrame popUp = new JFrame();
 				popUp.setVisible(true);
-				popUp.setSize(750, 320);
+				popUp.setSize(750, 350);
 				popUp.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 				popUp.setLayout(new GridBagLayout());
 				popUp.setTitle("Exporting CGP compatible data set");
@@ -525,12 +528,12 @@ public class Main extends JFrame {
 						else if (!copyData.isSelected() && recallData.isSelected())
 							outputMode = 2;
 
-						int cgpoutputMode = 0;// 0:One output, 1:Four outputs
+						int cgpOutputMode = 0;// 0:One output, 1:Four outputs
 
 						if (fourOutputs.isSelected())
-							cgpoutputMode = 1;
+							cgpOutputMode = 1;
 						else
-							cgpoutputMode = 0;
+							cgpOutputMode = 0;
 
 						for (int i = 0; i < featureTag.length; i++) {
 							featureSelected[i] = featureSelection[i].isSelected();
@@ -545,7 +548,13 @@ public class Main extends JFrame {
 						statusBar.setText("Setting tiers.");
 						exportCustomTier(tierDef);
 						statusBar.setText("Exporting data set.");
-						dataSetFolder = exportCGPDataSet(trainingRatio, outputMode, featureSelected, cgpoutputMode);
+
+						try {
+							dataSetFolder = exportCGPDataSet(trainingRatio, outputMode, featureSelected, cgpOutputMode);
+						} catch (Exception e1) {
+							statusBar.setText("Data export failed.");
+						}
+
 						statusBar.setText("Data set exported to " + dataSetFolder + " folder.");
 
 						/* Provide data overwrite option when exporting is done */
