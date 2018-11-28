@@ -216,7 +216,7 @@ public class Main extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				/* New pop up windows */
 				JFrame frame = new JFrame();
-				frame.setSize(275, 375);
+				frame.setSize(450,370);
 				frame.setTitle("Set CGP Parameters");
 				frame.setVisible(true);
 				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -252,7 +252,8 @@ public class Main extends JFrame {
 				}
 
 				JButton export = new JButton("Save parameter");
-				JButton launchCGP = new JButton("Launch CGP");
+				JButton launchCGP = new JButton("Launch CGP (in YARCC)");
+				JButton localCGP = new JButton("Launch CGP (in local)");
 				export.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 				c.gridx = 0;
 				c.gridy = defaultValue.length;
@@ -262,6 +263,11 @@ public class Main extends JFrame {
 				c.gridx = 1;
 				c.gridy = defaultValue.length;
 				frame.add(launchCGP, c);
+
+				localCGP.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+				c.gridx = 2;
+				c.gridy = defaultValue.length;
+				frame.add(localCGP, c);
 
 				export.addActionListener(new ActionListener() {
 					@Override
@@ -286,6 +292,17 @@ public class Main extends JFrame {
 				});
 
 				launchCGP.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						try {
+							Runtime.getRuntime().exec("putty.exe [redacted]@[redacted] -pw [redacted]");
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						}
+					}
+				});
+
+				localCGP.addActionListener(new ActionListener() {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						try {
