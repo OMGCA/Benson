@@ -53,11 +53,13 @@ public class Main extends JFrame {
 	static JPanel panel;
 	static int displayMode = 0;
 	// static GridBagConstraints c = new GridBagConstraints();
-	static Font xtDefault = new Font("Segoe UI", Font.PLAIN, 12);
-	static String yarccAddress = "[REDACTED]";
+	static Font xtDefault = new Font("Segoe UI", Font.PLAIN, 14);
+	static String yarccAddress = "@research2.york.ac.uk";
 
 	public static void main(String[] args) {
 		/* Load GUI component */
+		System.setProperty("awt.useSystemAAFontSettings", "on");
+		System.setProperty("swing.aatext", "true");
 		GUISetup();
 		System.gc();
 	}
@@ -192,7 +194,7 @@ public class Main extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				/* New pop up windows */
 				JFrame frame = new JFrame();
-				frame.setSize(450, 370);
+				frame.setSize(600, 360);
 				frame.setTitle("Set CGP Parameters");
 				frame.setVisible(true);
 				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -261,7 +263,7 @@ public class Main extends JFrame {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						JFrame yarccLogin = new JFrame();
-						yarccLogin.setSize(300, 140);
+						yarccLogin.setSize(370, 150);
 						yarccLogin.setVisible(true);
 						yarccLogin.setLayout(new GridBagLayout());
 						yarccLogin.setTitle("Logging in to YARCC");
@@ -400,7 +402,7 @@ public class Main extends JFrame {
 				/* New pop up windows */
 				JFrame popUp = new JFrame();
 				popUp.setVisible(true);
-				popUp.setSize(750, 350);
+				popUp.setSize(850, 360);
 				popUp.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 				popUp.setLayout(new GridBagLayout());
 				popUp.setTitle("Exporting CGP compatible data set");
@@ -423,15 +425,19 @@ public class Main extends JFrame {
 
 				JCheckBox copyData = new JCheckBox("Copy");
 				copyData.setSelected(true);
+				copyData.setFont(xtDefault);
 				windowAddComponent(popUp, c, 0, 1, copyData);
 
 				JCheckBox recallData = new JCheckBox("Recall");
+				recallData.setFont(xtDefault);
 				recallData.setSelected(true);
 				windowAddComponent(popUp, c, 1, 1, recallData);
 
 				JRadioButton singleOutput = new JRadioButton("Single Output");
+				singleOutput.setFont(xtDefault);
 				windowAddComponent(popUp, c, 2, 1, singleOutput);
 				JRadioButton fourOutputs = new JRadioButton("Four Outputs");
+				fourOutputs.setFont(xtDefault);
 				windowAddComponent(popUp, c, 3, 1, fourOutputs);
 
 				ButtonGroup bGroup = new ButtonGroup();
@@ -457,13 +463,16 @@ public class Main extends JFrame {
 				for (int i = 0; i < 4; i++) {
 					tierRange[i * 2] = new TextField(2);
 					tierRange[i * 2].setText(String.valueOf(i * 5));
+					tierRange[i * 2].setFont(xtDefault);
 					tierRange[i * 2 + 1] = new TextField(2);
 					tierRange[i * 2 + 1].setText(String.valueOf(i * 5 + 4));
+					tierRange[i * 2 + 1].setFont(xtDefault);
 
 					if (i * 5 + 4 > 17)
 						tierRange[i * 2 + 1].setText(String.valueOf(17));
 
 					tier[i] = new JLabel("Class " + String.valueOf(i + 1));
+					tier[i].setFont(xtDefault);
 
 					windowAddComponent(popUp, c, i, 3, tierRange[i * 2]);
 
