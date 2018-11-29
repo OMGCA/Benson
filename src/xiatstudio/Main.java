@@ -52,7 +52,7 @@ public class Main extends JFrame {
 	static String data = "./Benson_Data/empty.txt";
 	static JPanel panel;
 	static int displayMode = 0;
-	static GridBagConstraints c = new GridBagConstraints();
+	// static GridBagConstraints c = new GridBagConstraints();
 	static Font xtDefault = new Font("Segoe UI", Font.PLAIN, 12);
 	static String yarccAddress = "[REDACTED]";
 
@@ -214,12 +214,12 @@ public class Main extends JFrame {
 				for (int i = 0; i < defaultValue.length; i++) {
 					params[i] = new JLabel(cgpTags[i]);
 					params[i].setFont(xtDefault);
-					windowAddComponent(frame, 0, i, params[i]);
+					windowAddComponent(frame, c, 0, i, params[i]);
 
 					cgpParams[i] = new TextField(10);
 					cgpParams[i].setFont(xtDefault);
 					cgpParams[i].setText(defaultValue[i]);
-					windowAddComponent(frame, 1, i, cgpParams[i]);
+					windowAddComponent(frame, c, 1, i, cgpParams[i]);
 				}
 
 				JButton export = new JButton("Save parameter");
@@ -227,13 +227,13 @@ public class Main extends JFrame {
 				JButton localCGP = new JButton("Launch CGP (in local)");
 
 				export.setFont(xtDefault);
-				windowAddComponent(frame, 0, defaultValue.length, export);
+				windowAddComponent(frame, c, 0, defaultValue.length, export);
 
 				launchCGP.setFont(xtDefault);
-				windowAddComponent(frame, 1, defaultValue.length, launchCGP);
+				windowAddComponent(frame, c, 1, defaultValue.length, launchCGP);
 
 				localCGP.setFont(xtDefault);
-				windowAddComponent(frame, 2, defaultValue.length, localCGP);
+				windowAddComponent(frame, c, 2, defaultValue.length, localCGP);
 
 				export.addActionListener(new ActionListener() {
 					@Override
@@ -265,34 +265,36 @@ public class Main extends JFrame {
 						yarccLogin.setVisible(true);
 						yarccLogin.setLayout(new GridBagLayout());
 						yarccLogin.setTitle("Logging in to YARCC");
+						GridBagConstraints c = new GridBagConstraints();
+						c.fill = GridBagConstraints.HORIZONTAL;
 
 						JLabel infoBoard = new JLabel("After login, type ./cgp_run.sh");
 						infoBoard.setFont(xtDefault);
-						windowAddComponent(yarccLogin, 0, 0, infoBoard);
+						windowAddComponent(yarccLogin, c, 0, 0, infoBoard);
 
 						JLabel userName = new JLabel("User Name");
 						userName.setFont(xtDefault);
-						windowAddComponent(yarccLogin, 0, 1, userName);
+						windowAddComponent(yarccLogin, c, 0, 1, userName);
 
 						JLabel pw = new JLabel("Password");
 						pw.setFont(xtDefault);
-						windowAddComponent(yarccLogin, 0, 2, pw);
+						windowAddComponent(yarccLogin, c, 0, 2, pw);
 
 						TextField userInput = new TextField(10);
 						JPasswordField pwInput = new JPasswordField(10);
-						windowAddComponent(yarccLogin, 1, 1, userInput);
-						windowAddComponent(yarccLogin, 1, 2, pwInput);
+						windowAddComponent(yarccLogin, c, 1, 1, userInput);
+						windowAddComponent(yarccLogin, c, 1, 2, pwInput);
 
 						JButton loginConfirm = new JButton("Log In");
-						windowAddComponent(yarccLogin, 0, 3, loginConfirm);
+						windowAddComponent(yarccLogin, c, 0, 3, loginConfirm);
 
 						loginConfirm.addActionListener(new ActionListener() {
 							@Override
 							public void actionPerformed(ActionEvent e) {
 								try {
 									yarccLogin.dispose();
-									Runtime.getRuntime().exec("putty.exe " + userInput.getText()
-											+ yarccAddress+ " -pw " + pwInput.getText());
+									Runtime.getRuntime().exec("putty.exe " + userInput.getText() + yarccAddress
+											+ " -pw " + pwInput.getText());
 								} catch (Exception e1) {
 									infoBoard.setText("PuTTY.exe missing.");
 								}
@@ -403,32 +405,34 @@ public class Main extends JFrame {
 				popUp.setLayout(new GridBagLayout());
 				popUp.setTitle("Exporting CGP compatible data set");
 				popUp.setIconImage(xt_logo.getImage());
+				GridBagConstraints c = new GridBagConstraints();
+				c.fill = GridBagConstraints.HORIZONTAL;
 
 				/* GUI components */
 				JLabel ratioPrompt = new JLabel("Ratio for training data (in %)");
 				ratioPrompt.setFont(xtDefault);
-				windowAddComponent(popUp, 0, 0, ratioPrompt);
+				windowAddComponent(popUp, c, 0, 0, ratioPrompt);
 
 				TextField trRatio = new TextField(10);
 				trRatio.setText("60");
-				windowAddComponent(popUp, 1, 0, trRatio);
+				windowAddComponent(popUp, c, 1, 0, trRatio);
 
 				JButton exportData = new JButton("Export");
 				exportData.setFont(xtDefault);
-				windowAddComponent(popUp, 2, 0, exportData);
+				windowAddComponent(popUp, c, 2, 0, exportData);
 
 				JCheckBox copyData = new JCheckBox("Copy");
 				copyData.setSelected(true);
-				windowAddComponent(popUp, 0, 1, copyData);
+				windowAddComponent(popUp, c, 0, 1, copyData);
 
 				JCheckBox recallData = new JCheckBox("Recall");
 				recallData.setSelected(true);
-				windowAddComponent(popUp, 1, 1, recallData);
+				windowAddComponent(popUp, c, 1, 1, recallData);
 
 				JRadioButton singleOutput = new JRadioButton("Single Output");
-				windowAddComponent(popUp, 2, 1, singleOutput);
+				windowAddComponent(popUp, c, 2, 1, singleOutput);
 				JRadioButton fourOutputs = new JRadioButton("Four Outputs");
-				windowAddComponent(popUp, 3, 1, fourOutputs);
+				windowAddComponent(popUp, c, 3, 1, fourOutputs);
 
 				ButtonGroup bGroup = new ButtonGroup();
 
@@ -448,7 +452,7 @@ public class Main extends JFrame {
 				JLabel tier[] = new JLabel[4];
 				JLabel tierTitle = new JLabel("Tier definition");
 				tierTitle.setFont(new Font("Segoe UI", Font.PLAIN, 15));
-				windowAddComponent(popUp, 0, 2, tierTitle);
+				windowAddComponent(popUp, c, 0, 2, tierTitle);
 
 				for (int i = 0; i < 4; i++) {
 					tierRange[i * 2] = new TextField(2);
@@ -461,16 +465,16 @@ public class Main extends JFrame {
 
 					tier[i] = new JLabel("Class " + String.valueOf(i + 1));
 
-					windowAddComponent(popUp, i, 3, tierRange[i * 2]);
+					windowAddComponent(popUp, c, i, 3, tierRange[i * 2]);
 
-					windowAddComponent(popUp, i, 4, tier[i]);
+					windowAddComponent(popUp, c, i, 4, tier[i]);
 
-					windowAddComponent(popUp, i, 5, tierRange[i * 2 + 1]);
+					windowAddComponent(popUp, c, i, 5, tierRange[i * 2 + 1]);
 
 				}
 				JLabel featureTitle = new JLabel("Feature selection");
 				featureTitle.setFont(new Font("Segoe UI", Font.PLAIN, 15));
-				windowAddComponent(popUp, 0, 6, featureTitle);
+				windowAddComponent(popUp, c, 0, 6, featureTitle);
 
 				int x = -1;
 				int y = 7;
@@ -479,7 +483,7 @@ public class Main extends JFrame {
 					featureSelection[i] = new JCheckBox(featureTag[i]);
 					featureSelection[i].setSelected(true);
 					featureSelection[i].setFont(xtDefault);
-					windowAddComponent(popUp, x, y, featureSelection[i]);
+					windowAddComponent(popUp, c, x, y, featureSelection[i]);
 					if (x == 4) {
 						y++;
 						x = -1;
@@ -491,18 +495,18 @@ public class Main extends JFrame {
 				JLabel msg = new JLabel("Cover existing data set?");
 				msg.setFont(xtDefault);
 
-				windowAddComponent(popUp, 0, y + 1, msg);
+				windowAddComponent(popUp, c, 0, y + 1, msg);
 
 				JButton confirm = new JButton("Yes");
 				confirm.setFont(xtDefault);
 				c.weightx = 0.5;
-				windowAddComponent(popUp, 1, y + 1, confirm);
+				windowAddComponent(popUp, c, 1, y + 1, confirm);
 				confirm.setSize(50, 30);
 
 				JButton noConfirm = new JButton("No");
 				noConfirm.setFont(xtDefault);
 				c.weightx = 0.4;
-				windowAddComponent(popUp, 2, y + 1, noConfirm);
+				windowAddComponent(popUp, c, 2, y + 1, noConfirm);
 				noConfirm.setSize(50, 30);
 
 				msg.setVisible(false);
@@ -514,7 +518,7 @@ public class Main extends JFrame {
 				statusBar.setEditable(false);
 				c.weightx = 0.2;
 				c.gridwidth = 3;
-				windowAddComponent(popUp, 0, y + 2, statusBar);
+				windowAddComponent(popUp, c, 0, y + 2, statusBar);
 
 				exportData.addActionListener(new ActionListener() {
 					@Override
@@ -649,7 +653,8 @@ public class Main extends JFrame {
 		}
 	}
 
-	public static void windowAddComponent(JFrame frame, int gridX, int gridY, java.awt.Component o) {
+	public static void windowAddComponent(JFrame frame, GridBagConstraints c, int gridX, int gridY,
+			java.awt.Component o) {
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.gridx = gridX;
 		c.gridy = gridY;
