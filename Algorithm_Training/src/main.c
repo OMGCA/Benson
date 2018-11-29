@@ -2,7 +2,6 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include <conio.h>
 #include "cgp-sls.h"
 #include <time.h>
 
@@ -11,7 +10,7 @@ double simpleThresholdClassifier(struct parameters *params, struct chromosome *c
 double fourOutputFitnessFunction(struct parameters *params, struct chromosome *chromo, struct dataSet *data);
 int maxIndex(double* arr);
 char** importCGPParams(void);
-
+void getBestEntity(void);
 
 int main(void)
 {
@@ -68,7 +67,7 @@ int main(void)
 
 	printChromosome(chromo, 0);
 
-	saveChromosome(chromo,"Trial_2018_11_21.chromo");
+	saveChromosome(chromo,"latest_chromo.chromo");
 
 	saveChromosomeDot(chromo, 0, "chromo.dot");
 
@@ -166,7 +165,7 @@ int main(void)
         printf("Accuracy = %.4f (%d/%d)", 100 - ((float)mismatchError * 100 / getNumDataSetSamples(testData)), (getNumDataSetSamples(testData) - mismatchError), getNumDataSetSamples(testData));
 
 	}
-	getch();
+	getBestEntity();
 
 	freeDataSet(trainingData);
 	freeDataSet(validationData);
@@ -307,4 +306,43 @@ char** importCGPParams(void){
     fclose(fp);
 
     return cgp_params;
+}
+
+void getBestEntity(void){
+    FILE* fp;
+    char line[256];
+    int i = 0;
+
+    double tmpBest[4] = {0,0,0,0};
+
+    fp = fopen("CGP_Output.txt","r");
+    if(fp == NULL){
+        printf("File not found.");
+        return 0;
+    }
+
+    while(fgets(line, sizeof(line), fp)){
+		i = 0;
+        char* pch = strtok(line," ");
+		char** fitnessSeg = malloc(4*sizeof(char*));
+
+        while(pch != NULL){
+			fitnessSeg[i] = malloc(10*sizeof(char));
+			strcpy(fitnessSeg[i],pch);
+            pch = strtok(NULL," ");
+			i++;
+        }
+
+		if(atof(fitnessSeg[1]) >= atof(fitnessSeg[2]) && atof(fitnessSeg[2]) >= atof(fitnessSeg[3])){
+			if(atof(fitnessSeg[3]) > tmpBest[3]){
+				for(i = 0; i < 4; i++){
+					tmpBest[i] = atof(fitnessSeg[i]);
+				}
+			}
+		}
+
+
+    }
+	printf("\nBest gen at %.0f with fitness of %.2f, %.2f and %.2f.\n", tmpBest[0], tmpBest[1], tmpBest[2], tmpBest[3]);
+
 }
