@@ -450,7 +450,7 @@ public class Main extends JFrame {
 				String featureTag[] = { "Total Time", "Total Length", "Size", "Aspect Ratio", "Velocity SD", "Angle SD",
 						"Pen-Up Portion", "Horizontal Portion", "Vertical Portion", "Oblique Portion", "Horizontal SD",
 						"Vertical SD", "Oblique SD", "Hesitation Counts(down)", "Hesitation Counts(up)",
-						"Hesitation Portion(down)", "Hesitation Portion(up)" };
+						"Hesitation Portion(down)", "Hesitation Portion(up)","Copy Mode" };
 
 				JCheckBox featureSelection[] = new JCheckBox[featureTag.length];
 
@@ -965,7 +965,7 @@ public class Main extends JFrame {
 						String.valueOf((double) b.getHesitation() / 1000),
 						String.valueOf((double) b.getPenUpHesitation() / 1000),
 						String.valueOf((double) b.getHesitationPortion() * 10),
-						String.valueOf((double) b.getPenUpHesiPortion() * 10), String.valueOf(b.getRating()) };
+						String.valueOf((double) b.getPenUpHesiPortion() * 10),String.valueOf(b.getBinMode()), String.valueOf(b.getRating()) };
 
 				/* Check whether this data is entitled to be exported */
 				if (dataWriteHandshake(mode, b, ".\\Sheets\\rating.csv")) {
@@ -974,7 +974,6 @@ public class Main extends JFrame {
 
 					/* Remove unselected feature */
 					/* 2018-11-27: Bug, when deselect features for the second time */
-					/* IndexOutOfBoundsException at line 989 */
 					/* 2018-11-28: Bug fix */
 					for (int j = 0; j < selections.length; j++) {
 						if (!selections[j]) {
