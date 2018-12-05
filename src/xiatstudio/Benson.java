@@ -12,7 +12,6 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
 import xiatstudio.Component;
@@ -238,6 +237,13 @@ public class Benson {
 			return "Unknown";
 		}
 
+	}
+
+	public int getBinMode(){
+		if(this.getFigureMode().equals("Copy"))
+			return 0;
+		else
+			return 1;
 	}
 
 	public String getGroup() {
@@ -533,7 +539,6 @@ public class Benson {
 						compoGroup = 1;
 						this.components.add(new Component(1));
 						compoIndex++;
-
 					}
 					if (tmpX[0] != 0 && tmpY[0] != 0)
 						this.components.get(compoIndex - 1).addNewAxis(tmpX[0], tmpY[0]);
@@ -543,7 +548,6 @@ public class Benson {
 						compoGroup = 2;
 						this.components.add(new Component(2));
 						compoIndex++;
-
 					}
 					this.components.get(compoIndex - 1).addNewAxis(tmpX[0], tmpY[0]);
 
@@ -552,11 +556,9 @@ public class Benson {
 						compoGroup = 3;
 						this.components.add(new Component(3));
 						compoIndex++;
-
 					}
 					this.components.get(compoIndex - 1).addNewAxis(tmpX[0], tmpY[0]);
 				}
-
 			}
 			if (this.penPressure[i] == 0 && this.penPressure[i + 1] != 0) {
 				this.components.add(new Component(compoGroup));
