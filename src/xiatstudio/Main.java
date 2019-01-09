@@ -424,15 +424,18 @@ public class Main extends JFrame {
 				exportData.setFont(xtDefault);
 				windowAddComponent(popUp, c, 2, 0, exportData);
 
-				JCheckBox copyData = new JCheckBox("Copy");
-				copyData.setSelected(true);
+				JRadioButton copyData = new JRadioButton("Copy");
 				copyData.setFont(xtDefault);
 				windowAddComponent(popUp, c, 0, 1, copyData);
 
 				JRadioButton recallData = new JRadioButton("Recall");
-				recallData.setFont(xtDefault);
 				recallData.setSelected(true);
 				windowAddComponent(popUp, c, 1, 1, recallData);
+
+				ButtonGroup drawinTask = new ButtonGroup();
+				drawinTask.add(copyData);
+				drawinTask.add(recallData);
+				copyData.setSelected(true);
 
 				JRadioButton visualClassify = new JRadioButton("Visual");
 				visualClassify.setFont(xtDefault);
@@ -550,11 +553,11 @@ public class Main extends JFrame {
 						int outputMode = 0;// 0: all, 1:copy only, 2:recall only
 						String dataSetFolder = "";
 
-						if (copyData.isSelected() && recallData.isSelected())
-							outputMode = 0;
-						else if (copyData.isSelected() && !recallData.isSelected())
+						int classificationScheme = 0;
+
+						if (copyData.isSelected())
 							outputMode = 1;
-						else if (!copyData.isSelected() && recallData.isSelected())
+						else if (recallData.isSelected())
 							outputMode = 2;
 
 						int cgpOutputMode = 0;// 0:One output, 1:Four outputs
@@ -573,13 +576,18 @@ public class Main extends JFrame {
 							tierDef[i] = Integer.parseInt(tierRange[i].getText());
 						}
 
+						if(visualClassify.isSelected())
+							classificationScheme = 0;
+						else if(conditionClassify.isSelected())
+							classificationScheme = 1;
+
 						double trainingRatio = Double.parseDouble(trRatio.getText()) / 100;
 						statusBar.setText("Setting tiers.");
 						exportCustomTier(tierDef);
 						statusBar.setText("Exporting data set.");
 
 						try {
-							dataSetFolder = exportCGPDataSet(trainingRatio, outputMode, featureSelected, cgpOutputMode);
+							dataSetFolder = exportCGPDataSet(trainingRatio, outputMode, featureSelected, cgpOutputMode, classificationScheme);
 						} catch (Exception e1) {
 							statusBar.setText("Data export failed.");
 						}
@@ -860,7 +868,7 @@ public class Main extends JFrame {
 		}
 	}
 
-	public static String exportCGPDataSet(double trainingRatio, int mode, boolean[] selections, int outputMode) {
+	public static String exportCGPDataSet(double trainingRatio, int mode, boolean[] selections, int outputMode, int classificationScheme) {
 		File newDataFolder = new File(
 				".\\Sheets\\DataSet\\" + new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()));
 		newDataFolder.mkdir();
@@ -888,7 +896,12 @@ public class Main extends JFrame {
 		int testingClasses[][] = new int[4][3];
 
 		try {
-			br = new BufferedReader(new FileReader(".\\Sheets\\rating.csv"));
+			String ratingSheet;
+			if(classificationScheme == 0)
+				ratingSheet = ".\\Sheets\\visual_rating.csv";
+			else
+				ratingSheet = ".\\Sheets\\condition_rating.csv";
+			br = new BufferedReader(new FileReader(ratingSheet));
 			while ((line = br.readLine()) != null) {
 				/* Counting total objects in all, copy only and recall only */
 				classTotal[Integer.parseInt(line.split(",")[2]) - 1]++;
@@ -1076,7 +1089,7 @@ public class Main extends JFrame {
 	}
 
 	public static void exportCustomTier(int[] customTier) {
-		File ratingSheet = new File(".\\Sheets\\rating.csv");
+		File ratingSheet = new File(".\\Sheets\\visual_rating.csv");
 		FileWriter fwRating;
 		BufferedReader br;
 		String line = "";
