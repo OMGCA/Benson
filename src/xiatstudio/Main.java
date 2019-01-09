@@ -429,6 +429,7 @@ public class Main extends JFrame {
 				windowAddComponent(popUp, c, 0, 1, copyData);
 
 				JRadioButton recallData = new JRadioButton("Recall");
+				recallData.setFont(xtDefault);
 				recallData.setSelected(true);
 				windowAddComponent(popUp, c, 1, 1, recallData);
 
