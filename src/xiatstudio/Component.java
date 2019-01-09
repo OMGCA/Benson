@@ -1,9 +1,6 @@
 package xiatstudio;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import java.awt.Graphics2D;
 
 public class Component {
 	float[] xAxis;
@@ -103,6 +100,13 @@ public class Component {
 		this.endPoint[1] = newY[newY.length - 1];
 		
 		
+	}
+
+	public void drawComponent(Graphics2D g2){
+		int ovalRadius = 4;
+		for(int i = 0; i < this.ticks; i++){
+			g2.fillOval((int)this.xAxis[i], (int)this.yAxis[i], ovalRadius,ovalRadius);
+		}
 	}
 
 	public double getDistanceBetweenPoints(float[] x, float[] y) {

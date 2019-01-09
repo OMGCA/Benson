@@ -48,9 +48,12 @@ public class Benson {
 		this.penPressure = new float[timeStamp];
 		this.components = new ArrayList<Component>();
 
-		colorSet.add(new Color(87, 207, 244));
+		/*colorSet.add(new Color(87, 207, 244));
 		colorSet.add(new Color(200, 236, 89));
-		colorSet.add(new Color(218, 157, 223));
+		colorSet.add(new Color(218, 157, 223));*/
+		for(int i = 0; i < 3; i++) {
+			colorSet.add(new Color(10,10,10));
+		}
 
 		initData();
 		positionCentre();
@@ -316,7 +319,7 @@ public class Benson {
 		id = getID();
 		mode = getFigureMode();
 
-		infoBoard(g2, group, id, mode);
+		//infoBoard(g2, group, id, mode);
 
 		g2.setFont(new Font("Inconsolata", Font.PLAIN, 15));
 
@@ -326,11 +329,11 @@ public class Benson {
 		groupComp(g2, displayMode);
 		g2.setColor(new Color(255, 0, 0));
 
-		plotHesitation(g2);
+		//plotHesitation(g2);
 
 		// divideComp(g2, displayMode);
 
-		vertexPoint(g2);
+		//vertexPoint(g2);
 	}
 
 	public void infoBoard(Graphics2D g2, String group, String id, String mode) {

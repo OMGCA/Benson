@@ -82,7 +82,8 @@ public class Main extends JFrame {
 		JMenuItem pen_offON, pen_offOFF;
 
 		/* Background color */
-		Color bg = new Color(54, 63, 70);
+		//Color bg = new Color(54, 63, 70);
+		Color bg = new Color(250,250,250);
 
 		menu = new JMenu("File");
 		menu2 = new JMenu("Component");
