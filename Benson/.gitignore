@@ -1,0 +1,9 @@
+*.jpg
+*.class
+bin/
+*.classpath
+*.project
+*.jar
+Algorithm_Training/bin/
+Algorithm_Training/obj/
+Sheets/DataSet/
