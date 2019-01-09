@@ -403,7 +403,7 @@ public class Main extends JFrame {
 				/* New pop up windows */
 				JFrame popUp = new JFrame();
 				popUp.setVisible(true);
-				popUp.setSize(850, 360);
+				popUp.setSize(910, 360);
 				popUp.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 				popUp.setLayout(new GridBagLayout());
 				popUp.setTitle("Exporting CGP compatible data set");
@@ -429,10 +429,18 @@ public class Main extends JFrame {
 				copyData.setFont(xtDefault);
 				windowAddComponent(popUp, c, 0, 1, copyData);
 
-				JCheckBox recallData = new JCheckBox("Recall");
+				JRadioButton recallData = new JRadioButton("Recall");
 				recallData.setFont(xtDefault);
 				recallData.setSelected(true);
 				windowAddComponent(popUp, c, 1, 1, recallData);
+
+				JRadioButton visualClassify = new JRadioButton("Visual");
+				visualClassify.setFont(xtDefault);
+				windowAddComponent(popUp, c, 4, 1, visualClassify);
+
+				JRadioButton conditionClassify = new JRadioButton("Condition");
+				conditionClassify.setFont(xtDefault);
+				windowAddComponent(popUp, c, 5, 1, conditionClassify);
 
 				JRadioButton singleOutput = new JRadioButton("Single Output");
 				singleOutput.setFont(xtDefault);
@@ -447,6 +455,12 @@ public class Main extends JFrame {
 				bGroup.add(singleOutput);
 				bGroup.add(fourOutputs);
 				singleOutput.setSelected(true);
+
+				ButtonGroup classifyGroup = new ButtonGroup();
+
+				classifyGroup.add(visualClassify);
+				classifyGroup.add(conditionClassify);
+				visualClassify.setSelected(true);
 
 				String featureTag[] = { "Total Time", "Total Length", "Size", "Aspect Ratio", "Velocity SD", "Angle SD",
 						"Pen-Up Portion", "Horizontal Portion", "Vertical Portion", "Oblique Portion", "Horizontal SD",
