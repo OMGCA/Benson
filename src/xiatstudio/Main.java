@@ -331,7 +331,7 @@ public class Main extends JFrame {
 				switch (fileChooser.showOpenDialog(panel)) {
 				case JFileChooser.APPROVE_OPTION:
 					String dataPending = fileChooser.getSelectedFile().getPath();
-					exportLibSVMData(dataPending);
+					//exportLibSVMData(dataPending);
 					System.gc();
 					break;
 				}
@@ -357,7 +357,7 @@ public class Main extends JFrame {
 		menuItem3.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Benson b = new Benson(data);
+				Benson b = new Benson(data,0);
 				exportSingleData(b, data.substring(0, data.lastIndexOf('.')) + ".csv");
 			}
 
@@ -739,7 +739,7 @@ public class Main extends JFrame {
 
 			for (int i = 0; i < dataList.length; i++) {
 
-				Benson b = new Benson(dataList[i].replace("\\", "/"));
+				Benson b = new Benson(dataList[i].replace("\\", "/"),0);
 				b.calcThreeLength();
 				String[] dataPending = { b.getID(), b.getFigureMode(), String.valueOf(b.timeSpent / 100000),
 						String.valueOf((double) (b.getTotalLength() / 10000)),
@@ -805,9 +805,9 @@ public class Main extends JFrame {
 			writer.flush();
 			writer.close();
 		} catch (FileNotFoundException e) {
-			System.out.println("ERROR: Specific data file can not be found.");
+			System.out.println("LIBSVM_DATA_ERROR: Specific data file can not be found.");
 		} catch (IOException e) {
-			System.out.println("ERROR: Specific data file can not be accessed.");
+			System.out.println("LIBSVM_DATA_ERROR: Specific data file can not be accessed.");
 		} finally {
 			if (br != null) {
 				try {
@@ -833,7 +833,7 @@ public class Main extends JFrame {
 
 			for (int i = 0; i < dataList.length; i++) {
 
-				Benson b = new Benson(dataList[i].replace("\\", "/"));
+				Benson b = new Benson(dataList[i].replace("\\", "/"),0);
 				b.calcThreeLength();
 				String[] dataPending = { b.getID(), b.getFigureMode(), String.valueOf(b.timeSpent / 10000),
 						String.valueOf(b.getTotalLength() / 10000),
@@ -894,14 +894,19 @@ public class Main extends JFrame {
 		int validationClasses[][] = new int[4][3];
 
 		int testingClasses[][] = new int[4][3];
+		
+		String ratingSheet;
+		
+		if(classificationScheme == 0)
+			ratingSheet = ".\\Sheets\\visual_rating.csv";
+		else
+			ratingSheet = ".\\Sheets\\condition_rating.csv";
+		
 
 		try {
-			String ratingSheet;
-			if(classificationScheme == 0)
-				ratingSheet = ".\\Sheets\\visual_rating.csv";
-			else
-				ratingSheet = ".\\Sheets\\condition_rating.csv";
+			
 			br = new BufferedReader(new FileReader(ratingSheet));
+			
 			while ((line = br.readLine()) != null) {
 				/* Counting total objects in all, copy only and recall only */
 				classTotal[Integer.parseInt(line.split(",")[2]) - 1]++;
@@ -912,7 +917,7 @@ public class Main extends JFrame {
 					recallTotal[Integer.parseInt(line.split(",")[2]) - 1]++;
 			}
 		} catch (Exception e) {
-			System.out.println("ERROR: File not found or can not be accessed.");
+			System.out.println("RATING_SHEET_ERROR: File not found or can not be accessed.");
 		}
 
 		for (int i = 0; i < 4; i++) {
@@ -978,7 +983,7 @@ public class Main extends JFrame {
 			}
 
 			for (int i = 0; i < overallDataList.length; i++) {
-				Benson b = new Benson(overallDataList[i].replace("\\", "/"));
+				Benson b = new Benson(overallDataList[i].replace("\\", "/"),classificationScheme);
 				b.calcThreeLength();
 
 				String[] dataPending = { String.valueOf(b.timeSpent / 100000),
@@ -996,7 +1001,7 @@ public class Main extends JFrame {
 						String.valueOf((double) b.getPenUpHesiPortion() * 10),String.valueOf(b.getBinMode()), String.valueOf(b.getRating()) };
 
 				/* Check whether this data is entitled to be exported */
-				if (dataWriteHandshake(mode, b, ".\\Sheets\\rating.csv")) {
+				if (dataWriteHandshake(mode, b, ratingSheet)) {
 					String alterRating[] = { "0", "0", "0", "0" };
 					alterRating[b.getRating() - 1] = "1";
 
@@ -1211,7 +1216,7 @@ public class Main extends JFrame {
 					RenderingHints.VALUE_ANTIALIAS_ON);
 
 			g2.setRenderingHints(hints);
-			Benson testFigure = new Benson(data);
+			Benson testFigure = new Benson(data,0);
 			testFigure.drawBenson(g2, displayMode);
 		}
 	}

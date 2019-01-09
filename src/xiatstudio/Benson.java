@@ -27,13 +27,14 @@ public class Benson {
 	double obliLength;
 	float timeSpent;
 	int timeStamp;
+	String ratingSheet;
 	int rating;
 	String data;
 	ArrayList<Component> components;
 
 	ArrayList<Color> colorSet = new ArrayList<Color>();
 
-	public Benson(String data) {
+	public Benson(String data, int classifyScheme) {
 		this.data = data;
 		this.timeStamp = fetchTimeStamp(data);
 		this.xAxis = new float[timeStamp];
@@ -44,7 +45,8 @@ public class Benson {
 		this.vertLength = 0;
 		this.obliLength = 0;
 		this.timeSpent = 0;
-		registerRating(".\\Sheets\\rating.csv");
+		setRatingSheet(classifyScheme);
+		registerRating(ratingSheet);
 		this.penPressure = new float[timeStamp];
 		this.components = new ArrayList<Component>();
 
@@ -62,6 +64,13 @@ public class Benson {
 
 	}
 
+	public void setRatingSheet(int classifyMode) {
+		if(classifyMode == 0)
+			this.ratingSheet = ".\\Sheets\\visual_rating.csv";
+		else
+			this.ratingSheet = ".\\Sheets\\condition_rating.csv";
+	}
+	
 	public int fetchTimeStamp(String data) {
 		int counter = 0;
 		@SuppressWarnings("unused")
@@ -103,9 +112,9 @@ public class Benson {
 				}
 			}
 		} catch (FileNotFoundException e) {
-			System.out.println("ERROR: Specific data file can not be found.");
+			System.out.println("FIGURE_RATE_INIT_ERROR: Specific data file can not be found.");
 		} catch (IOException e) {
-			System.out.println("ERROR: Specific data file can not be accessed.");
+			System.out.println("FIGURE_RATE_INIT_ERROR: Specific data file can not be accessed.");
 		} finally {
 			if (br != null) {
 				try {
@@ -148,9 +157,9 @@ public class Benson {
 				this.timeSpent = Float.parseFloat(tmpArray[0]);
 			}
 		} catch (FileNotFoundException e) {
-			System.out.println("ERROR: Specific data file can not be found.");
+			System.out.println("FIGURE_DATA_ERROR: Specific data file can not be found.");
 		} catch (IOException e) {
-			System.out.println("ERROR: Specific data file can not be accessed.");
+			System.out.println("FIGURE_DATA_ERROR: Specific data file can not be accessed.");
 		} finally {
 			if (br != null) {
 				try {
