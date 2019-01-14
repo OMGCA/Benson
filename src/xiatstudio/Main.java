@@ -206,10 +206,10 @@ public class Main extends JFrame {
 				GridBagConstraints c = new GridBagConstraints();
 				c.fill = GridBagConstraints.HORIZONTAL;
 
-				String cgpTags[] = { "Threshold 1", "Threshold 2", "Threshold 3", "Nodes", "Arity", "Max Generations",
+				String cgpTags[] = { "Threshold Initial", "Threshold Increment", "Class Numbers", "Nodes", "Arity", "Max Generations",
 						"Update Frequency", "Random number seed", "Mutation Rate", "Input(s)", "Output(s)" };
 
-				String defaultValue[] = { "10", "20", "30", "20", "3", "100000", "500", "1234", "0.08", "17", "1" };
+				String defaultValue[] = { "10", "10", "4", "20", "3", "100000", "500", "1234", "0.08", "17", "1" };
 				JLabel params[] = new JLabel[defaultValue.length];
 				TextField cgpParams[] = new TextField[defaultValue.length];
 

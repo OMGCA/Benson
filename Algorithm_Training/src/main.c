@@ -5,7 +5,9 @@
 #include "cgp-sls.h"
 #include <time.h>
 
-double thresHold[] = {1,2,3};
+double threshold = 10;
+double threshIncre = 10;
+double classNumber = 4;
 double simpleThresholdClassifier(struct parameters *params, struct chromosome *chromo, struct dataSet *data);
 double fourOutputFitnessFunction(struct parameters *params, struct chromosome *chromo, struct dataSet *data);
 int maxIndex(double* arr);
@@ -22,9 +24,9 @@ int main(void)
 	struct chromosome *chromo = NULL;
 
 	char** cgp_params = importCGPParams();
-	thresHold[0] = atof(cgp_params[0]);
-	thresHold[1] = atof(cgp_params[1]);
-	thresHold[2] = atof(cgp_params[2]);
+	threshold = atof(cgp_params[0]);
+    threshIncre = atof(cgp_params[1]);
+    classNumber = atof(cgp_params[2]);
 
 	int numInputs = atoi(cgp_params[9]);
 	int numNodes = atoi(cgp_params[3]);
@@ -84,46 +86,34 @@ int main(void)
 			chromoOutput = getChromosomeOutput(chromo, 0);
 			int expectedOutput = getDataSetSampleOutputs(testData, i)[0];
 			printf("%.2f ", chromoOutput);
-
-			switch (expectedOutput)
-			{
-			case 1:
-				if (chromoOutput > thresHold[0])
-				{
-					mismatchError++;
-					printf("Mismatch");
-				}
-				else
-					printf("Match");
-
-				break;
-			case 2:
-				if (chromoOutput > thresHold[1] || chromoOutput <= thresHold[0])
-				{
-					mismatchError++;
-					printf("Mismatch");
-				}
-				else
-					printf("Match");
-				break;
-			case 3:
-				if (chromoOutput > thresHold[2] || chromoOutput <= thresHold[1])
-				{
-					mismatchError++;
-					printf("Mismatch");
-				}
-				else
-					printf("Match");
-				break;
-			case 4:
-				if (chromoOutput < thresHold[2])
-				{
-					mismatchError++;
-					printf("Mismatch");
-				}
-				else
-					printf("Match");
-				break;
+			int j = 0;
+			for(j = 0; j < classNumber; j++){
+                if(j == 0){
+                    if(chromoOutput > threshold)
+                    {
+                        mismatchError++;
+                        printf("Mismatch");
+                    }
+                    else
+                        printf("Match");
+                }
+                else if (j == classNumber - 1){
+                    if (chromoOutput < threshold+(j-1)*threshIncre)
+                    {
+                        mismatchError++;
+                        printf("Mismatch");
+                    }
+                    else
+                        printf("Match");
+                }
+                else{
+                    if(chromoOutput > threshold+j*threshIncre || chromoOutput <= threshold+(j-1)*threshIncre){
+                        mismatchError++;
+                        printf("Mismatch");
+                    }
+                    else
+                        printf("Match");
+                }
 			}
 
 			printf(" %.2f", getDataSetSampleOutputs(testData, i)[0]);
@@ -254,25 +244,28 @@ double simpleThresholdClassifier(struct parameters *params, struct chromosome *c
 		executeChromosome(chromo, getDataSetSampleInputs(data, i));
 		double chromoOutput = getChromosomeOutput(chromo,0);
 		int expectedClass = getDataSetSampleOutputs(data,i)[0];
-
-		switch(expectedClass){
-			case 1:
-				if(chromoOutput > thresHold[0])
-					threshError++;
-				break;
-			case 2:
-				if(chromoOutput > thresHold[1] || chromoOutput <= thresHold[0])
-					threshError++;
-				break;
-			case 3:
-				if(chromoOutput > thresHold[2] || chromoOutput <= thresHold[1])
-					threshError++;
-				break;
-			case 4:
-				if(chromoOutput < thresHold[2])
-					threshError++;
-				break;
-		}
+		int j = 0;
+        for (j = 0; j < classNumber; j++)
+        {
+            if(expectedClass == j+1)
+            {
+                if( j != 0 && j != classNumber - 1 )
+                {
+                    if(chromoOutput > threshold+j*threshIncre || chromoOutput <= threshold+(j-1)*threshIncre)
+                        threshError++;
+                }
+                else if (j == 0)
+                {
+                    if(chromoOutput > threshold)
+                        threshError++;
+                }
+                else if (j == classNumber - 1)
+                {
+                    if(chromoOutput < threshold+(j-1)*threshIncre)
+                        threshError++;
+                }
+            }
+        }
 
 	}
 
@@ -333,7 +326,7 @@ void getBestEntity(void){
 			i++;
         }
 
-		if(atof(fitnessSeg[1]) >= atof(fitnessSeg[2]) && atof(fitnessSeg[2]) >= atof(fitnessSeg[3])){
+		if(atof(fitnessSeg[1]) >= atof(fitnessSeg[2])){
 			if(atof(fitnessSeg[3]) > tmpBest[3]){
 				for(i = 0; i < 4; i++){
 					tmpBest[i] = atof(fitnessSeg[i]);
