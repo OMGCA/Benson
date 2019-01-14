@@ -403,7 +403,7 @@ public class Main extends JFrame {
 				/* New pop up windows */
 				JFrame popUp = new JFrame();
 				popUp.setVisible(true);
-				popUp.setSize(910, 360);
+				popUp.setSize(910, 400);
 				popUp.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 				popUp.setLayout(new GridBagLayout());
 				popUp.setTitle("Exporting CGP compatible data set");
@@ -472,12 +472,23 @@ public class Main extends JFrame {
 						"Hesitation Portion(down)", "Hesitation Portion(up)"};
 
 				JCheckBox featureSelection[] = new JCheckBox[featureTag.length];
+				
+				String pdCondition[] = {"Control","PD-NC","PD-MCI","PD-D"};
+				JCheckBox pdSelect[] = new JCheckBox[pdCondition.length];
 
 				TextField tierRange[] = new TextField[8];
 				JLabel tier[] = new JLabel[4];
 				JLabel tierTitle = new JLabel("Tier definition");
 				tierTitle.setFont(new Font("Segoe UI", Font.PLAIN, 15));
-				windowAddComponent(popUp, c, 0, 2, tierTitle);
+				
+				for (int i = 0; i < pdCondition.length; i++) {
+					pdSelect[i] = new JCheckBox(pdCondition[i]);
+					pdSelect[i].setFont(xtDefault);
+					pdSelect[i].setSelected(true);
+					windowAddComponent(popUp,c,i,2,pdSelect[i]);
+				}
+				
+				windowAddComponent(popUp, c, 0, 3, tierTitle);
 
 				for (int i = 0; i < 4; i++) {
 					tierRange[i * 2] = new TextField(2);
@@ -493,19 +504,19 @@ public class Main extends JFrame {
 					tier[i] = new JLabel("Class " + String.valueOf(i + 1));
 					tier[i].setFont(xtDefault);
 
-					windowAddComponent(popUp, c, i, 3, tierRange[i * 2]);
+					windowAddComponent(popUp, c, i, 4, tierRange[i * 2]);
 
-					windowAddComponent(popUp, c, i, 4, tier[i]);
+					windowAddComponent(popUp, c, i, 5, tier[i]);
 
-					windowAddComponent(popUp, c, i, 5, tierRange[i * 2 + 1]);
+					windowAddComponent(popUp, c, i, 6, tierRange[i * 2 + 1]);
 
 				}
 				JLabel featureTitle = new JLabel("Feature selection");
 				featureTitle.setFont(new Font("Segoe UI", Font.PLAIN, 15));
-				windowAddComponent(popUp, c, 0, 6, featureTitle);
+				windowAddComponent(popUp, c, 0, 7, featureTitle);
 
 				int x = -1;
-				int y = 7;
+				int y = 8;
 				for (int i = 0; i < featureTag.length; i++) {
 					x++;
 					featureSelection[i] = new JCheckBox(featureTag[i]);
@@ -517,6 +528,8 @@ public class Main extends JFrame {
 						x = -1;
 					}
 				}
+				
+				
 
 				boolean featureSelected[] = new boolean[featureTag.length];
 
