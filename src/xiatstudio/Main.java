@@ -469,7 +469,7 @@ public class Main extends JFrame {
 				String featureTag[] = { "Total Time", "Total Length", "Size", "Aspect Ratio", "Velocity SD", "Angle SD",
 						"Pen-Up Portion", "Horizontal Portion", "Vertical Portion", "Oblique Portion", "Horizontal SD",
 						"Vertical SD", "Oblique SD", "Hesitation Counts(down)", "Hesitation Counts(up)",
-						"Hesitation Portion(down)", "Hesitation Portion(up)","Copy Mode" };
+						"Hesitation Portion(down)", "Hesitation Portion(up)"};
 
 				JCheckBox featureSelection[] = new JCheckBox[featureTag.length];
 
@@ -999,7 +999,7 @@ public class Main extends JFrame {
 						String.valueOf((double) b.getHesitation() / 1000),
 						String.valueOf((double) b.getPenUpHesitation() / 1000),
 						String.valueOf((double) b.getHesitationPortion() * 10),
-						String.valueOf((double) b.getPenUpHesiPortion() * 10),String.valueOf(b.getBinMode()), String.valueOf(b.getRating()) };
+						String.valueOf((double) b.getPenUpHesiPortion() * 10), String.valueOf(b.getRating()) };
 
 				/* Check whether this data is entitled to be exported */
 				if (dataWriteHandshake(mode, b, ratingSheet)) {
