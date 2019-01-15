@@ -1,5 +1,6 @@
 package xiatstudio;
 
+import java.awt.CheckboxGroup;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -52,7 +53,6 @@ public class Main extends JFrame {
 	static String data = "./Benson_Data/empty.txt";
 	static JPanel panel;
 	static int displayMode = 0;
-	// static GridBagConstraints c = new GridBagConstraints();
 	static Font xtDefault = new Font("Segoe UI", Font.PLAIN, 14);
 	static String yarccAddress = "@research2.york.ac.uk";
 
@@ -473,8 +473,9 @@ public class Main extends JFrame {
 
 				JCheckBox featureSelection[] = new JCheckBox[featureTag.length];
 				
-				String pdCondition[] = {"Control","PD-NC","PD-MCI","PD-D"};
+				String pdCondition[] = {"PD-NC","PD-MCI","PD-D","Control"};
 				JCheckBox pdSelect[] = new JCheckBox[pdCondition.length];
+				
 
 				TextField tierRange[] = new TextField[8];
 				JLabel tier[] = new JLabel[4];
@@ -487,7 +488,7 @@ public class Main extends JFrame {
 					pdSelect[i].setSelected(true);
 					windowAddComponent(popUp,c,i,2,pdSelect[i]);
 				}
-				
+
 				windowAddComponent(popUp, c, 0, 3, tierTitle);
 
 				for (int i = 0; i < 4; i++) {
@@ -528,8 +529,6 @@ public class Main extends JFrame {
 						x = -1;
 					}
 				}
-				
-				
 
 				boolean featureSelected[] = new boolean[featureTag.length];
 
@@ -599,9 +598,17 @@ public class Main extends JFrame {
 						statusBar.setText("Setting tiers.");
 						exportCustomTier(tierDef);
 						statusBar.setText("Exporting data set.");
+						
+						int pdCond[] = new int[pdSelect.length];
+						
+						for (int i = 0; i < pdSelect.length; i++) {
+							pdCond[i] = 0;
+							if(pdSelect[i].isSelected())
+								pdCond[i] = i+1;
+						}
 
 						try {
-							dataSetFolder = exportCGPDataSet(trainingRatio, outputMode, featureSelected, cgpOutputMode, classificationScheme);
+							dataSetFolder = exportCGPDataSet(trainingRatio, outputMode, featureSelected, cgpOutputMode, classificationScheme, pdCond);
 						} catch (Exception e1) {
 							statusBar.setText("Data export failed.");
 						}
@@ -882,7 +889,7 @@ public class Main extends JFrame {
 		}
 	}
 
-	public static String exportCGPDataSet(double trainingRatio, int mode, boolean[] selections, int outputMode, int classificationScheme) {
+	public static String exportCGPDataSet(double trainingRatio, int mode, boolean[] selections, int outputMode, int classificationScheme, int[] pdCond) {
 		File newDataFolder = new File(
 				".\\Sheets\\DataSet\\" + new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()));
 		newDataFolder.mkdir();
@@ -971,6 +978,7 @@ public class Main extends JFrame {
 				if (selections[i])
 					selectedCount++;
 			}
+			
 			/* Data set header */
 			String cgpIOPair = String.valueOf(selectedCount) + ",1,";
 
@@ -1015,18 +1023,16 @@ public class Main extends JFrame {
 						String.valueOf((double) b.getPenUpHesiPortion() * 10), String.valueOf(b.getRating()) };
 
 				/* Check whether this data is entitled to be exported */
-				if (dataWriteHandshake(mode, b, ratingSheet)) {
+				if (dataWriteHandshake(mode, b, ratingSheet, pdCond)) {
 					String alterRating[] = { "0", "0", "0", "0" };
 					alterRating[b.getRating() - 1] = "1";
 
-					/* Remove unselected feature */
-					/* 2018-11-27: Bug, when deselect features for the second time */
-					/* 2018-11-28: Bug fix */
 					for (int j = 0; j < selections.length; j++) {
 						if (!selections[j]) {
 							dataPending[j] = null;
 						}
 					}
+					
 					List<String> list = new ArrayList<String>(Arrays.asList(dataPending));
 
 					if (outputMode == 1) {
@@ -1035,8 +1041,7 @@ public class Main extends JFrame {
 							list.add(alterRating[j]);
 							dataPending = list.toArray(new String[0]);
 						}
-						/* Update 2018-11-26 */
-						/* Allow user to switch output mode back */
+
 						if (outputMode == 0) {
 							for (int j = 0; j < 4; j++) {
 								list.remove(dataPending.length - 1);
@@ -1136,7 +1141,7 @@ public class Main extends JFrame {
 		}
 	}
 
-	public static boolean dataWriteHandshake(int mode, Benson b, String ratingSheet) {
+	public static boolean dataWriteHandshake(int mode, Benson b, String ratingSheet, int[] rating) {
 		/* Part I: Check the rating sheet */
 		BufferedReader br = null;
 		String line = "";
@@ -1145,15 +1150,20 @@ public class Main extends JFrame {
 			br = new BufferedReader(new FileReader(ratingSheet));
 
 			while ((line = br.readLine()) != null) {
-				writeQueue.add(line.split(",")[0] + line.split(",")[1]);
+				writeQueue.add(line.split(",")[0] + line.split(",")[1] + "_" + line.split(",")[2]);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		boolean writeApprove = false;
 
-		if (writeQueue.contains(b.getID() + b.getFigureMode()))
-			writeApprove = true;
+		for (int i = 0; i < rating.length; i++){
+			if (writeQueue.contains(b.getID() + b.getFigureMode() + "_" + rating[i])){
+				writeApprove = true;
+				break;
+			}
+			
+		}
 
 		/* Part II: Check mode */
 		if (writeApprove) {

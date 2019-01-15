@@ -92,27 +92,27 @@ int main(void)
                     if(chromoOutput > threshold)
                     {
                         mismatchError++;
-                        printf("Mismatch");
+                        printf("Mismatch ");
                     }
                     else
-                        printf("Match");
+                        printf("Match ");
                 }
                 else if (j == classNumber - 1){
                     if (chromoOutput < threshold+(j-1)*threshIncre)
                     {
                         mismatchError++;
-                        printf("Mismatch");
+                        printf("Mismatch ");
                     }
                     else
-                        printf("Match");
+                        printf("Match ");
                 }
                 else{
                     if(chromoOutput > threshold+j*threshIncre || chromoOutput <= threshold+(j-1)*threshIncre){
                         mismatchError++;
-                        printf("Mismatch");
+                        printf("Mismatch ");
                     }
                     else
-                        printf("Match");
+                        printf("Match ");
                 }
 			}
 
