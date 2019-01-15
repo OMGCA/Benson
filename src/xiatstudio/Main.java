@@ -942,6 +942,7 @@ public class Main extends JFrame {
 		}
 
 		for (int i = 0; i < 4; i++) {
+
 			/* Calculate number of objects required for each data set segment */
 			trainingClasses[i][0] = (int) Math.floor(classTotal[i] * trainingRatio);
 			trainingClasses[i][1] = (int) Math.floor(copyTotal[i] * trainingRatio);
@@ -955,7 +956,10 @@ public class Main extends JFrame {
 			testingClasses[i][1] = (int) (copyTotal[i] - trainingClasses[i][1] - validationClasses[i][1]);
 			testingClasses[i][2] = (int) (recallTotal[i] - trainingClasses[i][2] - validationClasses[i][2]);
 
+
 		}
+		
+		
 
 		int trainingCounter[] = { 0, 0, 0, 0 };
 		int validationCounter[] = { 0, 0, 0, 0 };
@@ -984,17 +988,26 @@ public class Main extends JFrame {
 
 			if (outputMode == 1)
 				cgpIOPair = String.valueOf(selectedCount) + ",4,";
+			
+			int trainingTotal = 0;
+			int validateTotal = 0;
+			int testTotal = 0;
+			
+			for(int i = 0; i < pdCond.length; i++) {
+				if(pdCond[i] == i+1) {
+					trainingTotal+=trainingClasses[i][mode];
+					validateTotal+=validationClasses[i][mode];
+					testTotal+=testingClasses[i][mode];
+				}
+			}
 
-			fwTraining.append(cgpIOPair + (trainingClasses[0][mode] + trainingClasses[1][mode]
-					+ trainingClasses[2][mode] + trainingClasses[3][mode]) + ",");
+			fwTraining.append(cgpIOPair + trainingTotal + ",");
 			fwTraining.append("\r\n");
 
-			fwValidation.append(cgpIOPair + (validationClasses[0][mode] + validationClasses[1][mode]
-					+ validationClasses[2][mode] + validationClasses[3][mode]) + ",");
+			fwValidation.append(cgpIOPair + validateTotal + ",");
 			fwValidation.append("\r\n");
 
-			fwTesting.append(cgpIOPair + (testingClasses[0][mode] + testingClasses[1][mode] + testingClasses[2][mode]
-					+ testingClasses[3][mode]) + ",");
+			fwTesting.append(cgpIOPair + testTotal + ",");
 			fwTesting.append("\r\n");
 
 			for (int i = 0; i < overallDataList.length; i++) {
