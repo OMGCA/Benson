@@ -284,16 +284,19 @@ void getBestEntity(void){
             pch = strtok(NULL," ");
 			i++;
         }
-
-		if(atof(fitnessSeg[1]) >= atof(fitnessSeg[2])){
-			if(atof(fitnessSeg[3]) > tmpBest[3]){
-				for(i = 0; i < 4; i++){
-					tmpBest[i] = atof(fitnessSeg[i]);
-				}
-			}
-		}
-
-
+        if(atof(fitnessSeg[1]) >= atof(fitnessSeg[2]))
+        {
+            if(atof(fitnessSeg[2]) > tmpBest[2])
+            {
+                if(atof(fitnessSeg[3]) > tmpBest[3])
+                {
+                    for(i = 0; i < 4; i++)
+                    {
+                        tmpBest[i] = atof(fitnessSeg[i]);
+                    }
+                }
+            }
+        }
     }
 	printf("\nBest gen at %.0f with fitness of %.2f, %.2f and %.2f.\n", tmpBest[0], tmpBest[1], tmpBest[2], tmpBest[3]);
 
