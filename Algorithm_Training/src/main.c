@@ -87,8 +87,7 @@ int main(void)
 			int expectedOutput = getDataSetSampleOutputs(testData, i)[0];
 			printf("%.2f ", chromoOutput);
 
-
-            if (chromoOutput <= threshold+(expectedOutput-1)*threshIncre) || (chromoOutput > threshold+expectedOutput*threshIncre){
+            if (chromoOutput <= threshold+(expectedOutput-1)*threshIncre || chromoOutput > threshold+expectedOutput*threshIncre){
                 printf("Mismatch ");
                 mismatchError++;
             }
