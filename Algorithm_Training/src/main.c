@@ -86,35 +86,15 @@ int main(void)
 			chromoOutput = getChromosomeOutput(chromo, 0);
 			int expectedOutput = getDataSetSampleOutputs(testData, i)[0];
 			printf("%.2f ", chromoOutput);
-			int j = 0;
-			for(j = 0; j < classNumber; j++){
-                if(j == 0){
-                    if(chromoOutput > threshold)
-                    {
-                        mismatchError++;
-                        printf("Mismatch ");
-                    }
-                    else
-                        printf("Match ");
-                }
-                else if (j == classNumber - 1){
-                    if (chromoOutput < threshold+(j-1)*threshIncre)
-                    {
-                        mismatchError++;
-                        printf("Mismatch ");
-                    }
-                    else
-                        printf("Match ");
-                }
-                else{
-                    if(chromoOutput > threshold+j*threshIncre || chromoOutput <= threshold+(j-1)*threshIncre){
-                        mismatchError++;
-                        printf("Mismatch ");
-                    }
-                    else
-                        printf("Match ");
-                }
-			}
+
+
+            if (chromoOutput <= threshold+(expectedOutput-1)*threshIncre) || (chromoOutput > threshold+expectedOutput*threshIncre){
+                printf("Mismatch ");
+                mismatchError++;
+            }
+            else{
+                printf("Match ");
+            }
 
 			printf(" %.2f", getDataSetSampleOutputs(testData, i)[0]);
 			printf("\n");
@@ -244,29 +224,9 @@ double simpleThresholdClassifier(struct parameters *params, struct chromosome *c
 		executeChromosome(chromo, getDataSetSampleInputs(data, i));
 		double chromoOutput = getChromosomeOutput(chromo,0);
 		int expectedClass = getDataSetSampleOutputs(data,i)[0];
-		int j = 0;
-        for (j = 0; j < classNumber; j++)
-        {
-            if(expectedClass == j+1)
-            {
-                if( j != 0 && j != classNumber - 1 )
-                {
-                    if(chromoOutput > threshold+j*threshIncre || chromoOutput <= threshold+(j-1)*threshIncre)
-                        threshError++;
-                }
-                else if (j == 0)
-                {
-                    if(chromoOutput > threshold)
-                        threshError++;
-                }
-                else if (j == classNumber - 1)
-                {
-                    if(chromoOutput < threshold+(j-1)*threshIncre)
-                        threshError++;
-                }
-            }
+		if(chromoOutput < threshold+(expectedClass-1)*threshIncre || chromoOutput >= threshold+expectedClass*threshIncre){
+            threshError++;
         }
-
 	}
 
 	return threshError / (getNumDataSetSamples(data));
