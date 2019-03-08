@@ -260,9 +260,9 @@ double totalSum(struct parameters *params, struct chromosome *chromo, struct dat
 	for(i = 0; i < getNumDataSetSamples(data); i++){
 		executeChromosome(chromo, getDataSetSampleInputs(data, i));
 		double chromoOutput = getChromosomeOutput(chromo, 0);
-		int expectedOutput = getDataSetSampleOutputs(data, i)[0];
+		double expectedOutput = getDataSetSampleOutputs(data, i)[0];
 
-		totalSum += abs(expectedOutput - chromoOutput);
+		totalSum += fabs(expectedOutput - chromoOutput);
 	}
 
 	return totalSum / maxPossibleSum;
