@@ -5,11 +5,14 @@
 #include "cgp-sls.h"
 #include <time.h>
 
+#define MAX_UPDRS 56
+
 double threshold = 10;
 double threshIncre = 10;
 double classNumber = 4;
 double simpleThresholdClassifier(struct parameters *params, struct chromosome *chromo, struct dataSet *data);
 double fourOutputFitnessFunction(struct parameters *params, struct chromosome *chromo, struct dataSet *data);
+double totalSum(struct parameters *params, struct chromosome *chromo, struct dataSet *data);
 int maxIndex(double* arr);
 char** importCGPParams(void);
 void getBestEntity(void);
@@ -49,10 +52,13 @@ int main(void)
 
 	setShortcutConnections(params,0);
 
-	if(numOutputs == 1)
+	/*if(numOutputs == 1)
 		setCustomFitnessFunction(params, simpleThresholdClassifier, "STC");
 	else if(numOutputs == 4)
-		setCustomFitnessFunction(params, fourOutputFitnessFunction, "XT4");
+		setCustomFitnessFunction(params, fourOutputFitnessFunction, "XT4");*/
+
+    setCustomFitnessFunction(params, totalSum, "total sum");
+	//setCustomFitnessFunction(params, simpleThresholdClassifier, "STC");
 
 	setShortcutConnections(params, 0);
 
@@ -229,6 +235,37 @@ double simpleThresholdClassifier(struct parameters *params, struct chromosome *c
 	}
 
 	return threshError / (getNumDataSetSamples(data));
+}
+
+double totalSum(struct parameters *params, struct chromosome *chromo, struct dataSet *data){
+	int i = 0;
+	double totalSum = 0;
+
+	if (getNumChromosomeInputs(chromo) != getNumDataSetInputs(data))
+	{
+		printf("Error: the number of chromosome inputs must match the number of inputs specified in the dataSet.\n");
+		printf("Terminating.\n");
+		exit(0);
+	}
+
+	if (getNumChromosomeOutputs(chromo) != getNumDataSetOutputs(data))
+	{
+		printf("Error: the number of chromosome outputs must match the number of outputs specified in the dataSet.\n");
+		printf("Terminating.\n");
+		exit(0);
+	}
+
+	double maxPossibleSum = 56*getNumDataSetSamples(data);
+
+	for(i = 0; i < getNumDataSetSamples(data); i++){
+		executeChromosome(chromo, getDataSetSampleInputs(data, i));
+		double chromoOutput = getChromosomeOutput(chromo, 0);
+		int expectedOutput = getDataSetSampleOutputs(data, i)[0];
+
+		totalSum += abs(expectedOutput - chromoOutput);
+	}
+
+	return totalSum / maxPossibleSum;
 }
 
 char** importCGPParams(void){
