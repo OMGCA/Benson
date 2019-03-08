@@ -13,8 +13,8 @@ double classNumber = 4;
 double simpleThresholdClassifier(struct parameters *params, struct chromosome *chromo, struct dataSet *data);
 double fourOutputFitnessFunction(struct parameters *params, struct chromosome *chromo, struct dataSet *data);
 double totalSum(struct parameters *params, struct chromosome *chromo, struct dataSet *data);
-int maxIndex(double* arr);
-char** importCGPParams(void);
+int maxIndex(double *arr);
+char **importCGPParams(void);
 void getBestEntity(void);
 
 int main(void)
@@ -26,10 +26,10 @@ int main(void)
 	struct dataSet *testData = NULL;
 	struct chromosome *chromo = NULL;
 
-	char** cgp_params = importCGPParams();
+	char **cgp_params = importCGPParams();
 	threshold = atof(cgp_params[0]);
-    threshIncre = atof(cgp_params[1]);
-    classNumber = atof(cgp_params[2]);
+	threshIncre = atof(cgp_params[1]);
+	classNumber = atof(cgp_params[2]);
 
 	int numInputs = atoi(cgp_params[9]);
 	int numNodes = atoi(cgp_params[3]);
@@ -50,14 +50,14 @@ int main(void)
 
 	setMutationRate(params, atof(cgp_params[8]));
 
-	setShortcutConnections(params,0);
+	setShortcutConnections(params, 0);
 
 	/*if(numOutputs == 1)
 		setCustomFitnessFunction(params, simpleThresholdClassifier, "STC");
 	else if(numOutputs == 4)
 		setCustomFitnessFunction(params, fourOutputFitnessFunction, "XT4");*/
 
-    setCustomFitnessFunction(params, totalSum, "total sum");
+	setCustomFitnessFunction(params, totalSum, "total sum");
 	//setCustomFitnessFunction(params, simpleThresholdClassifier, "STC");
 
 	setShortcutConnections(params, 0);
@@ -75,11 +75,11 @@ int main(void)
 
 	printChromosome(chromo, 0);
 
-	saveChromosome(chromo,"latest_chromo.chromo");
+	saveChromosome(chromo, "latest_chromo.chromo");
 
 	saveChromosomeDot(chromo, 0, "chromo.dot");
 
-	if (numOutputs == 1)
+	/*if (numOutputs == 1)
 	{
 		int i;
 		int mismatchError = 0;
@@ -139,7 +139,26 @@ int main(void)
 		}
         printf("Accuracy = %.4f (%d/%d)", 100 - ((float)mismatchError * 100 / getNumDataSetSamples(testData)), (getNumDataSetSamples(testData) - mismatchError), getNumDataSetSamples(testData));
 
+	}*/
+	int i;
+	for (i = 0; i < getNumDataSetSamples(testData); i++)
+	{
+
+		executeChromosome(chromo, getDataSetSampleInputs(testData, i));
+		double chromoOutput = 0;
+
+		chromoOutput = getChromosomeOutput(chromo, 0);
+		int expectedOutput = getDataSetSampleOutputs(testData, i)[0];
+		printf("%.2f ", chromoOutput);
+
+		printf("Diff: %.2f ", fabs(chromoOutput - expectedOutput));
+
+		printf(" %.2f", getDataSetSampleOutputs(testData, i)[0]);
+		printf("\n");
 	}
+
+
+	printf("\n");
 	getBestEntity();
 
 	freeDataSet(trainingData);
@@ -151,24 +170,27 @@ int main(void)
 	return 0;
 }
 
-int maxIndex(double* arr){
+int maxIndex(double *arr)
+{
 	int i = 0;
 	int max = 0;
 	double tmp = arr[0];
 
-	for(i = 0; i < 4; i++){
-		if(tmp < arr[i]){
+	for (i = 0; i < 4; i++)
+	{
+		if (tmp < arr[i])
+		{
 			tmp = arr[i];
 			max = i;
 		}
-
 	}
 
 	return max;
 }
 
-double fourOutputFitnessFunction(struct parameters *params, struct chromosome *chromo, struct dataSet *data){
-    int i;
+double fourOutputFitnessFunction(struct parameters *params, struct chromosome *chromo, struct dataSet *data)
+{
+	int i;
 	double threshError = 0;
 
 	if (getNumChromosomeInputs(chromo) != getNumDataSetInputs(data))
@@ -185,19 +207,20 @@ double fourOutputFitnessFunction(struct parameters *params, struct chromosome *c
 		exit(0);
 	}
 
-	for(i = 0; i < getNumDataSetSamples(data); i++){
-		executeChromosome(chromo, getDataSetSampleInputs(data,i));
-		double *chromoOutput = malloc(4*sizeof(double));
-		double *expectedOutput = getDataSetSampleOutputs(data,i);
-
+	for (i = 0; i < getNumDataSetSamples(data); i++)
+	{
+		executeChromosome(chromo, getDataSetSampleInputs(data, i));
+		double *chromoOutput = malloc(4 * sizeof(double));
+		double *expectedOutput = getDataSetSampleOutputs(data, i);
 
 		int j = 0;
-		for(j = 0; j < 4; j++){
-			chromoOutput[j] = getChromosomeOutput(chromo,j);
+		for (j = 0; j < 4; j++)
+		{
+			chromoOutput[j] = getChromosomeOutput(chromo, j);
 			//threshError += pow(chromoOutput[j] - expectedOutput[j],2);
 		}
 
-		if(maxIndex(chromoOutput) != maxIndex(expectedOutput))
+		if (maxIndex(chromoOutput) != maxIndex(expectedOutput))
 			threshError++;
 	}
 
@@ -227,17 +250,19 @@ double simpleThresholdClassifier(struct parameters *params, struct chromosome *c
 	{
 
 		executeChromosome(chromo, getDataSetSampleInputs(data, i));
-		double chromoOutput = getChromosomeOutput(chromo,0);
-		int expectedClass = getDataSetSampleOutputs(data,i)[0];
-		if(chromoOutput < threshold+(expectedClass-1)*threshIncre || chromoOutput >= threshold+expectedClass*threshIncre){
-            threshError++;
-        }
+		double chromoOutput = getChromosomeOutput(chromo, 0);
+		int expectedClass = getDataSetSampleOutputs(data, i)[0];
+		if (chromoOutput < threshold + (expectedClass - 1) * threshIncre || chromoOutput >= threshold + expectedClass * threshIncre)
+		{
+			threshError++;
+		}
 	}
 
 	return threshError / (getNumDataSetSamples(data));
 }
 
-double totalSum(struct parameters *params, struct chromosome *chromo, struct dataSet *data){
+double totalSum(struct parameters *params, struct chromosome *chromo, struct dataSet *data)
+{
 	int i = 0;
 	double totalSum = 0;
 
@@ -255,9 +280,10 @@ double totalSum(struct parameters *params, struct chromosome *chromo, struct dat
 		exit(0);
 	}
 
-	double maxPossibleSum = 56*getNumDataSetSamples(data);
+	double maxPossibleSum = 56 * getNumDataSetSamples(data);
 
-	for(i = 0; i < getNumDataSetSamples(data); i++){
+	for (i = 0; i < getNumDataSetSamples(data); i++)
+	{
 		executeChromosome(chromo, getDataSetSampleInputs(data, i));
 		double chromoOutput = getChromosomeOutput(chromo, 0);
 		double expectedOutput = getDataSetSampleOutputs(data, i)[0];
@@ -268,73 +294,80 @@ double totalSum(struct parameters *params, struct chromosome *chromo, struct dat
 	return totalSum / maxPossibleSum;
 }
 
-char** importCGPParams(void){
-    FILE* fp;
-    char line[256];
-    int i = 0;
+char **importCGPParams(void)
+{
+	FILE *fp;
+	char line[256];
+	int i = 0;
 
-    char **cgp_params = malloc(11*sizeof(char*));
+	char **cgp_params = malloc(11 * sizeof(char *));
 
-    fp = fopen("cgp_params.txt","r");
+	fp = fopen("cgp_params.txt", "r");
 
-    if(fp == NULL){
-        printf("File not found");
-        return 0;
-    }
+	if (fp == NULL)
+	{
+		printf("File not found");
+		return 0;
+	}
 
-    for(i = 0; i < 11; i++){
-        cgp_params[i] = malloc(10*sizeof(char));
-    }
-    i = 0;
+	for (i = 0; i < 11; i++)
+	{
+		cgp_params[i] = malloc(10 * sizeof(char));
+	}
+	i = 0;
 
-    while(fgets(line, sizeof(line), fp)){
-        strcpy(cgp_params[i],line);
-        i++;
-    }
+	while (fgets(line, sizeof(line), fp))
+	{
+		strcpy(cgp_params[i], line);
+		i++;
+	}
 
-    fclose(fp);
+	fclose(fp);
 
-    return cgp_params;
+	return cgp_params;
 }
 
-void getBestEntity(void){
-    FILE* fp;
-    char line[256];
-    int i = 0;
+void getBestEntity(void)
+{
+	FILE *fp;
+	char line[256];
+	int i = 0;
 
-    double tmpBest[4] = {0,0,0,0};
+	double tmpBest[4] = {0, 0, 0, 0};
 
-    fp = fopen("CGP_Output.txt","r");
-    if(fp == NULL){
-        printf("File not found.");
-        return 0;
-    }
+	fp = fopen("CGP_Output.txt", "r");
+	if (fp == NULL)
+	{
+		printf("File not found.");
+		return 0;
+	}
 
-    while(fgets(line, sizeof(line), fp)){
+	while (fgets(line, sizeof(line), fp))
+	{
 		i = 0;
-        char* pch = strtok(line," ");
-		char** fitnessSeg = malloc(4*sizeof(char*));
+		char *pch = strtok(line, " ");
+		char **fitnessSeg = malloc(4 * sizeof(char *));
 
-        while(pch != NULL){
-			fitnessSeg[i] = malloc(10*sizeof(char));
-			strcpy(fitnessSeg[i],pch);
-            pch = strtok(NULL," ");
+		while (pch != NULL)
+		{
+			fitnessSeg[i] = malloc(10 * sizeof(char));
+			strcpy(fitnessSeg[i], pch);
+			pch = strtok(NULL, " ");
 			i++;
-        }
-        if(atof(fitnessSeg[1]) >= atof(fitnessSeg[2]))
-        {
-            if(atof(fitnessSeg[2]) > tmpBest[2])
-            {
-                if(atof(fitnessSeg[3]) > tmpBest[3])
-                {
-                    for(i = 0; i < 4; i++)
-                    {
-                        tmpBest[i] = atof(fitnessSeg[i]);
-                    }
-                }
-            }
-        }
-    }
+		}
+		if (atof(fitnessSeg[1]) >= atof(fitnessSeg[2]))
+		{
+			if (atof(fitnessSeg[2]) > tmpBest[2])
+			{
+				if (atof(fitnessSeg[3]) > tmpBest[3])
+				{
+					for (i = 0; i < 4; i++)
+					{
+						tmpBest[i] = atof(fitnessSeg[i]);
+					}
+				}
+			}
+		}
+	}
 	printf("\nBest gen at %.0f with fitness of %.2f, %.2f and %.2f.\n", tmpBest[0], tmpBest[1], tmpBest[2], tmpBest[3]);
-
 }
