@@ -28,6 +28,7 @@ public class Benson {
 	float timeSpent;
 	int timeStamp;
 	String ratingSheet;
+	int updrsRating;
 	int rating;
 	String data;
 	ArrayList<Component> components;
@@ -47,6 +48,7 @@ public class Benson {
 		this.timeSpent = 0;
 		setRatingSheet(classifyScheme);
 		registerRating(ratingSheet);
+		registerUPDRS(".\\Sheets\\updrs_sheet.csv");
 		this.penPressure = new float[timeStamp];
 		this.components = new ArrayList<Component>();
 
@@ -124,6 +126,37 @@ public class Benson {
 				}
 			}
 		}
+	}
+
+	public void registerUPDRS(String ratingSheet){
+		BufferedReader br = null;
+		String line = "";
+		try {
+			br = new BufferedReader(new FileReader(ratingSheet));
+			while ((line = br.readLine()) != null) {
+				String[] ratingPair = line.split(",");
+				if (ratingPair[0].equals(getID()) && ratingPair[1].equals(getFigureMode())) {
+					this.updrsRating = Integer.parseInt(ratingPair[2]);
+					break;
+				}
+			}
+		} catch (FileNotFoundException e) {
+			System.out.println("UPDRS_SHEET_INIT_ERROR: Specific data file can not be found.");
+		} catch (IOException e) {
+			System.out.println("UPDRS_SHEET_INIT_ERROR: Specific data file can not be accessed.");
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public int getUPDRS(){
+		return this.updrsRating;
 	}
 
 	public int getRating() {

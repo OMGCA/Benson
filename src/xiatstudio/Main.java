@@ -82,8 +82,8 @@ public class Main extends JFrame {
 		JMenuItem pen_offON, pen_offOFF;
 
 		/* Background color */
-		//Color bg = new Color(54, 63, 70);
-		Color bg = new Color(250,250,250);
+		// Color bg = new Color(54, 63, 70);
+		Color bg = new Color(250, 250, 250);
 
 		menu = new JMenu("File");
 		menu2 = new JMenu("Component");
@@ -206,8 +206,9 @@ public class Main extends JFrame {
 				GridBagConstraints c = new GridBagConstraints();
 				c.fill = GridBagConstraints.HORIZONTAL;
 
-				String cgpTags[] = { "Threshold Initial", "Threshold Increment", "Class Numbers", "Nodes", "Arity", "Max Generations",
-						"Update Frequency", "Random number seed", "Mutation Rate", "Input(s)", "Output(s)" };
+				String cgpTags[] = { "Threshold Initial", "Threshold Increment", "Class Numbers", "Nodes", "Arity",
+						"Max Generations", "Update Frequency", "Random number seed", "Mutation Rate", "Input(s)",
+						"Output(s)" };
 
 				String defaultValue[] = { "10", "10", "4", "20", "3", "100000", "500", "1234", "0.08", "17", "1" };
 				JLabel params[] = new JLabel[defaultValue.length];
@@ -331,7 +332,7 @@ public class Main extends JFrame {
 				switch (fileChooser.showOpenDialog(panel)) {
 				case JFileChooser.APPROVE_OPTION:
 					String dataPending = fileChooser.getSelectedFile().getPath();
-					//exportLibSVMData(dataPending);
+					// exportLibSVMData(dataPending);
 					System.gc();
 					break;
 				}
@@ -357,7 +358,7 @@ public class Main extends JFrame {
 		menuItem3.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Benson b = new Benson(data,0);
+				Benson b = new Benson(data, 0);
 				exportSingleData(b, data.substring(0, data.lastIndexOf('.')) + ".csv");
 			}
 
@@ -446,6 +447,10 @@ public class Main extends JFrame {
 				conditionClassify.setFont(xtDefault);
 				windowAddComponent(popUp, c, 5, 1, conditionClassify);
 
+				JRadioButton updrsClassify = new JRadioButton("UPDRS");
+				updrsClassify.setFont(xtDefault);
+				windowAddComponent(popUp, c, 6, 1, updrsClassify);
+
 				JRadioButton singleOutput = new JRadioButton("Single Output");
 				singleOutput.setFont(xtDefault);
 				windowAddComponent(popUp, c, 2, 1, singleOutput);
@@ -464,29 +469,29 @@ public class Main extends JFrame {
 
 				classifyGroup.add(visualClassify);
 				classifyGroup.add(conditionClassify);
+				classifyGroup.add(updrsClassify);
 				visualClassify.setSelected(true);
 
 				String featureTag[] = { "Total Time", "Total Length", "Size", "Aspect Ratio", "Velocity SD", "Angle SD",
 						"Pen-Up Portion", "Horizontal Portion", "Vertical Portion", "Oblique Portion", "Horizontal SD",
 						"Vertical SD", "Oblique SD", "Hesitation Counts(down)", "Hesitation Counts(up)",
-						"Hesitation Portion(down)", "Hesitation Portion(up)"};
+						"Hesitation Portion(down)", "Hesitation Portion(up)" };
 
 				JCheckBox featureSelection[] = new JCheckBox[featureTag.length];
-				
-				String pdCondition[] = {"PD-NC","PD-MCI","PD-D","Control"};
+
+				String pdCondition[] = { "PD-NC", "PD-MCI", "PD-D", "Control" };
 				JCheckBox pdSelect[] = new JCheckBox[pdCondition.length];
-				
 
 				TextField tierRange[] = new TextField[8];
 				JLabel tier[] = new JLabel[4];
 				JLabel tierTitle = new JLabel("Tier definition");
 				tierTitle.setFont(new Font("Segoe UI", Font.PLAIN, 15));
-				
+
 				for (int i = 0; i < pdCondition.length; i++) {
 					pdSelect[i] = new JCheckBox(pdCondition[i]);
 					pdSelect[i].setFont(xtDefault);
 					pdSelect[i].setSelected(true);
-					windowAddComponent(popUp,c,i,2,pdSelect[i]);
+					windowAddComponent(popUp, c, i, 2, pdSelect[i]);
 				}
 
 				windowAddComponent(popUp, c, 0, 3, tierTitle);
@@ -589,26 +594,29 @@ public class Main extends JFrame {
 							tierDef[i] = Integer.parseInt(tierRange[i].getText());
 						}
 
-						if(visualClassify.isSelected())
+						if (visualClassify.isSelected())
 							classificationScheme = 0;
-						else if(conditionClassify.isSelected())
+						else if (conditionClassify.isSelected())
 							classificationScheme = 1;
+						else if (updrsClassify.isSelected())
+							classificationScheme = 2;
 
 						double trainingRatio = Double.parseDouble(trRatio.getText()) / 100;
 						statusBar.setText("Setting tiers.");
 						exportCustomTier(tierDef);
 						statusBar.setText("Exporting data set.");
-						
+
 						int pdCond[] = new int[pdSelect.length];
-						
+
 						for (int i = 0; i < pdSelect.length; i++) {
 							pdCond[i] = 0;
-							if(pdSelect[i].isSelected())
-								pdCond[i] = i+1;
+							if (pdSelect[i].isSelected())
+								pdCond[i] = i + 1;
 						}
 
 						try {
-							dataSetFolder = exportCGPDataSet(trainingRatio, outputMode, featureSelected, cgpOutputMode, classificationScheme, pdCond);
+							dataSetFolder = exportCGPDataSet(trainingRatio, outputMode, featureSelected, cgpOutputMode,
+									classificationScheme, pdCond);
 						} catch (Exception e1) {
 							statusBar.setText("Data export failed.");
 						}
@@ -760,7 +768,7 @@ public class Main extends JFrame {
 
 			for (int i = 0; i < dataList.length; i++) {
 
-				Benson b = new Benson(dataList[i].replace("\\", "/"),0);
+				Benson b = new Benson(dataList[i].replace("\\", "/"), 0);
 				b.calcThreeLength();
 				String[] dataPending = { b.getID(), b.getFigureMode(), String.valueOf(b.timeSpent / 100000),
 						String.valueOf((double) (b.getTotalLength() / 10000)),
@@ -854,7 +862,7 @@ public class Main extends JFrame {
 
 			for (int i = 0; i < dataList.length; i++) {
 
-				Benson b = new Benson(dataList[i].replace("\\", "/"),0);
+				Benson b = new Benson(dataList[i].replace("\\", "/"), 0);
 				b.calcThreeLength();
 				String[] dataPending = { b.getID(), b.getFigureMode(), String.valueOf(b.timeSpent / 10000),
 						String.valueOf(b.getTotalLength() / 10000),
@@ -889,7 +897,8 @@ public class Main extends JFrame {
 		}
 	}
 
-	public static String exportCGPDataSet(double trainingRatio, int mode, boolean[] selections, int outputMode, int classificationScheme, int[] pdCond) {
+	public static String exportCGPDataSet(double trainingRatio, int mode, boolean[] selections, int outputMode,
+			int classificationScheme, int[] pdCond) {
 		File newDataFolder = new File(
 				".\\Sheets\\DataSet\\" + new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date()));
 		newDataFolder.mkdir();
@@ -915,19 +924,18 @@ public class Main extends JFrame {
 		int validationClasses[][] = new int[4][3];
 
 		int testingClasses[][] = new int[4][3];
-		
+
 		String ratingSheet;
-		
-		if(classificationScheme == 0)
+
+		if (classificationScheme == 0)
 			ratingSheet = ".\\Sheets\\visual_rating.csv";
 		else
 			ratingSheet = ".\\Sheets\\condition_rating.csv";
-		
 
 		try {
-			
+
 			br = new BufferedReader(new FileReader(ratingSheet));
-			
+
 			while ((line = br.readLine()) != null) {
 				/* Counting total objects in all, copy only and recall only */
 				classTotal[Integer.parseInt(line.split(",")[2]) - 1]++;
@@ -956,10 +964,7 @@ public class Main extends JFrame {
 			testingClasses[i][1] = (int) (copyTotal[i] - trainingClasses[i][1] - validationClasses[i][1]);
 			testingClasses[i][2] = (int) (recallTotal[i] - trainingClasses[i][2] - validationClasses[i][2]);
 
-
 		}
-		
-		
 
 		int trainingCounter[] = { 0, 0, 0, 0 };
 		int validationCounter[] = { 0, 0, 0, 0 };
@@ -982,22 +987,22 @@ public class Main extends JFrame {
 				if (selections[i])
 					selectedCount++;
 			}
-			
+
 			/* Data set header */
 			String cgpIOPair = String.valueOf(selectedCount) + ",1,";
 
 			if (outputMode == 1)
 				cgpIOPair = String.valueOf(selectedCount) + ",4,";
-			
+
 			int trainingTotal = 0;
 			int validateTotal = 0;
 			int testTotal = 0;
-			
-			for(int i = 0; i < pdCond.length; i++) {
-				if(pdCond[i] == i+1) {
-					trainingTotal+=trainingClasses[i][mode];
-					validateTotal+=validationClasses[i][mode];
-					testTotal+=testingClasses[i][mode];
+
+			for (int i = 0; i < pdCond.length; i++) {
+				if (pdCond[i] == i + 1) {
+					trainingTotal += trainingClasses[i][mode];
+					validateTotal += validationClasses[i][mode];
+					testTotal += testingClasses[i][mode];
 				}
 			}
 
@@ -1018,8 +1023,12 @@ public class Main extends JFrame {
 			}
 
 			for (int i = 0; i < overallDataList.length; i++) {
-				Benson b = new Benson(overallDataList[i].replace("\\", "/"),classificationScheme);
+				Benson b = new Benson(overallDataList[i].replace("\\", "/"), classificationScheme);
 				b.calcThreeLength();
+
+				String ratingString = String.valueOf(b.getRating());
+				if (classificationScheme == 2)
+					ratingString = String.valueOf(b.getUPDRS());
 
 				String[] dataPending = { String.valueOf(b.timeSpent / 100000),
 						String.valueOf(b.getTotalLength() / 10000),
@@ -1033,7 +1042,7 @@ public class Main extends JFrame {
 						String.valueOf((double) b.getHesitation() / 1000),
 						String.valueOf((double) b.getPenUpHesitation() / 1000),
 						String.valueOf((double) b.getHesitationPortion() * 10),
-						String.valueOf((double) b.getPenUpHesiPortion() * 10), String.valueOf(b.getRating()) };
+						String.valueOf((double) b.getPenUpHesiPortion() * 10), ratingString };
 
 				/* Check whether this data is entitled to be exported */
 				if (dataWriteHandshake(mode, b, ratingSheet, pdCond)) {
@@ -1045,7 +1054,7 @@ public class Main extends JFrame {
 							dataPending[j] = null;
 						}
 					}
-					
+
 					List<String> list = new ArrayList<String>(Arrays.asList(dataPending));
 
 					if (outputMode == 1) {
@@ -1170,12 +1179,12 @@ public class Main extends JFrame {
 		}
 		boolean writeApprove = false;
 
-		for (int i = 0; i < rating.length; i++){
-			if (writeQueue.contains(b.getID() + b.getFigureMode() + "_" + rating[i])){
+		for (int i = 0; i < rating.length; i++) {
+			if (writeQueue.contains(b.getID() + b.getFigureMode() + "_" + rating[i])) {
 				writeApprove = true;
 				break;
 			}
-			
+
 		}
 
 		/* Part II: Check mode */
@@ -1253,7 +1262,7 @@ public class Main extends JFrame {
 					RenderingHints.VALUE_ANTIALIAS_ON);
 
 			g2.setRenderingHints(hints);
-			Benson testFigure = new Benson(data,0);
+			Benson testFigure = new Benson(data, 0);
 			testFigure.drawBenson(g2, displayMode);
 		}
 	}
