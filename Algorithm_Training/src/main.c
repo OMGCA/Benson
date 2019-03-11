@@ -6,6 +6,7 @@
 #include <time.h>
 
 #define MAX_UPDRS 56
+#define CGP_PARAMS 12
 
 double threshold = 10;
 double threshIncre = 10;
@@ -13,9 +14,16 @@ double classNumber = 4;
 double simpleThresholdClassifier(struct parameters *params, struct chromosome *chromo, struct dataSet *data);
 double fourOutputFitnessFunction(struct parameters *params, struct chromosome *chromo, struct dataSet *data);
 double totalSum(struct parameters *params, struct chromosome *chromo, struct dataSet *data);
+
 int maxIndex(double *arr);
 char **importCGPParams(void);
 void getBestEntity(void);
+
+void stcAction(struct chromosome *chromo, struct dataSet *testData);
+void ftcAction(struct chromosome *chromo, struct dataSet *testData);
+void tsAction(struct chromosome *chromo, struct dataSet *testData);
+void setDisplayAction(char *arr, struct chromosome *chromo, struct dataSet *testData);
+void setFitnessFromText(char *arr, struct parameters *params);
 
 int main(void)
 {
@@ -52,16 +60,6 @@ int main(void)
 
 	setShortcutConnections(params, 0);
 
-	/*if(numOutputs == 1)
-		setCustomFitnessFunction(params, simpleThresholdClassifier, "STC");
-	else if(numOutputs == 4)
-		setCustomFitnessFunction(params, fourOutputFitnessFunction, "XT4");*/
-
-	setCustomFitnessFunction(params, totalSum, "total sum");
-	//setCustomFitnessFunction(params, simpleThresholdClassifier, "STC");
-
-	setShortcutConnections(params, 0);
-
 	setUpdateFrequency(params, updateFrequency);
 
 	printParameters(params);
@@ -70,6 +68,8 @@ int main(void)
 	trainingData = initialiseDataSetFromFile("./01_training.csv");
 	validationData = initialiseDataSetFromFile("./02_validation.csv");
 	testData = initialiseDataSetFromFile("./03_testing.csv");
+	
+	setFitnessFromText(strtok(cgp_params[11],"\n"), params);
 
 	chromo = runValiTestCGP(params, trainingData, validationData, testData, numGens);
 
@@ -79,86 +79,8 @@ int main(void)
 
 	saveChromosomeDot(chromo, 0, "chromo.dot");
 
-	/*if (numOutputs == 1)
-	{
-		int i;
-		int mismatchError = 0;
-		for (i = 0; i < getNumDataSetSamples(testData); i++)
-		{
+	setDisplayAction(strtok(cgp_params[11],"\n"), chromo, testData);
 
-			executeChromosome(chromo, getDataSetSampleInputs(testData, i));
-			double chromoOutput = 0;
-
-			chromoOutput = getChromosomeOutput(chromo, 0);
-			int expectedOutput = getDataSetSampleOutputs(testData, i)[0];
-			printf("%.2f ", chromoOutput);
-
-            if (chromoOutput <= threshold+(expectedOutput-1)*threshIncre || chromoOutput > threshold+expectedOutput*threshIncre){
-                printf("Mismatch ");
-                mismatchError++;
-            }
-            else{
-                printf("Match ");
-            }
-
-			printf(" %.2f", getDataSetSampleOutputs(testData, i)[0]);
-			printf("\n");
-		}
-
-		printf("Accuracy = %.4f (%d/%d)", 100 - ((float)mismatchError * 100 / getNumDataSetSamples(testData)), (getNumDataSetSamples(testData) - mismatchError), getNumDataSetSamples(testData));
-
-		printf("\n");
-	}
-
-	else if (numOutputs == 4){
-		int i;
-		int mismatchError = 0;
-		for(i = 0;i < getNumDataSetSamples(testData);i++){
-			executeChromosome(chromo, getDataSetSampleInputs(testData,i));
-			double *chromoOutput = malloc(4*sizeof(double));
-			double *expectedOutput = getDataSetSampleOutputs(testData,i);
-			int j = 0;
-			for(j = 0; j < 4; j++){
-                chromoOutput[j] = getChromosomeOutput(chromo,j);
-				printf("%.2f ", chromoOutput[j]);
-			}
-			if(maxIndex(chromoOutput) != maxIndex(expectedOutput)){
-				printf("Mismatch ");
-				mismatchError++;
-			}
-
-			else
-				printf("Match ");
-
-			for(j = 0; j < 4; j++){
-				printf("%.2f ", expectedOutput[j]);
-			}
-
-			printf("\n");
-
-		}
-        printf("Accuracy = %.4f (%d/%d)", 100 - ((float)mismatchError * 100 / getNumDataSetSamples(testData)), (getNumDataSetSamples(testData) - mismatchError), getNumDataSetSamples(testData));
-
-	}*/
-	int i;
-	for (i = 0; i < getNumDataSetSamples(testData); i++)
-	{
-
-		executeChromosome(chromo, getDataSetSampleInputs(testData, i));
-		double chromoOutput = 0;
-
-		chromoOutput = getChromosomeOutput(chromo, 0);
-		int expectedOutput = getDataSetSampleOutputs(testData, i)[0];
-		printf("%.2f ", chromoOutput);
-
-		printf("Diff: %.2f ", fabs(chromoOutput - expectedOutput));
-
-		printf(" %.2f", getDataSetSampleOutputs(testData, i)[0]);
-		printf("\n");
-	}
-
-
-	printf("\n");
 	getBestEntity();
 
 	freeDataSet(trainingData);
@@ -300,7 +222,7 @@ char **importCGPParams(void)
 	char line[256];
 	int i = 0;
 
-	char **cgp_params = malloc(11 * sizeof(char *));
+	char **cgp_params = malloc(CGP_PARAMS * sizeof(char *));
 
 	fp = fopen("cgp_params.txt", "r");
 
@@ -310,7 +232,7 @@ char **importCGPParams(void)
 		return 0;
 	}
 
-	for (i = 0; i < 11; i++)
+	for (i = 0; i < CGP_PARAMS; i++)
 	{
 		cgp_params[i] = malloc(10 * sizeof(char));
 	}
@@ -370,4 +292,114 @@ void getBestEntity(void)
 		}
 	}
 	printf("\nBest gen at %.0f with fitness of %.2f, %.2f and %.2f.\n", tmpBest[0], tmpBest[1], tmpBest[2], tmpBest[3]);
+}
+
+void stcAction(struct chromosome *chromo, struct dataSet *testData){
+	int i;
+	int mismatchError = 0;
+	for (i = 0; i < getNumDataSetSamples(testData); i++)
+	{
+
+		executeChromosome(chromo, getDataSetSampleInputs(testData, i));
+		double chromoOutput = 0;
+
+		chromoOutput = getChromosomeOutput(chromo, 0);
+		int expectedOutput = getDataSetSampleOutputs(testData, i)[0];
+		printf("%.2f ", chromoOutput);
+
+        if (chromoOutput <= threshold+(expectedOutput-1)*threshIncre || chromoOutput > threshold+expectedOutput*threshIncre){
+            printf("Mismatch ");
+            mismatchError++;
+        }
+        else{
+            printf("Match ");
+        }
+
+		printf(" %.2f", getDataSetSampleOutputs(testData, i)[0]);
+		printf("\n");
+	}
+
+	printf("Accuracy = %.4f (%d/%d)", 100 - ((float)mismatchError * 100 / getNumDataSetSamples(testData)), (getNumDataSetSamples(testData) - mismatchError), getNumDataSetSamples(testData));
+
+	printf("\n");
+}
+
+void ftcAction(struct chromosome *chromo, struct dataSet *testData){
+	int i;
+	int mismatchError = 0;
+	for(i = 0;i < getNumDataSetSamples(testData);i++){
+		executeChromosome(chromo, getDataSetSampleInputs(testData,i));
+		double *chromoOutput = malloc(4*sizeof(double));
+		double *expectedOutput = getDataSetSampleOutputs(testData,i);
+		int j = 0;
+		for(j = 0; j < 4; j++){
+            chromoOutput[j] = getChromosomeOutput(chromo,j);
+			printf("%.2f ", chromoOutput[j]);
+		}
+		if(maxIndex(chromoOutput) != maxIndex(expectedOutput)){
+			printf("Mismatch ");
+			mismatchError++;
+		}
+
+		else
+			printf("Match ");
+
+		for(j = 0; j < 4; j++){
+			printf("%.2f ", expectedOutput[j]);
+		}
+
+		printf("\n");
+
+	}
+    printf("Accuracy = %.4f (%d/%d)", 100 - ((float)mismatchError * 100 / getNumDataSetSamples(testData)), (getNumDataSetSamples(testData) - mismatchError), getNumDataSetSamples(testData));
+}
+
+void tsAction(struct chromosome *chromo, struct dataSet *testData){
+	int i;
+	for (i = 0; i < getNumDataSetSamples(testData); i++)
+	{
+
+		executeChromosome(chromo, getDataSetSampleInputs(testData, i));
+		double chromoOutput = 0;
+
+		chromoOutput = getChromosomeOutput(chromo, 0);
+		int expectedOutput = getDataSetSampleOutputs(testData, i)[0];
+		printf("%.2f ", chromoOutput);
+
+		printf("Diff: %.2f ", fabs(chromoOutput - expectedOutput));
+
+		printf(" %.2f", getDataSetSampleOutputs(testData, i)[0]);
+		printf("\n");
+	}
+
+
+	printf("\n");
+}
+
+void setFitnessFromText(char *arr, struct parameters *params){
+	if(strcmp(arr,"STC") == 0){
+		setCustomFitnessFunction(params, simpleThresholdClassifier, "STC");
+		
+	}
+	else if(strcmp(arr,"FTC") == 0){
+		setCustomFitnessFunction(params, fourOutputFitnessFunction, "FTC");
+		//ftcAction(chromo, testData);
+	}
+	else if (strcmp(arr,"TS") == 0){
+		setCustomFitnessFunction(params, totalSum, "TS");
+		//tsAction(chromo, testData);
+	}
+		
+}
+
+void setDisplayAction(char *arr, struct chromosome *chromo, struct dataSet *testData){
+	if(strcmp(arr,"STC") == 0){
+		stcAction(chromo, testData);
+	}
+	else if(strcmp(arr,"FTC") == 0){
+		ftcAction(chromo, testData);
+	}
+	else if (strcmp(arr,"TS") == 0){
+		tsAction(chromo, testData);
+	}
 }

@@ -307,11 +307,26 @@ public class Main extends JFrame {
 				JLabel tierTitle = new JLabel("Tier definition");
 				tierTitle.setFont(new Font("Segoe UI", Font.PLAIN, 15));
 
+				int tmp = 0;
+
 				for (int i = 0; i < pdCondition.length; i++) {
 					pdSelect[i] = new JCheckBox(pdCondition[i]);
 					pdSelect[i].setFont(xtDefault);
 					pdSelect[i].setSelected(true);
 					windowAddComponent(popUp, c, i, 2, pdSelect[i]);
+
+					tmp = i;
+				}
+
+				String fitnessFunction[] = {"STC","FTC","TS","SRE"};
+				JRadioButton fitnessSelect[] = new JRadioButton[fitnessFunction.length];
+				ButtonGroup fitnessFunc = new ButtonGroup();
+
+				for(int i = 0; i < fitnessFunction.length; i++){
+					fitnessSelect[i] = new JRadioButton(fitnessFunction[i]);
+					fitnessSelect[i].setFont(xtDefault);
+					fitnessFunc.add(fitnessSelect[i]);
+					windowAddComponent(popUp, c, i + 1 + tmp, 2, fitnessSelect[i]);
 				}
 
 				windowAddComponent(popUp, c, 0, 3, tierTitle);
