@@ -68,7 +68,7 @@ int main(void)
 	trainingData = initialiseDataSetFromFile("./01_training.csv");
 	validationData = initialiseDataSetFromFile("./02_validation.csv");
 	testData = initialiseDataSetFromFile("./03_testing.csv");
-	
+
 	setFitnessFromText(strtok(cgp_params[11],"\n"), params);
 
 	chromo = runValiTestCGP(params, trainingData, validationData, testData, numGens);
@@ -187,6 +187,7 @@ double totalSum(struct parameters *params, struct chromosome *chromo, struct dat
 {
 	int i = 0;
 	double totalSum = 0;
+	double error = 0;
 
 	if (getNumChromosomeInputs(chromo) != getNumDataSetInputs(data))
 	{
@@ -210,10 +211,35 @@ double totalSum(struct parameters *params, struct chromosome *chromo, struct dat
 		double chromoOutput = getChromosomeOutput(chromo, 0);
 		double expectedOutput = getDataSetSampleOutputs(data, i)[0];
 
-		totalSum += fabs(expectedOutput - chromoOutput);
+		//totalSum += fabs(expectedOutput - chromoOutput);
+		if(fabs(expectedOutput - chromoOutput) >= 8)
+            error++;
 	}
 
-	return totalSum / maxPossibleSum;
+
+	//return totalSum / maxPossibleSum;
+	return error / getNumDataSetSamples(data);
+}
+
+double meanSquareError(struct parameters *params, struct chromosome *chromo, struct dataSet *data){
+	int i = 0;
+
+	if (getNumChromosomeInputs(chromo) != getNumDataSetInputs(data))
+	{
+		printf("Error: the number of chromosome inputs must match the number of inputs specified in the dataSet.\n");
+		printf("Terminating.\n");
+		exit(0);
+	}
+
+	if (getNumChromosomeOutputs(chromo) != getNumDataSetOutputs(data))
+	{
+		printf("Error: the number of chromosome outputs must match the number of outputs specified in the dataSet.\n");
+		printf("Terminating.\n");
+		exit(0);
+	}
+
+
+
 }
 
 char **importCGPParams(void)
@@ -379,7 +405,7 @@ void tsAction(struct chromosome *chromo, struct dataSet *testData){
 void setFitnessFromText(char *arr, struct parameters *params){
 	if(strcmp(arr,"STC") == 0){
 		setCustomFitnessFunction(params, simpleThresholdClassifier, "STC");
-		
+
 	}
 	else if(strcmp(arr,"FTC") == 0){
 		setCustomFitnessFunction(params, fourOutputFitnessFunction, "FTC");
@@ -389,7 +415,7 @@ void setFitnessFromText(char *arr, struct parameters *params){
 		setCustomFitnessFunction(params, totalSum, "TS");
 		//tsAction(chromo, testData);
 	}
-		
+
 }
 
 void setDisplayAction(char *arr, struct chromosome *chromo, struct dataSet *testData){
