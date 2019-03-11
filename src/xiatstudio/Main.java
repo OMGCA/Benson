@@ -57,6 +57,7 @@ public class Main extends JFrame {
 	static String yarccAddress = "@research2.york.ac.uk";
 	static ImageIcon xt_logo = new ImageIcon("xt_logo.png");
 	static JFrame frame = new JFrame();
+	static int fitnessIndex = 0;
 
 	public static void main(String[] args) {
 		/* Load GUI component */
@@ -224,7 +225,7 @@ public class Main extends JFrame {
 				/* New pop up windows */
 				JFrame popUp = new JFrame();
 				popUp.setVisible(true);
-				popUp.setSize(910, 400);
+				popUp.setSize(1060, 420);
 				popUp.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 				popUp.setLayout(new GridBagLayout());
 				popUp.setTitle("Exporting CGP compatible data set");
@@ -329,6 +330,8 @@ public class Main extends JFrame {
 					windowAddComponent(popUp, c, i + 1 + tmp, 2, fitnessSelect[i]);
 				}
 
+				
+
 				windowAddComponent(popUp, c, 0, 3, tierTitle);
 
 				for (int i = 0; i < 4; i++) {
@@ -405,6 +408,13 @@ public class Main extends JFrame {
 					public void actionPerformed(ActionEvent e) {
 						int outputMode = 0;// 0: all, 1:copy only, 2:recall only
 						String dataSetFolder = "";
+
+						for(int i = 0; i < fitnessFunction.length; i++){
+							if(fitnessSelect[i].isSelected()){
+								fitnessIndex = i;
+								break;
+							}
+						}
 
 						int classificationScheme = 0;
 
@@ -1162,9 +1172,9 @@ public class Main extends JFrame {
 
 				String cgpTags[] = { "Threshold Initial", "Threshold Increment", "Class Numbers", "Nodes", "Arity",
 						"Max Generations", "Update Frequency", "Random number seed", "Mutation Rate", "Input(s)",
-						"Output(s)" };
+						"Output(s)", "Fitness Function" };
 
-				String defaultValue[] = { "10", "10", "4", "20", "3", "100000", "500", "1234", "0.08", "17", "1" };
+				String defaultValue[] = { "10", "10", "4", "20", "3", "100000", "500", "1234", "0.08", "17", "1", "STC" };
 				JLabel params[] = new JLabel[defaultValue.length];
 				TextField cgpParams[] = new TextField[defaultValue.length];
 
@@ -1205,6 +1215,7 @@ public class Main extends JFrame {
 								writer.append(cgpParams[i].getText());
 								writer.append("\n");
 							}
+
 
 							writer.flush();
 							writer.close();
