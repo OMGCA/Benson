@@ -76,7 +76,7 @@ public class Main extends JFrame {
 		}
 
 		/* Initialize JFrame and Menu bar */
-		
+
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menu, menu2, menu3, exportMenu, exportAllMenu;
 		JMenuItem menuItem, menuItem2, menuItem3, menuItem4, menuItem5, menuItem6, menuItem7;
@@ -133,7 +133,7 @@ public class Main extends JFrame {
 		frame.setSize(1280, 720);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
-		
+
 		frame.setIconImage(xt_logo.getImage());
 
 		String displayMenuSet[] = { "All", "Horizontal", "Vertical", "Oblique" };
@@ -141,7 +141,7 @@ public class Main extends JFrame {
 			displayModeMenu[i] = new JMenuItem(displayMenuSet[i]);
 			menu2.add(displayModeMenu[i]);
 			final int tmpIndex = i;
-			displayModeMenu[i].addActionListener(new ActionListener(){
+			displayModeMenu[i].addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					displayMode = tmpIndex;
@@ -319,18 +319,16 @@ public class Main extends JFrame {
 					tmp = i;
 				}
 
-				String fitnessFunction[] = {"STC","FTC","TS","SRE"};
+				String fitnessFunction[] = { "STC", "FTC", "TS", "SRE" };
 				JRadioButton fitnessSelect[] = new JRadioButton[fitnessFunction.length];
 				ButtonGroup fitnessFunc = new ButtonGroup();
 
-				for(int i = 0; i < fitnessFunction.length; i++){
+				for (int i = 0; i < fitnessFunction.length; i++) {
 					fitnessSelect[i] = new JRadioButton(fitnessFunction[i]);
 					fitnessSelect[i].setFont(xtDefault);
 					fitnessFunc.add(fitnessSelect[i]);
 					windowAddComponent(popUp, c, i + 1 + tmp, 2, fitnessSelect[i]);
 				}
-
-				
 
 				windowAddComponent(popUp, c, 0, 3, tierTitle);
 
@@ -409,8 +407,8 @@ public class Main extends JFrame {
 						int outputMode = 0;// 0: all, 1:copy only, 2:recall only
 						String dataSetFolder = "";
 
-						for(int i = 0; i < fitnessFunction.length; i++){
-							if(fitnessSelect[i].isSelected()){
+						for (int i = 0; i < fitnessFunction.length; i++) {
+							if (fitnessSelect[i].isSelected()) {
 								fitnessIndex = i;
 								break;
 							}
@@ -1120,7 +1118,7 @@ public class Main extends JFrame {
 		}
 	};
 
-	static ActionListener penOff_Off = new ActionListener(){
+	static ActionListener penOff_Off = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			displayMode = 0;
@@ -1128,14 +1126,13 @@ public class Main extends JFrame {
 
 		}
 	};
-	
-	static ActionListener openFileAction = new ActionListener(){
+
+	static ActionListener openFileAction = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			/* Default path */
 			JFileChooser fileChooser = new JFileChooser(".\\Benson_Data");
-			FileNameExtensionFilter filter = new FileNameExtensionFilter("Text Files(*.txt, *.text)", "txt",
-					"text");
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("Text Files(*.txt, *.text)", "txt", "text");
 			fileChooser.setFileFilter(filter);
 
 			switch (fileChooser.showOpenDialog(panel)) {
@@ -1154,140 +1151,139 @@ public class Main extends JFrame {
 		}
 	};
 
-	static ActionListener setCGP = new ActionListener(){
+	static ActionListener setCGP = new ActionListener() {
 		@Override
-			public void actionPerformed(ActionEvent e) {
-				/* New pop up windows */
-				JFrame frame = new JFrame();
-				frame.setSize(600, 360);
-				frame.setTitle("Set CGP Parameters");
-				frame.setVisible(true);
-				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				frame.setLayout(new GridBagLayout());
-				frame.setIconImage(xt_logo.getImage());
+		public void actionPerformed(ActionEvent e) {
+			/* New pop up windows */
+			JFrame frame = new JFrame();
+			frame.setSize(600, 360);
+			frame.setTitle("Set CGP Parameters");
+			frame.setVisible(true);
+			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			frame.setLayout(new GridBagLayout());
+			frame.setIconImage(xt_logo.getImage());
 
-				/* Set Layout Manager */
-				GridBagConstraints c = new GridBagConstraints();
-				c.fill = GridBagConstraints.HORIZONTAL;
+			/* Set Layout Manager */
+			GridBagConstraints c = new GridBagConstraints();
+			c.fill = GridBagConstraints.HORIZONTAL;
 
-				String cgpTags[] = { "Threshold Initial", "Threshold Increment", "Class Numbers", "Nodes", "Arity",
-						"Max Generations", "Update Frequency", "Random number seed", "Mutation Rate", "Input(s)",
-						"Output(s)", "Fitness Function" };
+			String cgpTags[] = { "Threshold Initial", "Threshold Increment", "Class Numbers", "Nodes", "Arity",
+					"Max Generations", "Update Frequency", "Random number seed", "Mutation Rate", "Input(s)",
+					"Output(s)", "Fitness Function" };
 
-				String defaultValue[] = { "10", "10", "4", "20", "3", "100000", "500", "1234", "0.08", "17", "1", "STC" };
-				JLabel params[] = new JLabel[defaultValue.length];
-				TextField cgpParams[] = new TextField[defaultValue.length];
+			String defaultValue[] = { "10", "10", "4", "20", "3", "100000", "500", "1234", "0.08", "17", "1", "STC" };
+			JLabel params[] = new JLabel[defaultValue.length];
+			TextField cgpParams[] = new TextField[defaultValue.length];
 
-				/* Adding components above to the menu */
-				for (int i = 0; i < defaultValue.length; i++) {
-					params[i] = new JLabel(cgpTags[i]);
-					params[i].setFont(xtDefault);
-					windowAddComponent(frame, c, 0, i, params[i]);
+			/* Adding components above to the menu */
+			for (int i = 0; i < defaultValue.length; i++) {
+				params[i] = new JLabel(cgpTags[i]);
+				params[i].setFont(xtDefault);
+				windowAddComponent(frame, c, 0, i, params[i]);
 
-					cgpParams[i] = new TextField(10);
-					cgpParams[i].setFont(xtDefault);
-					cgpParams[i].setText(defaultValue[i]);
-					windowAddComponent(frame, c, 1, i, cgpParams[i]);
-				}
-
-				JButton export = new JButton("Save parameter");
-				JButton launchCGP = new JButton("Launch CGP (in YARCC)");
-				JButton localCGP = new JButton("Launch CGP (in local)");
-
-				export.setFont(xtDefault);
-				windowAddComponent(frame, c, 0, defaultValue.length, export);
-
-				launchCGP.setFont(xtDefault);
-				windowAddComponent(frame, c, 1, defaultValue.length, launchCGP);
-
-				localCGP.setFont(xtDefault);
-				windowAddComponent(frame, c, 2, defaultValue.length, localCGP);
-
-				export.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						FileWriter writer;
-						try {
-							File cgp_Param = new File(".\\Algorithm_Training\\cgp_params.txt");
-							writer = new FileWriter(cgp_Param, false);// false parameter will overwrite previous file
-
-							for (int i = 0; i < cgpTags.length; i++) {
-								writer.append(cgpParams[i].getText());
-								writer.append("\n");
-							}
-
-
-							writer.flush();
-							writer.close();
-						} catch (IOException e2) {
-							e2.printStackTrace();
-						}
-
-					}
-				});
-
-				launchCGP.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						JFrame yarccLogin = new JFrame();
-						yarccLogin.setSize(370, 150);
-						yarccLogin.setVisible(true);
-						yarccLogin.setLayout(new GridBagLayout());
-						yarccLogin.setTitle("Logging in to YARCC");
-						GridBagConstraints c = new GridBagConstraints();
-						c.fill = GridBagConstraints.HORIZONTAL;
-
-						JLabel infoBoard = new JLabel("After login, type ./cgp_run.sh");
-						infoBoard.setFont(xtDefault);
-						windowAddComponent(yarccLogin, c, 0, 0, infoBoard);
-
-						JLabel userName = new JLabel("User Name");
-						userName.setFont(xtDefault);
-						windowAddComponent(yarccLogin, c, 0, 1, userName);
-
-						JLabel pw = new JLabel("Password");
-						pw.setFont(xtDefault);
-						windowAddComponent(yarccLogin, c, 0, 2, pw);
-
-						TextField userInput = new TextField(10);
-						JPasswordField pwInput = new JPasswordField(10);
-						windowAddComponent(yarccLogin, c, 1, 1, userInput);
-						windowAddComponent(yarccLogin, c, 1, 2, pwInput);
-
-						JButton loginConfirm = new JButton("Log In");
-						windowAddComponent(yarccLogin, c, 0, 3, loginConfirm);
-
-						loginConfirm.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								try {
-									yarccLogin.dispose();
-									Runtime.getRuntime().exec("putty.exe " + userInput.getText() + yarccAddress
-											+ " -pw " + pwInput.getText());
-								} catch (Exception e1) {
-									infoBoard.setText("PuTTY.exe missing.");
-								}
-							}
-						});
-					}
-				});
-
-				localCGP.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						try {
-							Runtime.getRuntime().exec(
-									"cmd /c start cmd.exe /K \" cd Algorithm_Training && Algorithm_Training.exe\"");
-						} catch (Exception e1) {
-							e1.printStackTrace();
-						}
-					}
-				});
-
+				cgpParams[i] = new TextField(10);
+				cgpParams[i].setFont(xtDefault);
+				cgpParams[i].setText(defaultValue[i]);
+				windowAddComponent(frame, c, 1, i, cgpParams[i]);
 			}
+
+			JButton export = new JButton("Save parameter");
+			JButton launchCGP = new JButton("Launch CGP (in YARCC)");
+			JButton localCGP = new JButton("Launch CGP (in local)");
+
+			export.setFont(xtDefault);
+			windowAddComponent(frame, c, 0, defaultValue.length, export);
+
+			launchCGP.setFont(xtDefault);
+			windowAddComponent(frame, c, 1, defaultValue.length, launchCGP);
+
+			localCGP.setFont(xtDefault);
+			windowAddComponent(frame, c, 2, defaultValue.length, localCGP);
+
+			export.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					FileWriter writer;
+					try {
+						File cgp_Param = new File(".\\Algorithm_Training\\cgp_params.txt");
+						writer = new FileWriter(cgp_Param, false);// false parameter will overwrite previous file
+
+						for (int i = 0; i < cgpTags.length; i++) {
+							writer.append(cgpParams[i].getText());
+							writer.append("\n");
+						}
+
+						writer.flush();
+						writer.close();
+					} catch (IOException e2) {
+						e2.printStackTrace();
+					}
+
+				}
+			});
+
+			launchCGP.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					JFrame yarccLogin = new JFrame();
+					yarccLogin.setSize(370, 150);
+					yarccLogin.setVisible(true);
+					yarccLogin.setLayout(new GridBagLayout());
+					yarccLogin.setTitle("Logging in to YARCC");
+					GridBagConstraints c = new GridBagConstraints();
+					c.fill = GridBagConstraints.HORIZONTAL;
+
+					JLabel infoBoard = new JLabel("After login, type ./cgp_run.sh");
+					infoBoard.setFont(xtDefault);
+					windowAddComponent(yarccLogin, c, 0, 0, infoBoard);
+
+					JLabel userName = new JLabel("User Name");
+					userName.setFont(xtDefault);
+					windowAddComponent(yarccLogin, c, 0, 1, userName);
+
+					JLabel pw = new JLabel("Password");
+					pw.setFont(xtDefault);
+					windowAddComponent(yarccLogin, c, 0, 2, pw);
+
+					TextField userInput = new TextField(10);
+					JPasswordField pwInput = new JPasswordField(10);
+					windowAddComponent(yarccLogin, c, 1, 1, userInput);
+					windowAddComponent(yarccLogin, c, 1, 2, pwInput);
+
+					JButton loginConfirm = new JButton("Log In");
+					windowAddComponent(yarccLogin, c, 0, 3, loginConfirm);
+
+					loginConfirm.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							try {
+								yarccLogin.dispose();
+								Runtime.getRuntime().exec("putty.exe " + userInput.getText() + yarccAddress + " -pw "
+										+ pwInput.getText());
+							} catch (Exception e1) {
+								infoBoard.setText("PuTTY.exe missing.");
+							}
+						}
+					});
+				}
+			});
+
+			localCGP.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					try {
+						Runtime.getRuntime()
+								.exec("cmd /c start cmd.exe /K \" cd Algorithm_Training && Algorithm_Training.exe\"");
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+				}
+			});
+
+		}
 	};
 
-	static ActionListener exportLibSVMAction = new ActionListener(){
+	static ActionListener exportLibSVMAction = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			JFileChooser fileChooser = new JFileChooser(".\\Sheets");

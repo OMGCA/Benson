@@ -1,21 +1,5 @@
-<<<<<<< HEAD
 # depslib dependency file v1.0
-1521422208 source:m:\eclipse-workspace\bensonfigure\algorithm_training\src\cgp.c
-	<stdio.h>
-	<stdlib.h>
-	<string.h>
-	<time.h>
-	<math.h>
-	<float.h>
-	"cgp.h"
-
-1521422208 m:\eclipse-workspace\bensonfigure\algorithm_training\src\cgp.h
-
-1541430772 source:m:\eclipse-workspace\bensonfigure\algorithm_training\src\main.c
-	<stdio.h>
-	"cgp-sls.h"
-
-1524516654 source:m:\eclipse-workspace\bensonfigure\algorithm_training\src\cgp-sls.c
+1552042208 source:m:\benson\algorithm_training\src\cgp-sls.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -24,34 +8,25 @@
 	<float.h>
 	"cgp-sls.h"
 
-1524513539 m:\eclipse-workspace\bensonfigure\algorithm_training\src\cgp-sls.h
+1552042208 m:\benson\algorithm_training\src\cgp-sls.h
 
-=======
-# depslib dependency file v1.0
-1521422208 source:m:\eclipse-workspace\bensonfigure\algorithm_training\src\cgp.c
+1552321838 source:m:\benson\algorithm_training\src\fitness_functions.c
 	<stdio.h>
+	<math.h>
 	<stdlib.h>
 	<string.h>
-	<time.h>
-	<math.h>
-	<float.h>
-	"cgp.h"
-
-1521422208 m:\eclipse-workspace\bensonfigure\algorithm_training\src\cgp.h
-
-1541430772 source:m:\eclipse-workspace\bensonfigure\algorithm_training\src\main.c
-	<stdio.h>
 	"cgp-sls.h"
+	<time.h>
+	"fitness_functions.h"
 
-1524516654 source:m:\eclipse-workspace\bensonfigure\algorithm_training\src\cgp-sls.c
+1552321775 m:\benson\algorithm_training\src\fitness_functions.h
+
+1552322082 source:m:\benson\algorithm_training\src\main.c
 	<stdio.h>
+	<math.h>
 	<stdlib.h>
 	<string.h>
-	<time.h>
-	<math.h>
-	<float.h>
 	"cgp-sls.h"
+	<time.h>
+	"fitness_functions.h"
 
-1524513539 m:\eclipse-workspace\bensonfigure\algorithm_training\src\cgp-sls.h
-
->>>>>>> 1229decac5352a7e36b46e1be8fe10a5c814f8bb
