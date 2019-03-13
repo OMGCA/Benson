@@ -1,6 +1,5 @@
 package xiatstudio;
 
-import java.awt.CheckboxGroup;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -64,7 +63,6 @@ public class Main extends JFrame {
 		System.setProperty("awt.useSystemAAFontSettings", "on");
 		System.setProperty("swing.aatext", "true");
 		GUISetup();
-		System.gc();
 	}
 
 	public static void GUISetup() {
@@ -1259,7 +1257,7 @@ public class Main extends JFrame {
 							try {
 								yarccLogin.dispose();
 								Runtime.getRuntime().exec("putty.exe " + userInput.getText() + yarccAddress + " -pw "
-										+ pwInput.getText());
+										+ pwInput.getPassword().toString());
 							} catch (Exception e1) {
 								infoBoard.setText("PuTTY.exe missing.");
 							}
@@ -1293,12 +1291,155 @@ public class Main extends JFrame {
 			switch (fileChooser.showOpenDialog(panel)) {
 			case JFileChooser.APPROVE_OPTION:
 				String dataPending = fileChooser.getSelectedFile().getPath();
-				// exportLibSVMData(dataPending);
+				exportLibSVMData(dataPending);
 				System.gc();
 				break;
 			}
 
 		}
 	};
+
+	public static void dataKFold(String srcFolder, int iteration){
+		File srcFileFolder = new File(srcFolder);
+		File srcTraining = new File(srcFileFolder.getPath() + "\\01_training.csv");
+		File srcValidation = new File(srcFileFolder.getPath() + "\\02_validation.csv");
+		File srcTesting = new File(srcFileFolder.getPath() + "\\03_testing.csv");
+
+		File kFoldFile = new File(srcFolder+"_fold");
+
+		kFoldFile.mkdir();
+
+		int sampleRate = 2;
+		String line = "";
+
+		int trainCount, validateCount, testCount;
+
+		List<String> swapTrain;
+		List<String> swapValidate;
+		List<String> swapTest;
+
+		List<String> keepTrain;
+		List<String> keepValidate;
+		List<String> keepTest;
+
+		for(int i = 0; i < iteration; i++){
+			swapTrain = new ArrayList<String>();
+			swapValidate = new ArrayList<String>();
+			swapTest = new ArrayList<String>();
+
+			keepTrain = new ArrayList<String>();
+			keepValidate = new ArrayList<String>();
+			keepTest = new ArrayList<String>();
+
+			File nFolder = new File(kFoldFile.getPath() + "\\fold_" + i);
+			nFolder.mkdir();
+
+			File nFoldTraining = new File(nFolder.getPath() + "\\01_training.csv");
+			File nFoldValidation = new File(nFolder.getPath() + "\\02_validation.csv");
+			File nFoldTesting = new File(nFolder.getPath() + "\\03_testing.csv");
+
+			try{
+				nFoldTraining.createNewFile();
+				nFoldValidation.createNewFile();
+				nFoldTesting.createNewFile();
+			} catch (Exception e){
+				e.printStackTrace();
+			}			
+
+			BufferedReader brTraining = null;
+			BufferedReader brValidation = null;
+			BufferedReader brTesting = null;
+
+			FileWriter fwTraining = null;
+			FileWriter fwValidation = null;
+			FileWriter fwTesting = null;
+			
+			try{
+				brTraining = new BufferedReader(new FileReader(srcTraining));
+				brValidation = new BufferedReader(new FileReader(srcValidation));
+				brTesting = new BufferedReader(new FileReader(srcTesting));
+
+				fwTraining = new FileWriter(nFoldTraining);
+				fwValidation = new FileWriter(nFoldValidation);
+				fwTesting = new FileWriter(nFoldTesting);
+
+				line = brTraining.readLine();
+				fwTraining.append(line+"\r\n");
+				trainCount = Integer.parseInt(line.split(",")[2]);
+
+				line = brValidation.readLine();
+				fwValidation.append(line+"\r\n");
+				validateCount = Integer.parseInt(line.split(",")[2]);
+
+				line = brTesting.readLine();
+				fwTesting.append(line+"\r\n");
+				testCount = Integer.parseInt(line.split(",")[2]);
+				
+				for(int j = 0; j < trainCount; j++){
+					line = brTraining.readLine();
+					if(j < trainCount - sampleRate)
+						keepTrain.add(line);
+					else
+						swapTrain.add(line);
+				}
+
+				for(int j = 0; j < validateCount; j++){
+					line = brValidation.readLine();
+					if(j < validateCount - sampleRate)
+						keepValidate.add(line);
+					else
+						swapValidate.add(line);
+				}
+
+				for(int j = 0; j < testCount; j++){
+					line = brTesting.readLine();
+					if(j < testCount - sampleRate)
+						keepTest.add(line);
+					else
+						swapTest.add(line);
+				}
+
+
+
+				for(int j = 0; j < trainCount; j++){
+					if(j < sampleRate)
+						fwTraining.append(swapTest.get(j)+"\r\n");
+					else
+						fwTraining.append(keepTrain.get(j-sampleRate)+"\r\n");
+				}
+
+				for(int j = 0; j < validateCount; j++){
+					if(j < sampleRate)
+						fwValidation.append(swapTrain.get(j)+"\r\n");
+					else
+						fwValidation.append(keepValidate.get(j-sampleRate)+"\r\n");
+				}
+
+				for(int j = 0; j < testCount; j++){
+					if(j < sampleRate)
+						fwTesting.append(swapValidate.get(j)+"\r\n");
+					else
+						fwTesting.append(keepTest.get(j-sampleRate)+"\r\n");
+				}
+
+				srcTraining = nFoldTraining;
+				srcValidation = nFoldValidation;
+				srcTesting = nFoldTesting;
+
+				fwTraining.flush();
+				fwTraining.close();
+
+				fwValidation.flush();
+				fwValidation.close();
+
+				fwTesting.flush();
+				fwTesting.close();
+			} catch (Exception e){
+				e.printStackTrace();
+			}
+
+			
+		}
+	}
 
 }

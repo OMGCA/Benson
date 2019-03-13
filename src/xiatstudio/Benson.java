@@ -355,11 +355,11 @@ public class Benson {
 		Color c = new Color(234, 234, 234);
 		g2.setColor(c);
 		g2.setFont(new Font("Inconsolata", Font.PLAIN, 20));
-		String group, id, mode;
+		/*String group, id, mode;
 
 		group = getGroup();
 		id = getID();
-		mode = getFigureMode();
+		mode = getFigureMode();*/
 
 		//infoBoard(g2, group, id, mode);
 
