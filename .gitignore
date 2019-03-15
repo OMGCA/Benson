@@ -8,3 +8,4 @@ Algorithm_Training/*.txt
 *.exe
 *.class
 *.o
+Algorithm_Training/kfolddata

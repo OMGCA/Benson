@@ -63,6 +63,7 @@ public class Main extends JFrame {
 		System.setProperty("awt.useSystemAAFontSettings", "on");
 		System.setProperty("swing.aatext", "true");
 		GUISetup();
+		// dataKFold("./Sheets/DataSet/2019-03-13_15_36_19",10);
 	}
 
 	public static void GUISetup() {
@@ -350,7 +351,17 @@ public class Main extends JFrame {
 
 					windowAddComponent(popUp, c, i, 6, tierRange[i * 2 + 1]);
 
+					tmp = i;
+
 				}
+				JCheckBox kFold = new JCheckBox("Enable k-Fold");
+				kFold.setFont(xtDefault);
+				windowAddComponent(popUp, c, tmp + 1, 4, kFold);
+
+				TextField kFoldVar = new TextField("4");
+				kFoldVar.setFont(xtDefault);
+				windowAddComponent(popUp, c, tmp + 2, 4, kFoldVar);
+
 				JLabel featureTitle = new JLabel("Feature selection");
 				featureTitle.setFont(new Font("Segoe UI", Font.PLAIN, 15));
 				windowAddComponent(popUp, c, 0, 7, featureTitle);
@@ -454,15 +465,20 @@ public class Main extends JFrame {
 							if (pdSelect[i].isSelected())
 								pdCond[i] = i + 1;
 						}
+						String timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date());
 
 						try {
 							dataSetFolder = exportCGPDataSet(trainingRatio, outputMode, featureSelected, cgpOutputMode,
-									classificationScheme, pdCond);
+									classificationScheme, pdCond, timeStamp);
 						} catch (Exception e1) {
 							statusBar.setText("Data export failed.");
 						}
 
 						statusBar.setText("Data set exported to " + dataSetFolder + " folder.");
+
+						if (kFold.isSelected()) {
+							dataKFold(dataSetFolder, Integer.parseInt(kFoldVar.getText()));
+						}
 
 						/* Provide data overwrite option when exporting is done */
 						msg.setVisible(true);
@@ -488,16 +504,67 @@ public class Main extends JFrame {
 									}
 								});
 
-								String tmpFolder = ".\\Sheets\\DataSet\\" + tmpDirs[tmpDirs.length - 1];
+								String tmpFolder;
+								if(kFold.isSelected())
+									tmpFolder = ".\\Sheets\\DataSet\\" + tmpDirs[tmpDirs.length - 2];
+								else
+									tmpFolder = ".\\Sheets\\DataSet\\" + tmpDirs[tmpDirs.length - 1];
+
+								
 								File training = new File(tmpFolder + "\\01_training.csv");
 								File validation = new File(tmpFolder + "\\02_validation.csv");
 								File testing = new File(tmpFolder + "\\03_testing.csv");
+
+								if (kFold.isSelected()) {
+									File srcKFolder = new File(tmpFolder + "_fold");
+									File[] nFolds = srcKFolder.listFiles();
+
+									File desFold = new File(".\\Algorithm_Training\\kfolddata\\");
+									System.gc();
+
+									File[] cgpKFold = desFold.listFiles();
+
+									int foldParam = cgpKFold.length;
+									for(int i = 0; i < foldParam; i++){
+										File[] cgpNFold = cgpKFold[i].listFiles();
+										int nFoldParam = cgpNFold.length;
+
+										for(int j = 0; j < nFoldParam; j++){
+											System.gc();
+											cgpNFold[j].delete();
+										}
+
+										System.gc();
+										cgpKFold[i].delete();
+									}
+									
+									for (int i = 0; i < nFolds.length; i++) {
+										File desFoldN = new File(desFold.getPath() + "\\fold_" + i);
+										desFoldN.mkdir();
+
+										File[] data = nFolds[i].listFiles();
+
+										File desFoldTrain = new File(desFoldN.getPath() + "\\01_training.csv");
+										File desFoldValidate = new File(desFoldN.getPath() + "\\02_validation.csv");
+										File desFoldTest = new File(desFoldN.getPath() + "\\03_testing.csv");
+										System.gc();
+										try {
+											copyFile(data[0], desFoldTrain);
+											copyFile(data[1], desFoldValidate);
+											copyFile(data[2], desFoldTest);
+										} catch (Exception e1) {
+											e1.printStackTrace();
+										}
+
+									}
+								}
 
 								try {
 									/* Overwrite new data set to the cgp root folder */
 									copyFile(training, prevTraining);
 									copyFile(validation, prevValidation);
 									copyFile(testing, prevTesting);
+
 									statusBar.setText("Data set copied to training root folder.");
 								} catch (IOException e1) {
 									e1.printStackTrace();
@@ -739,8 +806,9 @@ public class Main extends JFrame {
 	}
 
 	public static String exportCGPDataSet(double trainingRatio, int mode, boolean[] selections, int outputMode,
-			int classificationScheme, int[] pdCond) {
-		String dataFolder = ".\\Sheets\\DataSet\\" + new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss").format(new Date());
+			int classificationScheme, int[] pdCond, String timeStamp) {
+
+		String dataFolder = ".\\Sheets\\DataSet\\" + timeStamp;
 		File newDataFolder = new File(dataFolder);
 		newDataFolder.mkdir();
 		String overall = newDataFolder.getPath() + "\\00_overall" + ".csv";
@@ -963,7 +1031,7 @@ public class Main extends JFrame {
 			e.printStackTrace();
 		}
 
-		return newDataFolder.getPath() + "\\";
+		return newDataFolder.getPath();
 
 	}
 
@@ -1299,13 +1367,13 @@ public class Main extends JFrame {
 		}
 	};
 
-	public static void dataKFold(String srcFolder, int iteration){
+	public static void dataKFold(String srcFolder, int iteration) {
 		File srcFileFolder = new File(srcFolder);
 		File srcTraining = new File(srcFileFolder.getPath() + "\\01_training.csv");
 		File srcValidation = new File(srcFileFolder.getPath() + "\\02_validation.csv");
 		File srcTesting = new File(srcFileFolder.getPath() + "\\03_testing.csv");
 
-		File kFoldFile = new File(srcFolder+"_fold");
+		File kFoldFile = new File(srcFolder + "_fold");
 
 		kFoldFile.mkdir();
 
@@ -1322,7 +1390,7 @@ public class Main extends JFrame {
 		List<String> keepValidate;
 		List<String> keepTest;
 
-		for(int i = 0; i < iteration; i++){
+		for (int i = 0; i < iteration; i++) {
 			swapTrain = new ArrayList<String>();
 			swapValidate = new ArrayList<String>();
 			swapTest = new ArrayList<String>();
@@ -1338,13 +1406,13 @@ public class Main extends JFrame {
 			File nFoldValidation = new File(nFolder.getPath() + "\\02_validation.csv");
 			File nFoldTesting = new File(nFolder.getPath() + "\\03_testing.csv");
 
-			try{
+			try {
 				nFoldTraining.createNewFile();
 				nFoldValidation.createNewFile();
 				nFoldTesting.createNewFile();
-			} catch (Exception e){
+			} catch (Exception e) {
 				e.printStackTrace();
-			}			
+			}
 
 			BufferedReader brTraining = null;
 			BufferedReader brValidation = null;
@@ -1353,8 +1421,8 @@ public class Main extends JFrame {
 			FileWriter fwTraining = null;
 			FileWriter fwValidation = null;
 			FileWriter fwTesting = null;
-			
-			try{
+
+			try {
 				brTraining = new BufferedReader(new FileReader(srcTraining));
 				brValidation = new BufferedReader(new FileReader(srcValidation));
 				brTesting = new BufferedReader(new FileReader(srcTesting));
@@ -1364,62 +1432,60 @@ public class Main extends JFrame {
 				fwTesting = new FileWriter(nFoldTesting);
 
 				line = brTraining.readLine();
-				fwTraining.append(line+"\r\n");
+				fwTraining.append(line + "\r\n");
 				trainCount = Integer.parseInt(line.split(",")[2]);
 
 				line = brValidation.readLine();
-				fwValidation.append(line+"\r\n");
+				fwValidation.append(line + "\r\n");
 				validateCount = Integer.parseInt(line.split(",")[2]);
 
 				line = brTesting.readLine();
-				fwTesting.append(line+"\r\n");
+				fwTesting.append(line + "\r\n");
 				testCount = Integer.parseInt(line.split(",")[2]);
-				
-				for(int j = 0; j < trainCount; j++){
+
+				for (int j = 0; j < trainCount; j++) {
 					line = brTraining.readLine();
-					if(j < trainCount - sampleRate)
+					if (j < trainCount - sampleRate)
 						keepTrain.add(line);
 					else
 						swapTrain.add(line);
 				}
 
-				for(int j = 0; j < validateCount; j++){
+				for (int j = 0; j < validateCount; j++) {
 					line = brValidation.readLine();
-					if(j < validateCount - sampleRate)
+					if (j < validateCount - sampleRate)
 						keepValidate.add(line);
 					else
 						swapValidate.add(line);
 				}
 
-				for(int j = 0; j < testCount; j++){
+				for (int j = 0; j < testCount; j++) {
 					line = brTesting.readLine();
-					if(j < testCount - sampleRate)
+					if (j < testCount - sampleRate)
 						keepTest.add(line);
 					else
 						swapTest.add(line);
 				}
 
-
-
-				for(int j = 0; j < trainCount; j++){
-					if(j < sampleRate)
-						fwTraining.append(swapTest.get(j)+"\r\n");
+				for (int j = 0; j < trainCount; j++) {
+					if (j < sampleRate)
+						fwTraining.append(swapTest.get(j) + "\r\n");
 					else
-						fwTraining.append(keepTrain.get(j-sampleRate)+"\r\n");
+						fwTraining.append(keepTrain.get(j - sampleRate) + "\r\n");
 				}
 
-				for(int j = 0; j < validateCount; j++){
-					if(j < sampleRate)
-						fwValidation.append(swapTrain.get(j)+"\r\n");
+				for (int j = 0; j < validateCount; j++) {
+					if (j < sampleRate)
+						fwValidation.append(swapTrain.get(j) + "\r\n");
 					else
-						fwValidation.append(keepValidate.get(j-sampleRate)+"\r\n");
+						fwValidation.append(keepValidate.get(j - sampleRate) + "\r\n");
 				}
 
-				for(int j = 0; j < testCount; j++){
-					if(j < sampleRate)
-						fwTesting.append(swapValidate.get(j)+"\r\n");
+				for (int j = 0; j < testCount; j++) {
+					if (j < sampleRate)
+						fwTesting.append(swapValidate.get(j) + "\r\n");
 					else
-						fwTesting.append(keepTest.get(j-sampleRate)+"\r\n");
+						fwTesting.append(keepTest.get(j - sampleRate) + "\r\n");
 				}
 
 				srcTraining = nFoldTraining;
@@ -1434,11 +1500,10 @@ public class Main extends JFrame {
 
 				fwTesting.flush();
 				fwTesting.close();
-			} catch (Exception e){
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
-			
 		}
 	}
 
