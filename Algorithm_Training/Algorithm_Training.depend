@@ -10,7 +10,7 @@
 
 1552042208 m:\benson\algorithm_training\src\cgp-sls.h
 
-1552321838 source:m:\benson\algorithm_training\src\fitness_functions.c
+1552651214 source:m:\benson\algorithm_training\src\fitness_functions.c
 	<stdio.h>
 	<math.h>
 	<stdlib.h>
@@ -19,9 +19,9 @@
 	<time.h>
 	"fitness_functions.h"
 
-1552321775 m:\benson\algorithm_training\src\fitness_functions.h
+1552651863 m:\benson\algorithm_training\src\fitness_functions.h
 
-1552645903 source:m:\benson\algorithm_training\src\main.c
+1552652460 source:m:\benson\algorithm_training\src\main.c
 	<stdio.h>
 	<math.h>
 	<stdlib.h>

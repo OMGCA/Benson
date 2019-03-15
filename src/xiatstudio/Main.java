@@ -569,6 +569,53 @@ public class Main extends JFrame {
 								} catch (IOException e1) {
 									e1.printStackTrace();
 								}
+
+								FileWriter writer;
+								try{
+									File cgp_param = new File(".\\Algorithm_Training\\cgp_params2.txt");
+									writer = new FileWriter(cgp_param, false);
+
+									for(int i = 0; i < fitnessFunction.length; i++){
+										if(fitnessSelect[i].isSelected()){
+											writer.append(fitnessSelect[i].getText());
+											writer.append("\n");
+											break;
+										}
+									}
+									int inputs = 0;
+									for(int i = 0; i < featureTag.length; i++){
+										if(featureSelection[i].isSelected())
+											inputs++;
+									}
+									writer.append(String.valueOf(inputs));
+									writer.append("\n");
+
+									int outputs = 0;
+									if(singleOutput.isSelected())
+										outputs = 1;
+									else if(fourOutputs.isSelected())
+										outputs = 4;
+									
+									writer.append(String.valueOf(outputs));
+									writer.append("\n");
+
+									writer.append(kFoldVar.getText());
+									writer.append("\n");
+
+									int isKFold = 0;
+									if(kFold.isSelected())
+										isKFold = 1;
+									else
+										isKFold = 0;
+									
+									writer.append(String.valueOf(isKFold));
+									writer.append("\n");
+
+									writer.flush();
+									writer.close();
+								} catch (IOException e2){
+									e2.printStackTrace();
+								}
 							}
 						});
 
@@ -1234,10 +1281,9 @@ public class Main extends JFrame {
 			c.fill = GridBagConstraints.HORIZONTAL;
 
 			String cgpTags[] = { "Threshold Initial", "Threshold Increment", "Class Numbers", "Nodes", "Arity",
-					"Max Generations", "Update Frequency", "Random number seed", "Mutation Rate", "Input(s)",
-					"Output(s)", "Fitness Function" };
+					"Max Generations", "Update Frequency", "Random number seed", "Mutation Rate"};
 
-			String defaultValue[] = { "10", "10", "4", "20", "3", "100000", "500", "1234", "0.08", "17", "1", "STC" };
+			String defaultValue[] = { "10", "10", "4", "20", "3", "100000", "500", "1234", "0.08"};
 			JLabel params[] = new JLabel[defaultValue.length];
 			TextField cgpParams[] = new TextField[defaultValue.length];
 

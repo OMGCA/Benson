@@ -19,16 +19,17 @@ int main(void)
 	struct dataSet *testData = NULL;
 	struct chromosome *chromo = NULL;
 
-	char **cgp_params = importCGPParams();
+	char **cgp_params = importCGPParams("cgp_params.txt");
+	char **cgp_params2 = importCGPParams("cgp_params2.txt");
 
 	/* Parse parameters from external text file */
 	threshold = atof(cgp_params[0]);
 	threshIncre = atof(cgp_params[1]);
 	classNumber = atof(cgp_params[2]);
 
-	int numInputs = atoi(cgp_params[9]);
+	int numInputs = atoi(cgp_params2[1]);
 	int numNodes = atoi(cgp_params[3]);
-	int numOutputs = atoi(cgp_params[10]);
+	int numOutputs = atoi(cgp_params2[2]);
 	int nodeArity = atoi(cgp_params[4]);
 
 	int numGens = atoi(cgp_params[5]);
@@ -54,7 +55,7 @@ int main(void)
 
 	char *kFoldDataSrc = "./kfolddata";
 
-	setFitnessFromText(strtok(cgp_params[11],"\n"), params);
+	setFitnessFromText(strtok(cgp_params2[0],"\n"), params);
 
 	chromo = runValiTestCGP(params, trainingData, validationData, testData, numGens);
 
@@ -65,68 +66,13 @@ int main(void)
 	saveChromosomeDot(chromo, 0, "chromo.dot");
 
 	/* Display test data execution result */
-	setDisplayAction(strtok(cgp_params[11],"\n"), chromo, testData);
+	setDisplayAction(strtok(cgp_params2[0],"\n"), chromo, testData);
 
 	getBestEntity();
 
-	/*struct chromosome* kFoldChromo[10];
-	struct dataSet* kFoldTraining[10];
-	struct dataSet* kFoldValidation[10];
-	struct dataSet* kFoldTest[10];
-
-	int i = 0;
-	for(i = 0; i < 10; i++){
-        kFoldChromo[i] = NULL;
-        kFoldTraining[i] = NULL;
-        kFoldValidation[i] = NULL;
-        kFoldTest[i] = NULL;
-        char foldIndex[10];
-        char nFold[80];
-        strcpy(nFold, kFoldDataSrc);
-        strcat(nFold,"/fold_");
-        itoa(i,foldIndex,10);
-        strcat(nFold,foldIndex);
-
-        char foldTrain[80];
-        strcpy(foldTrain, nFold);
-
-        char foldValidate[80];
-        strcpy(foldValidate, nFold);
-
-        char foldTest[80];
-        strcpy(foldTest, nFold);
-
-        strcat(foldTrain, "/01_training.csv");
-        strcat(foldValidate, "/02_validation.csv");
-        strcat(foldTest, "/03_testing.csv");
-
-        kFoldTraining[i] = initialiseDataSetFromFile(foldTrain);
-        kFoldValidation[i] = initialiseDataSetFromFile(foldValidate);
-        kFoldTest[i] = initialiseDataSetFromFile(foldTest);
-
-        kFoldChromo[i] = runValiTestCGP(params, kFoldTraining[i], kFoldValidation[i], kFoldTest[i], numGens);
-
-        printChromosome(kFoldChromo[i], 0);
-
-        saveChromosome(kFoldChromo[i], "latest_chromo.chromo");
-        saveChromosomeDot(kFoldChromo[i], 0, "chromo.dot");
-
-        //setDisplayAction(strtok(cgp_params[11],"\n"), chromo, testData);
-
-        getBestEntity();
-
-        //printf("%s\n%s\n%s\n",foldTrain, foldValidate, foldTest);
-        freeDataSet(kFoldTraining[i]);
-        freeDataSet(kFoldValidation[i]);
-	}
-
-	for(i = 0; i < 10; i++){
-        printf("\nIteration %d: \n", i);
-        setDisplayAction(strtok(cgp_params[11],"\n"), kFoldChromo[i], kFoldTest[i]);
-        freeChromosome(kFoldChromo[i]);
-        freeDataSet(kFoldTest[i]);
-	}*/
-
+	if(atoi(cgp_params2[4]) == 1)
+		runKFold(params, numGens, atoi(cgp_params2[3]), strtok(cgp_params2[0],"\n"));
+	
 	freeDataSet(trainingData);
 	freeDataSet(validationData);
 	freeDataSet(testData);
