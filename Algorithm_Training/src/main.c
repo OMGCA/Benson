@@ -59,6 +59,7 @@ int main(void)
 
 	chromo = runValiTestCGP(params, trainingData, validationData, testData, numGens);
 
+
 	printChromosome(chromo, 0);
 
 	/* Save the chromosome in external file */
@@ -70,9 +71,9 @@ int main(void)
 
 	getBestEntity();
 
-	if(atoi(cgp_params2[4]) == 1)
-		runKFold(params, numGens, atoi(cgp_params2[3]), strtok(cgp_params2[0],"\n"));
-	
+	//if(atoi(cgp_params2[4]) == 1)
+		//runKFold(params, numGens, atoi(cgp_params2[3]), strtok(cgp_params2[0],"\n"));
+
 	freeDataSet(trainingData);
 	freeDataSet(validationData);
 	freeDataSet(testData);

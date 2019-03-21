@@ -63,7 +63,6 @@ public class Main extends JFrame {
 		System.setProperty("awt.useSystemAAFontSettings", "on");
 		System.setProperty("swing.aatext", "true");
 		GUISetup();
-		// dataKFold("./Sheets/DataSet/2019-03-13_15_36_19",10);
 	}
 
 	public static void GUISetup() {
@@ -98,6 +97,8 @@ public class Main extends JFrame {
 		menuBar.add(menu);
 		menuBar.add(menu2);
 		menuBar.add(menu3);
+
+		/* As described in initialization params. */
 		menuItem = new JMenuItem("Open");
 
 		exportMenu = new JMenu("Export as...");
@@ -1423,7 +1424,7 @@ public class Main extends JFrame {
 
 		kFoldFile.mkdir();
 
-		int sampleRate = 2;
+		
 		String line = "";
 
 		int trainCount, validateCount, testCount;
@@ -1488,6 +1489,8 @@ public class Main extends JFrame {
 				line = brTesting.readLine();
 				fwTesting.append(line + "\r\n");
 				testCount = Integer.parseInt(line.split(",")[2]);
+
+				int sampleRate = (int)Math.floor((trainCount * 2 / iteration)+0.5);
 
 				for (int j = 0; j < trainCount; j++) {
 					line = brTraining.readLine();

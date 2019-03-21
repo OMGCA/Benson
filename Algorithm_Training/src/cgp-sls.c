@@ -3813,7 +3813,7 @@ struct chromosome *runValiTestCGP(struct parameters *params, struct dataSet *dat
 																																							   //printf("%d\t%5.2f\t%5.2f\t%5.2f\n", gen, bestChromo->fitness, valiChromo->fitness, testChromo->fitness); /* SLS validation and test fitness */
 
 			/* XT create new text file */
-			char **tmpFitness = malloc(3 * sizeof(char *));
+			char **tmpFitness = malloc(3 * sizeof(char*));
 			char *genString = malloc(10 * sizeof(char));
 			int tmp = 0;
 
@@ -3841,6 +3841,8 @@ struct chromosome *runValiTestCGP(struct parameters *params, struct dataSet *dat
 
 		/* SLS free testChromo as now finished with reporting test fitness for this generaion */
 		freeChromosome(testChromo);
+
+
 
 		/*
 			Set the chromosomes which will be used by the selection scheme
@@ -3884,6 +3886,7 @@ struct chromosome *runValiTestCGP(struct parameters *params, struct dataSet *dat
 		/* create the children from the parents */
 		params->reproductionScheme(params, parentChromos, childrenChromos, params->mu, params->lambda);
 	}
+
 	fclose(filePtr);
 	/* deal with formatting for displaying progress */
 	if (params->updateFrequency != 0)
@@ -4071,10 +4074,10 @@ struct chromosome *fRunValiTestCGP(struct parameters *params, struct dataSet *da
 		}
 
 		/* SLS free valiChromo as now finished with reporting validation fitness for this generaion */
-		free(valiChromo);
+		freeChromosome(valiChromo);
 
 		/* SLS free testChromo as now finished with reporting test fitness for this generaion */
-		free(testChromo);
+		freeChromosome(testChromo);
 
 		/*
 			Set the chromosomes which will be used by the selection scheme

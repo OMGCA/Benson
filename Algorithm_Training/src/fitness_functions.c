@@ -203,9 +203,9 @@ int getBestEntity(void)
 		}
 		if (atof(fitnessSeg[1]) >= atof(fitnessSeg[2]))
 		{
-			if (atof(fitnessSeg[2]) > tmpBest[2])
+			if (atof(fitnessSeg[2]) == tmpBest[2])
 			{
-				if (atof(fitnessSeg[3]) > tmpBest[3])
+				if (atof(fitnessSeg[3]) >= tmpBest[3])
 				{
 					for (i = 0; i < 4; i++)
 					{
@@ -213,7 +213,18 @@ int getBestEntity(void)
 					}
 				}
 			}
+			else if(atof(fitnessSeg[2]) > tmpBest[2])
+            {
+                for (i = 0; i < 4; i++)
+                {
+                    tmpBest[i] = atof(fitnessSeg[i]);
+                }
+			}
 		}
+		for(i = 0; i < 4; i++){
+            free(fitnessSeg[i]);
+		}
+		free(fitnessSeg);
 	}
 	printf("\nBest gen at %.0f with fitness of %.2f, %.2f and %.2f.\n", tmpBest[0], tmpBest[1], tmpBest[2], tmpBest[3]);
 	return 1;
@@ -366,7 +377,7 @@ void runKFold(struct parameters *params, int numGens, int kFoldVar, char *fitnes
         kFoldValidation[i] = initialiseDataSetFromFile(foldValidate);
         kFoldTest[i] = initialiseDataSetFromFile(foldTest);
 
-        kFoldChromo[i] = runValiTestCGP(params, kFoldTraining[i], kFoldValidation[i], kFoldTest[i], numGens);
+		kFoldChromo[i] = runValiTestCGP(params, kFoldTraining[i], kFoldValidation[i], kFoldTest[i], numGens);
 
         printChromosome(kFoldChromo[i], 0);
 
