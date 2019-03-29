@@ -173,15 +173,18 @@ char **importCGPParams(char *paramFile)
 	return cgp_params;
 }
 
-int getBestEntity(void)
+int getBestEntity(char* randomNum)
 {
 	FILE *fp;
 	char line[256];
 	int i = 0;
 
 	double tmpBest[4] = {0, 0, 0, 0};
+	char outputFileName[20] = "_CGP_Output.txt";
+	strtok(randomNum, "\n");
+	strcat(randomNum, outputFileName);
 
-	fp = fopen("CGP_Output.txt", "r");
+	fp = fopen(randomNum, "r");
 	if (fp == NULL)
 	{
 		printf("File not found.");
@@ -213,7 +216,7 @@ int getBestEntity(void)
 					}
 				}
 			}
-			else if(atof(fitnessSeg[2]) > tmpBest[2])
+			else if(atof(fitnessSeg[2]) > tmpBest[2] && fabs(atof(fitnessSeg[2]) - atof(fitnessSeg[3])) < 30)
             {
                 for (i = 0; i < 4; i++)
                 {
@@ -337,7 +340,7 @@ void setDisplayAction(char *arr, struct chromosome *chromo, struct dataSet *test
 	}
 }
 
-void runKFold(struct parameters *params, int numGens, int kFoldVar, char *fitnessFunction){
+void runKFold(struct parameters *params, int numGens, int kFoldVar, char *fitnessFunction, char* randomNum){
 	char *kFoldDataSrc = "./kfolddata";
 
 	struct chromosome* kFoldChromo[kFoldVar];
@@ -386,7 +389,7 @@ void runKFold(struct parameters *params, int numGens, int kFoldVar, char *fitnes
 
         //setDisplayAction(strtok(cgp_params[11],"\n"), chromo, testData);
 
-        getBestEntity();
+        getBestEntity(randomNum);
 
         //printf("%s\n%s\n%s\n",foldTrain, foldValidate, foldTest);
         freeDataSet(kFoldTraining[i]);

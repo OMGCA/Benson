@@ -18,7 +18,7 @@ double totalSum(struct parameters *params, struct chromosome *chromo, struct dat
 
 int maxIndex(double *arr);
 char **importCGPParams(char *paramFile);
-int getBestEntity(void);
+int getBestEntity(char* randomNum);
 
 void stcAction(struct chromosome *chromo, struct dataSet *testData);
 void ftcAction(struct chromosome *chromo, struct dataSet *testData);
@@ -26,6 +26,6 @@ void tsAction(struct chromosome *chromo, struct dataSet *testData);
 void setDisplayAction(char *arr, struct chromosome *chromo, struct dataSet *testData);
 void setFitnessFromText(char *arr, struct parameters *params);
 
-void runKFold(struct parameters *params, int numGens, int kFoldVar, char *fitnessFunction);
+void runKFold(struct parameters *params, int numGens, int kFoldVar, char *fitnessFunction, char *randomNum);
 
 #endif // FITNESS_FUNCTIONS_H_INCLUDED

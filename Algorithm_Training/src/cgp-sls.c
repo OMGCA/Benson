@@ -33,6 +33,7 @@
 #include <float.h>
 
 #include "cgp-sls.h"
+#include "fitness_functions.h"
 
 /*
 	Hard limits on the size of the function set
@@ -3756,6 +3757,15 @@ struct chromosome *runValiTestCGP(struct parameters *params, struct dataSet *dat
 	{
 		setChromosomeFitness(params, parentChromos[i], data);
 	}
+	char outputFileName[20] = "_CGP_Output.txt";
+
+	char **cgp_params = importCGPParams("cgp_params.txt");
+    char randomNum[30];
+    strtok(cgp_params[7],"\n");
+    strcpy(randomNum, cgp_params[7]);
+    strcat(randomNum, outputFileName);
+
+	FILE *filePtr = fopen(randomNum, "w");
 
 	/* show the user whats going on */
 	if (params->updateFrequency != 0)
@@ -3763,7 +3773,7 @@ struct chromosome *runValiTestCGP(struct parameters *params, struct dataSet *dat
 		printf("\n-- Starting CGP --\n\n");
 		printf("Gen\tFitness\t\tValidation fitness\tTest fitness\n");
 	}
-	FILE *filePtr = fopen("CGP_Output.txt", "w");
+
 
 	/* for each generation */
 	for (gen = 0; gen < numGens; gen++)

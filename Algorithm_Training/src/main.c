@@ -69,7 +69,7 @@ int main(void)
 	/* Display test data execution result */
 	setDisplayAction(strtok(cgp_params2[0],"\n"), chromo, testData);
 
-	getBestEntity();
+	getBestEntity(cgp_params[7]);
 
 	//if(atoi(cgp_params2[4]) == 1)
 		//runKFold(params, numGens, atoi(cgp_params2[3]), strtok(cgp_params2[0],"\n"));
