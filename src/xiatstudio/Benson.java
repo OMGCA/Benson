@@ -653,12 +653,18 @@ public class Benson {
 				if (displayMode < 4) {
 					g2.setColor(colorSet.get(displayMode - 1));
 					groupComponents.get(displayMode - 1).drawComponent(g2);
-				} else {
+				} else if(displayMode == 4) {
 					for (int i = 0; i < 3; i++) {
 						g2.setColor(colorSet.get(i));
 						groupComponents.get(i).drawComponent(g2);
 					}
 					markPenoff(g2);
+				} else {
+					for (int i = 0; i < 3; i++) {
+						g2.setColor(colorSet.get(i));
+						groupComponents.get(i).drawComponent(g2);
+					}
+					plotHesitation(g2);
 				}
 
 			}
@@ -771,15 +777,25 @@ public class Benson {
 
 	public void plotHesitation(Graphics2D g2) {
 		int tickJump = 5;
+		int tmpSize = 8;
+		int tmpCounter = 10;
+		g2.setColor(new Color(0, 90, 200,90));
 
 		for (int i = 0; i < this.timeStamp - tickJump; i++) {
 			if (this.penPressure[i] != 0 && this.penPressure[i + tickJump] != 0) {
 				float[] tmpX = { this.xAxis[i], this.xAxis[i + tickJump] };
 				float[] tmpY = { this.yAxis[i], this.yAxis[i + tickJump] };
 				if ((getDistanceBetweenPoints(tmpX, tmpY)) < 0.1) {
-					g2.setColor(new Color(255, 0, 0));
-					g2.fillOval((int) tmpX[0], (int) tmpY[0], 8, 8);
+					g2.fillOval((int) tmpX[0], (int) tmpY[0], tmpSize, tmpSize);
 				}
+				if(tmpCounter % 10 == 0) {
+					tmpSize++;
+				}
+				tmpCounter++;
+					
+			}
+			else {
+				tmpSize = 8;
 			}
 		}
 	}

@@ -97,6 +97,7 @@ double simpleThresholdClassifier(struct parameters *params, struct chromosome *c
 
 		/* If the actual output doesn't lie in the threshold range that defined by the class */
 		/* Error counter increments by 1 */
+
 		if (chromoOutput < threshold + (expectedClass - 1) * threshIncre || chromoOutput >= threshold + expectedClass * threshIncre)
 		{
 			threshError++;

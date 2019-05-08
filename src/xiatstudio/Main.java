@@ -57,6 +57,7 @@ public class Main extends JFrame {
 	static ImageIcon xt_logo = new ImageIcon("xt_logo.png");
 	static JFrame frame = new JFrame();
 	static int fitnessIndex = 0;
+	static Benson testFigure;
 
 	public static void main(String[] args) {
 		/* Load GUI component */
@@ -76,11 +77,11 @@ public class Main extends JFrame {
 		/* Initialize JFrame and Menu bar */
 
 		JMenuBar menuBar = new JMenuBar();
-		JMenu menu, menu2, menu3, exportMenu, exportAllMenu;
+		JMenu menu, menu2, menu3, menu4, exportMenu, exportAllMenu;
 		JMenuItem menuItem, menuItem2, menuItem3, menuItem4, menuItem5, menuItem6, menuItem7;
 		JMenuItem exportLibSVMData, setCGPParams;
 		JMenuItem displayModeMenu[] = new JMenuItem[4];
-		JMenuItem pen_offON, pen_offOFF;
+		JMenuItem pen_offON, pen_offOFF, hesOn, hesOff;
 
 		/* Background color */
 		// Color bg = new Color(54, 63, 70);
@@ -89,14 +90,20 @@ public class Main extends JFrame {
 		menu = new JMenu("File");
 		menu2 = new JMenu("Component");
 		menu3 = new JMenu("Off-paper tracking");
+		menu4 = new JMenu("Hesitation Mark");
 		pen_offON = new JMenuItem("ON");
 		pen_offOFF = new JMenuItem("OFF");
+		hesOn = new JMenuItem("ON");
+		hesOff = new JMenuItem("OFF");
 		menu3.add(pen_offON);
 		menu3.add(pen_offOFF);
+		menu4.add(hesOn);
+		menu4.add(hesOff);
 
 		menuBar.add(menu);
 		menuBar.add(menu2);
 		menuBar.add(menu3);
+		menuBar.add(menu4);
 
 		/* As described in initialization params. */
 		menuItem = new JMenuItem("Open");
@@ -153,6 +160,9 @@ public class Main extends JFrame {
 		pen_offON.addActionListener(penOff_On);
 
 		pen_offOFF.addActionListener(penOff_Off);
+		
+		hesOn.addActionListener(hes_On);
+		hesOff.addActionListener(hes_Off);
 
 		/* Open file action */
 		menuItem.addActionListener(openFileAction);
@@ -1219,7 +1229,7 @@ public class Main extends JFrame {
 					RenderingHints.VALUE_ANTIALIAS_ON);
 
 			g2.setRenderingHints(hints);
-			Benson testFigure = new Benson(data, 0);
+			testFigure = new Benson(data, 0);
 			testFigure.drawBenson(g2, displayMode);
 		}
 	}
@@ -1240,6 +1250,24 @@ public class Main extends JFrame {
 
 		}
 	};
+	
+	static ActionListener hes_On = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			displayMode = 5;
+			panel.repaint();
+		}
+	};
+	
+	static ActionListener hes_Off = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			displayMode = 0;
+			panel.repaint();
+
+		}
+	};
+	
 
 	static ActionListener openFileAction = new ActionListener() {
 		@Override
