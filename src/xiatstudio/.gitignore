@@ -1,0 +1,14 @@
+*.png
+*.jar
+Sheets/DataSet/
+Algorithm_Training/*.csv
+Algorithm_Training/*.txt
+.settings
+.vscode
+*.exe
+*.class
+*.o
+Algorithm_Training/kfolddata
+bin/
+Matlab_dataplot/*.png
+.csv
