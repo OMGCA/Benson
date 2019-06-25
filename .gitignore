@@ -9,3 +9,4 @@ Algorithm_Training/*.txt
 *.class
 *.o
 Algorithm_Training/kfolddata
+bin/
