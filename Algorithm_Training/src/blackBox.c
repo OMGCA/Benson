@@ -11,36 +11,38 @@ int main(void)
 {
 
     int i = 0;
-    char **controlData = importFile("controlConsole.csv");
-    char **controlID = malloc(53 * sizeof(char*));
-    for(i = 0; i < 53; i++)
+    char **controlData = importFile("dataSet.csv");
+    printf("%d\n",(int)sizeof(controlData));
+    int entries = 163;
+    char **controlID = malloc(entries * sizeof(char*));
+    for(i = 0; i < entries; i++)
     {
         controlID[i] = (char*)malloc(10*sizeof(char));
     }
 
-    double *controlDataArr = malloc(53 * sizeof(double));
+    double *controlDataArr = malloc(entries * sizeof(double));
 
-    for(i = 0; i < 53; i++)
+    for(i = 0; i < entries; i++)
     {
         char* tmpID = (char*)strSplit(controlData[i],",",0);
         strcpy(controlID[i],tmpID);
         free(tmpID);
-        //controlID[i] = strSplit(controlData[i],",",0);
+
         char* tmpData = strSplit(controlData[i],",",1);
         controlDataArr[i] = atof(tmpData);
         free(tmpData);
     }
 
-    insertionSort(controlDataArr,controlID,53);
+    insertionSort(controlDataArr,controlID,entries);
 
-    for(i = 0; i < 53; i++)
+    for(i = 0; i < entries; i++)
     {
         printf("%s %.2f\n", controlID[i], controlDataArr[i]);
     }
 
-    printf("%s\n", controlID[binarySearch(controlDataArr,53,35450.0)]);
+    printf("%s\n", controlID[binarySearch(controlDataArr,entries,43238.0)]);
 
-    for(i = 0; i < 53; i++)
+    for(i = 0; i < entries; i++)
     {
         free(controlData[i]);
         free(controlID[i]);

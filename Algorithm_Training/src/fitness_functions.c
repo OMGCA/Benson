@@ -239,14 +239,42 @@ void ftcAction(struct chromosome *chromo, struct dataSet *testData)
 {
 	int i;
 	int mismatchError = 0;
+
+	char **originalDataSet = importFile("dataSet.csv");
+	int entries = 163;
+	
+	char **entrantID = malloc(entries * sizeof(char*));
+	for(i = 0; i < entries; i++)
+	{
+		entrantID[i] = (char*) malloc(10*sizeof(char));
+	}
+
+	double *entrantFootprint = malloc(entries*sizeof(double));
+
+	for(i = 0; i < entries; i++)
+	{
+		char* tmpID = (char*) strSplit(originalDataSet[i],",",0);
+		strcpy(entrantID[i], tmpID);
+		free(tmpID);
+
+		char* tmpData = strSplit(originalDataSet[i],",",1);
+		entrantFootprint[i] = atof(tmpData);
+		free(tmpData);
+	}
+
+	insertionSort(entrantFootprint, entrantID, entries);
+
 	for (i = 0; i < getNumDataSetSamples(testData); i++)
 	{
 		executeChromosome(chromo, getDataSetSampleInputs(testData, i));
 
 		double *chromoOutput = malloc(4 * sizeof(double));
 		double *expectedOutput = getDataSetSampleOutputs(testData, i);
+		double dataInput = getDataSetSampleInput(testData,i,0);
 
-		printf("Entity %d: \n", i + 1);
+		int idIndex = binarySearch(entrantFootprint, entries, dataInput*100000);
+
+		printf("Entity %d | Entrant ID %s\n", i + 1, entrantID[idIndex]);
 		printf("CGP Output: ");
 		int j = 0;
 		for (j = 0; j < 4; j++)
@@ -260,24 +288,33 @@ void ftcAction(struct chromosome *chromo, struct dataSet *testData)
 		{
 			printf("%.2f%% ", softmaxOutput[j] * 100);
 		}
-		printf("\nExpected Class: ");
+
+		printf("\nExpected Class: \t");
 		pdDecode(maxIndex(expectedOutput));
-		printf("\nCGP Output Class: ");
+		printf("\tSoftmax: %.2f%%",softmaxOutput[maxIndex(expectedOutput)] * 100);
+
+		printf("\nCGP Output Class: \t");
 		pdDecode(maxIndex(chromoOutput));
+		printf("\tSoftmax: %.2f%%",softmaxOutput[maxIndex(chromoOutput)] * 100);
+
 		if (maxIndex(chromoOutput) != maxIndex(expectedOutput))
 		{
 			mismatchError++;
 		}
-		//
-		//		else
-		//			printf("Match ");
-
-		//		for(j = 0; j < 4; j++){
-		//			printf("%.2f ", expectedOutput[j]);
-		//		}
 
 		printf("\n\n");
+
+		
 	}
+	free(entrantFootprint);
+	int j = 0;
+	for(j = 0; j < entries; j++)
+	{
+		free(entrantID[i]);
+		free(originalDataSet[i]);
+	}
+	free(entrantID);
+	free(originalDataSet);
 	printf("Accuracy = %.4f (%d/%d)", 100 - ((float)mismatchError * 100 / getNumDataSetSamples(testData)), (getNumDataSetSamples(testData) - mismatchError), getNumDataSetSamples(testData));
 }
 
