@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1561465823 source:m:\benson\algorithm_training\src\cgp-sls.c
+1561465962 source:m:\benson\algorithm_training\src\cgp-sls.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -11,7 +11,7 @@
 
 1552045808 m:\benson\algorithm_training\src\cgp-sls.h
 
-1561465769 source:m:\benson\algorithm_training\src\fitness_functions.c
+1561466678 source:m:\benson\algorithm_training\src\fitness_functions.c
 	<stdio.h>
 	<math.h>
 	<stdlib.h>
@@ -20,9 +20,9 @@
 	<time.h>
 	"fitness_functions.h"
 
-1561465800 m:\benson\algorithm_training\src\fitness_functions.h
+1561466218 m:\benson\algorithm_training\src\fitness_functions.h
 
-1561465781 source:m:\benson\algorithm_training\src\main.c
+1561465962 source:m:\benson\algorithm_training\src\main.c
 	<stdio.h>
 	<math.h>
 	<stdlib.h>
@@ -31,6 +31,7 @@
 	<time.h>
 	"fitness_functions.h"
 
-1561465510 source:m:\benson\algorithm_training\src\blackbox.c
+1561466651 source:m:\benson\algorithm_training\src\blackbox.c
 	<stdio.h>
+	"fitness_functions.h"
 

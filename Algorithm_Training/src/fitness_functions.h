@@ -32,5 +32,6 @@ double* softmax(double arr[], int arrLength);
 void pdDecode(int index);
 
 char **importFile(char *fileName, int arrSize);
+char *strSplit(char *strArr, char *delimiter, int index);
 
 #endif // FITNESS_FUNCTIONS_H_INCLUDED

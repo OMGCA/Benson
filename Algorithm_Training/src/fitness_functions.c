@@ -450,3 +450,21 @@ char **importFile(char *fileName, int arrSize)
     fclose(fp);
     return strArr;
 }
+
+char *strSplit(char *strArr, char *delimiter, int index)
+{
+    char *ptr = strtok(strArr, delimiter);
+    if(index != 0)
+    {
+
+        int i = 0;
+        for(i = 0; i < index; i++)
+        {
+            ptr = strtok(NULL, delimiter);
+        }
+    }
+
+
+
+    return ptr;
+}
