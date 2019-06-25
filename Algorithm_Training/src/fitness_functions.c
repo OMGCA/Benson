@@ -134,14 +134,14 @@ double totalSum(struct parameters *params, struct chromosome *chromo, struct dat
 		double expectedOutput = getDataSetSampleOutputs(data, i)[0];
 
 		/* Set error threshold */
-		if(fabs(expectedOutput - chromoOutput) >= 8)
-            error++;
+		if (fabs(expectedOutput - chromoOutput) >= 8)
+			error++;
 	}
 
 	return error / getNumDataSetSamples(data);
 }
 
-int getBestEntity(char* randomNum)
+int getBestEntity(char *randomNum)
 {
 	FILE *fp;
 	char line[256];
@@ -156,7 +156,7 @@ int getBestEntity(char* randomNum)
 	if (fp == NULL)
 	{
 		printf("File not found.");
-        return 0;
+		return 0;
 	}
 
 	while (fgets(line, sizeof(line), fp))
@@ -184,16 +184,17 @@ int getBestEntity(char* randomNum)
 					}
 				}
 			}
-			else if(atof(fitnessSeg[2]) > tmpBest[2] && fabs(atof(fitnessSeg[2]) - atof(fitnessSeg[3])) < 30)
-            {
-                for (i = 0; i < 4; i++)
-                {
-                    tmpBest[i] = atof(fitnessSeg[i]);
-                }
+			else if (atof(fitnessSeg[2]) > tmpBest[2] && fabs(atof(fitnessSeg[2]) - atof(fitnessSeg[3])) < 30)
+			{
+				for (i = 0; i < 4; i++)
+				{
+					tmpBest[i] = atof(fitnessSeg[i]);
+				}
 			}
 		}
-		for(i = 0; i < 4; i++){
-            free(fitnessSeg[i]);
+		for (i = 0; i < 4; i++)
+		{
+			free(fitnessSeg[i]);
 		}
 		free(fitnessSeg);
 	}
@@ -201,7 +202,8 @@ int getBestEntity(char* randomNum)
 	return 1;
 }
 
-void stcAction(struct chromosome *chromo, struct dataSet *testData){
+void stcAction(struct chromosome *chromo, struct dataSet *testData)
+{
 	int i;
 	int mismatchError = 0;
 	for (i = 0; i < getNumDataSetSamples(testData); i++)
@@ -214,13 +216,15 @@ void stcAction(struct chromosome *chromo, struct dataSet *testData){
 		int expectedOutput = getDataSetSampleOutputs(testData, i)[0];
 		printf("%.2f ", chromoOutput);
 
-        if (chromoOutput <= threshold+(expectedOutput-1)*threshIncre || chromoOutput > threshold+expectedOutput*threshIncre){
-            printf("Mismatch ");
-            mismatchError++;
-        }
-        else{
-            printf("Match ");
-        }
+		if (chromoOutput <= threshold + (expectedOutput - 1) * threshIncre || chromoOutput > threshold + expectedOutput * threshIncre)
+		{
+			printf("Mismatch ");
+			mismatchError++;
+		}
+		else
+		{
+			printf("Match ");
+		}
 
 		printf(" %.2f", getDataSetSampleOutputs(testData, i)[0]);
 		printf("\n");
@@ -231,47 +235,54 @@ void stcAction(struct chromosome *chromo, struct dataSet *testData){
 	printf("\n");
 }
 
-void ftcAction(struct chromosome *chromo, struct dataSet *testData){
+void ftcAction(struct chromosome *chromo, struct dataSet *testData)
+{
 	int i;
 	int mismatchError = 0;
-	for(i = 0;i < getNumDataSetSamples(testData);i++){
-		executeChromosome(chromo, getDataSetSampleInputs(testData,i));
-		double *chromoOutput = malloc(4*sizeof(double));
-		double *expectedOutput = getDataSetSampleOutputs(testData,i);
-		printf("Entity %d: \n", i+1);
+	for (i = 0; i < getNumDataSetSamples(testData); i++)
+	{
+		executeChromosome(chromo, getDataSetSampleInputs(testData, i));
+
+		double *chromoOutput = malloc(4 * sizeof(double));
+		double *expectedOutput = getDataSetSampleOutputs(testData, i);
+
+		printf("Entity %d: \n", i + 1);
 		printf("CGP Output: ");
 		int j = 0;
-		for(j = 0; j < 4; j++){
-            chromoOutput[j] = getChromosomeOutput(chromo,j);
+		for (j = 0; j < 4; j++)
+		{
+			chromoOutput[j] = getChromosomeOutput(chromo, j);
 			printf("%.2f ", chromoOutput[j]);
 		}
 		printf("\nSoftmax Probability: ");
-		double* softmaxOutput = softmax(chromoOutput,4);
-		for(j = 0; j < 4; j++){
-            printf("%.2f%% ", softmaxOutput[j]*100);
+		double *softmaxOutput = softmax(chromoOutput, 4);
+		for (j = 0; j < 4; j++)
+		{
+			printf("%.2f%% ", softmaxOutput[j] * 100);
 		}
 		printf("\nExpected Class: ");
 		pdDecode(maxIndex(expectedOutput));
 		printf("\nCGP Output Class: ");
 		pdDecode(maxIndex(chromoOutput));
-		if(maxIndex(chromoOutput) != maxIndex(expectedOutput)){
+		if (maxIndex(chromoOutput) != maxIndex(expectedOutput))
+		{
 			mismatchError++;
 		}
-//
-//		else
-//			printf("Match ");
+		//
+		//		else
+		//			printf("Match ");
 
-//		for(j = 0; j < 4; j++){
-//			printf("%.2f ", expectedOutput[j]);
-//		}
+		//		for(j = 0; j < 4; j++){
+		//			printf("%.2f ", expectedOutput[j]);
+		//		}
 
 		printf("\n\n");
-
 	}
-    printf("Accuracy = %.4f (%d/%d)", 100 - ((float)mismatchError * 100 / getNumDataSetSamples(testData)), (getNumDataSetSamples(testData) - mismatchError), getNumDataSetSamples(testData));
+	printf("Accuracy = %.4f (%d/%d)", 100 - ((float)mismatchError * 100 / getNumDataSetSamples(testData)), (getNumDataSetSamples(testData) - mismatchError), getNumDataSetSamples(testData));
 }
 
-void tsAction(struct chromosome *chromo, struct dataSet *testData){
+void tsAction(struct chromosome *chromo, struct dataSet *testData)
+{
 	int i;
 	for (i = 0; i < getNumDataSetSamples(testData); i++)
 	{
@@ -289,182 +300,205 @@ void tsAction(struct chromosome *chromo, struct dataSet *testData){
 		printf("\n");
 	}
 
-
 	printf("\n");
 }
 
-void setFitnessFromText(char *arr, struct parameters *params){
-	if(strcmp(arr,"STC") == 0){
+void setFitnessFromText(char *arr, struct parameters *params)
+{
+	if (strcmp(arr, "STC") == 0)
+	{
 		setCustomFitnessFunction(params, simpleThresholdClassifier, "STC");
-
 	}
-	else if(strcmp(arr,"FTC") == 0){
+	else if (strcmp(arr, "FTC") == 0)
+	{
 		setCustomFitnessFunction(params, fourOutputFitnessFunction, "FTC");
 	}
-	else if (strcmp(arr,"TS") == 0){
+	else if (strcmp(arr, "TS") == 0)
+	{
 		setCustomFitnessFunction(params, totalSum, "TS");
 	}
 }
 
-void setDisplayAction(char *arr, struct chromosome *chromo, struct dataSet *testData){
-	if(strcmp(arr,"STC") == 0){
+void setDisplayAction(char *arr, struct chromosome *chromo, struct dataSet *testData)
+{
+	if (strcmp(arr, "STC") == 0)
+	{
 		stcAction(chromo, testData);
 	}
-	else if(strcmp(arr,"FTC") == 0){
+	else if (strcmp(arr, "FTC") == 0)
+	{
 		ftcAction(chromo, testData);
 	}
-	else if (strcmp(arr,"TS") == 0){
+	else if (strcmp(arr, "TS") == 0)
+	{
 		tsAction(chromo, testData);
 	}
 }
 
-void runKFold(struct parameters *params, int numGens, int kFoldVar, char *fitnessFunction, char* randomNum){
+void runKFold(struct parameters *params, int numGens, int kFoldVar, char *fitnessFunction, char *randomNum)
+{
 	char *kFoldDataSrc = "./kfolddata";
 
-	struct chromosome* kFoldChromo[kFoldVar];
-	struct dataSet* kFoldTraining[kFoldVar];
-	struct dataSet* kFoldValidation[kFoldVar];
-	struct dataSet* kFoldTest[kFoldVar];
+	struct chromosome *kFoldChromo[kFoldVar];
+	struct dataSet *kFoldTraining[kFoldVar];
+	struct dataSet *kFoldValidation[kFoldVar];
+	struct dataSet *kFoldTest[kFoldVar];
 
 	int i = 0;
-	for(i = 0; i < kFoldVar; i++){
-        kFoldChromo[i] = NULL;
-        kFoldTraining[i] = NULL;
-        kFoldValidation[i] = NULL;
-        kFoldTest[i] = NULL;
+	for (i = 0; i < kFoldVar; i++)
+	{
+		kFoldChromo[i] = NULL;
+		kFoldTraining[i] = NULL;
+		kFoldValidation[i] = NULL;
+		kFoldTest[i] = NULL;
 
-        char foldIndex[kFoldVar];
-        char nFold[80];
+		char foldIndex[kFoldVar];
+		char nFold[80];
 
-        strcpy(nFold, kFoldDataSrc);
-        strcat(nFold,"/fold_");
-        itoa(i,foldIndex,kFoldVar);
-        strcat(nFold,foldIndex);
+		strcpy(nFold, kFoldDataSrc);
+		strcat(nFold, "/fold_");
+		itoa(i, foldIndex, kFoldVar);
+		strcat(nFold, foldIndex);
 
-        char foldTrain[80];
-        strcpy(foldTrain, nFold);
+		char foldTrain[80];
+		strcpy(foldTrain, nFold);
 
-        char foldValidate[80];
-        strcpy(foldValidate, nFold);
+		char foldValidate[80];
+		strcpy(foldValidate, nFold);
 
-        char foldTest[80];
-        strcpy(foldTest, nFold);
+		char foldTest[80];
+		strcpy(foldTest, nFold);
 
-        strcat(foldTrain, "/01_training.csv");
-        strcat(foldValidate, "/02_validation.csv");
-        strcat(foldTest, "/03_testing.csv");
+		strcat(foldTrain, "/01_training.csv");
+		strcat(foldValidate, "/02_validation.csv");
+		strcat(foldTest, "/03_testing.csv");
 
-        kFoldTraining[i] = initialiseDataSetFromFile(foldTrain);
-        kFoldValidation[i] = initialiseDataSetFromFile(foldValidate);
-        kFoldTest[i] = initialiseDataSetFromFile(foldTest);
+		kFoldTraining[i] = initialiseDataSetFromFile(foldTrain);
+		kFoldValidation[i] = initialiseDataSetFromFile(foldValidate);
+		kFoldTest[i] = initialiseDataSetFromFile(foldTest);
 
 		kFoldChromo[i] = runValiTestCGP(params, kFoldTraining[i], kFoldValidation[i], kFoldTest[i], numGens);
 
-        printChromosome(kFoldChromo[i], 0);
+		printChromosome(kFoldChromo[i], 0);
 
-        saveChromosome(kFoldChromo[i], "latest_chromo.chromo");
-        saveChromosomeDot(kFoldChromo[i], 0, "chromo.dot");
+		saveChromosome(kFoldChromo[i], "latest_chromo.chromo");
+		saveChromosomeDot(kFoldChromo[i], 0, "chromo.dot");
 
-        //setDisplayAction(strtok(cgp_params[11],"\n"), chromo, testData);
+		//setDisplayAction(strtok(cgp_params[11],"\n"), chromo, testData);
 
-        getBestEntity(randomNum);
+		getBestEntity(randomNum);
 
-        //printf("%s\n%s\n%s\n",foldTrain, foldValidate, foldTest);
-        freeDataSet(kFoldTraining[i]);
-        freeDataSet(kFoldValidation[i]);
+		//printf("%s\n%s\n%s\n",foldTrain, foldValidate, foldTest);
+		freeDataSet(kFoldTraining[i]);
+		freeDataSet(kFoldValidation[i]);
 	}
 
-	for(i = 0; i < kFoldVar; i++){
-        printf("\nIteration %d: \n", i);
-        setDisplayAction(fitnessFunction, kFoldChromo[i], kFoldTest[i]);
-        freeChromosome(kFoldChromo[i]);
-        freeDataSet(kFoldTest[i]);
+	for (i = 0; i < kFoldVar; i++)
+	{
+		printf("\nIteration %d: \n", i);
+		setDisplayAction(fitnessFunction, kFoldChromo[i], kFoldTest[i]);
+		freeChromosome(kFoldChromo[i]);
+		freeDataSet(kFoldTest[i]);
 	}
-
 }
 
-double* softmax(double arr[], int arrLength)
+double *softmax(double arr[], int arrLength)
 {
-    double logSum = 0;
-    double* logArr = malloc(arrLength * sizeof(double));
-    double* logAns = malloc(arrLength * sizeof(double));
-    int i = 0;
+	double logSum = 0;
+	double *logArr = malloc(arrLength * sizeof(double));
+	double *logAns = malloc(arrLength * sizeof(double));
+	int i = 0;
 
-    for(i = 0; i < arrLength; i++)
-    {
+	for (i = 0; i < arrLength; i++)
+	{
 
-        logArr[i] = exp(arr[i]);
-        //printf("%.3f ",exp(arr[i]));
+		logArr[i] = exp(arr[i]);
+		//printf("%.3f ",exp(arr[i]));
 
-        logSum+=exp(arr[i]);
-    }
-    for(i = 0; i < arrLength; i++)
-    {
-        logAns[i] = logArr[i] / logSum;
-    }
+		logSum += exp(arr[i]);
+	}
+	for (i = 0; i < arrLength; i++)
+	{
+		logAns[i] = logArr[i] / logSum;
+	}
 
-    return logAns;
-
+	return logAns;
 }
 
 void pdDecode(int index)
 {
-    if(index == 0)
-        printf("PD-NC");
-    else if(index == 1)
-        printf("PD-MCI");
-    else if(index == 2)
-        printf("PD-D");
-    else if(index == 3)
-        printf("HC");
+	if (index == 0)
+		printf("PD-NC");
+	else if (index == 1)
+		printf("PD-MCI");
+	else if (index == 2)
+		printf("PD-D");
+	else if (index == 3)
+		printf("HC");
 }
 
 char **importFile(char *fileName, int arrSize)
 {
-    FILE *fp;
-    char line[1024];
-    int i = 0;
+	FILE *fp;
+	char line[1024];
+	int i = 0;
 
-    char **strArr = malloc(arrSize * sizeof(char *));
+	char **strArr = malloc(arrSize * sizeof(char *));
 
-    fp = fopen(fileName, "r");
+	fp = fopen(fileName, "r");
 
-    if(fp == NULL)
-    {
-        printf("File not found");
-        return 0;
-    }
+	if (fp == NULL)
+	{
+		printf("File not found");
+		return 0;
+	}
 
-    for(i = 0; i < arrSize; i++)
-    {
-        strArr[i] = malloc(1024 * sizeof(char));
-    }
-    i = 0;
+	for (i = 0; i < arrSize; i++)
+	{
+		strArr[i] = malloc(1024 * sizeof(char));
+	}
+	i = 0;
 
-    while(fgets(line, sizeof(line), fp))
-    {
-        strcpy(strArr[i], line);
-        i++;
-    }
+	while (fgets(line, sizeof(line), fp))
+	{
+		strcpy(strArr[i], line);
+		i++;
+	}
 
-    fclose(fp);
-    return strArr;
+	fclose(fp);
+	return strArr;
 }
 
 char *strSplit(char *strArr, char *delimiter, int index)
 {
-    char *ptr = strtok(strArr, delimiter);
-    if(index != 0)
-    {
+	char *ptr = strtok(strArr, delimiter);
+	if (index != 0)
+	{
 
-        int i = 0;
-        for(i = 0; i < index; i++)
-        {
-            ptr = strtok(NULL, delimiter);
-        }
-    }
+		int i = 0;
+		for (i = 0; i < index; i++)
+		{
+			ptr = strtok(NULL, delimiter);
+		}
+	}
 
+	return ptr;
+}
 
+void insertionSort(double *arr, int length)
+{
+	int i, j;
+	double key;
+	for(i = 1; i < length; i++)
+	{
+		key = arr[i];
+		j = i - 1;
+		while(j >= 0 && arr[j] > key)
+		{
+			arr[j+1] = arr[j];
+			j--;
+		}
+		arr[j+1] = key;
+	}
 
-    return ptr;
 }

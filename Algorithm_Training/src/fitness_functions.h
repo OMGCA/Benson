@@ -34,4 +34,6 @@ void pdDecode(int index);
 char **importFile(char *fileName, int arrSize);
 char *strSplit(char *strArr, char *delimiter, int index);
 
+void insertionSort(double *arr, int length);
+
 #endif // FITNESS_FUNCTIONS_H_INCLUDED
