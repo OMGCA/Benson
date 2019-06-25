@@ -10,3 +10,4 @@ Algorithm_Training/*.txt
 *.o
 Algorithm_Training/kfolddata
 bin/
+Matlab_dataplot/*.png
