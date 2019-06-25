@@ -485,20 +485,41 @@ char *strSplit(char *strArr, char *delimiter, int index)
 	return ptr;
 }
 
-void insertionSort(double *arr, int length)
+void insertionSort(double *arr, char **idArr, int length)
 {
 	int i, j;
 	double key;
 	for(i = 1; i < length; i++)
 	{
 		key = arr[i];
+		char *key2 = idArr[i];
 		j = i - 1;
 		while(j >= 0 && arr[j] > key)
 		{
 			arr[j+1] = arr[j];
+			idArr[j+1] = idArr[j];
 			j--;
 		}
 		arr[j+1] = key;
+		idArr[j+1] = key2;
+	}
+}
+
+int binarySearch(double *arr, int arrSize, double target)
+{
+	int left = 0;
+	int right = arrSize - 1;
+	int middle;
+	while(left <= right)
+	{
+		middle = (int)floor((left+right)/2);
+		if(arr[middle] < target)
+			left = middle + 1;
+		else if(arr[middle] > target)
+			right = middle - 1;
+		else
+			return middle;
 	}
 
+	return -1;
 }

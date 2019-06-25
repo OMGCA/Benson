@@ -34,6 +34,7 @@ void pdDecode(int index);
 char **importFile(char *fileName, int arrSize);
 char *strSplit(char *strArr, char *delimiter, int index);
 
-void insertionSort(double *arr, int length);
+void insertionSort(double *arr, char **idArr, int length);
+int binarySearch(double *arr, int arrSize, double target);
 
 #endif // FITNESS_FUNCTIONS_H_INCLUDED
