@@ -471,18 +471,30 @@ char **importFile(char *fileName, int arrSize)
 
 char *strSplit(char *strArr, char *delimiter, int index)
 {
-	char *ptr = strtok(strArr, delimiter);
-	if (index != 0)
-	{
 
-		int i = 0;
-		for (i = 0; i < index; i++)
-		{
-			ptr = strtok(NULL, delimiter);
-		}
-	}
+    int i = 0;
+    char *tmpBuffer = (char*) malloc(strlen(strArr)*2*sizeof(char));
 
-	return ptr;
+    strcpy(tmpBuffer, strArr);
+    char *ptr = (char*) malloc(64*sizeof(char));
+    //ptr = strtok(tmpBuffer, delimiter);
+    strcpy(ptr,strtok(tmpBuffer, delimiter));
+
+
+    for (i = 0; i < index; i++)
+    {
+        strcpy(ptr,strtok(NULL, delimiter));
+        //ptr = strtok(NULL, delimiter);
+    }
+
+    char *rtnStr = (char*) malloc(strlen(ptr)*sizeof(char));
+    strcpy(rtnStr,ptr);
+
+    free(tmpBuffer);
+    free(ptr);
+
+
+	return rtnStr;
 }
 
 void insertionSort(double *arr, char **idArr, int length)
