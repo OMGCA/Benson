@@ -28,4 +28,7 @@ void setFitnessFromText(char *arr, struct parameters *params);
 
 void runKFold(struct parameters *params, int numGens, int kFoldVar, char *fitnessFunction, char *randomNum);
 
+double* softmax(double arr[], int arrLength);
+void pdDecode(int index);
+
 #endif // FITNESS_FUNCTIONS_H_INCLUDED

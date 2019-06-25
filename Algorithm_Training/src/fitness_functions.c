@@ -406,3 +406,39 @@ void runKFold(struct parameters *params, int numGens, int kFoldVar, char *fitnes
 
 }
 
+double* softmax(double arr[], int arrLength)
+{
+    double logSum = 0;
+    double* logArr = malloc(arrLength * sizeof(double));
+    double* logAns = malloc(arrLength * sizeof(double));
+    int i = 0;
+
+    for(i = 0; i < arrLength; i++)
+    {
+
+        logArr[i] = exp(arr[i]);
+        //printf("%.3f ",exp(arr[i]));
+
+        logSum+=exp(arr[i]);
+    }
+    for(i = 0; i < arrLength; i++)
+    {
+        logAns[i] = logArr[i] / logSum;
+    }
+
+    return logAns;
+
+}
+
+void pdDecode(int index)
+{
+    if(index == 0)
+        printf("PD-NC");
+    else if(index == 1)
+        printf("PD-MCI");
+    else if(index == 2)
+        printf("PD-D");
+    else if(index == 3)
+        printf("HC");
+}
+
