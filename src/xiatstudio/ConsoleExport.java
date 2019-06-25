@@ -37,8 +37,9 @@ public class ConsoleExport {
 		for (int i = 0; i < dataList.length; i++) {
 			Benson tmpBenson = new Benson(dataList[i], 0);
 			tmpBenson.calcThreeLength();
+			String[] tmpBensonDataSplit = tmpBenson.getData().split("\\\\");
 
-			String[] dataPending = { tmpBenson.getData().substring(0, tmpBenson.getData().lastIndexOf('.')),
+			String[] dataPending = { tmpBensonDataSplit[tmpBensonDataSplit.length-1].split("_")[1],
 					String.valueOf(tmpBenson.timeSpent), String.valueOf(tmpBenson.getTotalLength()),
 					String.valueOf(tmpBenson.getSize()[0] * tmpBenson.getSize()[1]),
 					String.valueOf((double) (tmpBenson.getSize()[0] / tmpBenson.getSize()[1] / 10)),
