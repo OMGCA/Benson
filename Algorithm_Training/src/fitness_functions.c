@@ -271,24 +271,34 @@ void ftcAction(struct chromosome *chromo, struct dataSet *testData){
 		executeChromosome(chromo, getDataSetSampleInputs(testData,i));
 		double *chromoOutput = malloc(4*sizeof(double));
 		double *expectedOutput = getDataSetSampleOutputs(testData,i);
+		printf("Entity %d: \n", i+1);
+		printf("CGP Output: ");
 		int j = 0;
 		for(j = 0; j < 4; j++){
             chromoOutput[j] = getChromosomeOutput(chromo,j);
 			printf("%.2f ", chromoOutput[j]);
 		}
+		printf("\nSoftmax Probability: ");
+		double* softmaxOutput = softmax(chromoOutput,4);
+		for(j = 0; j < 4; j++){
+            printf("%.2f%% ", softmaxOutput[j]*100);
+		}
+		printf("\nExpected Class: ");
+		pdDecode(maxIndex(expectedOutput));
+		printf("\nCGP Output Class: ");
+		pdDecode(maxIndex(chromoOutput));
 		if(maxIndex(chromoOutput) != maxIndex(expectedOutput)){
-			printf("Mismatch ");
 			mismatchError++;
 		}
+//
+//		else
+//			printf("Match ");
 
-		else
-			printf("Match ");
+//		for(j = 0; j < 4; j++){
+//			printf("%.2f ", expectedOutput[j]);
+//		}
 
-		for(j = 0; j < 4; j++){
-			printf("%.2f ", expectedOutput[j]);
-		}
-
-		printf("\n");
+		printf("\n\n");
 
 	}
     printf("Accuracy = %.4f (%d/%d)", 100 - ((float)mismatchError * 100 / getNumDataSetSamples(testData)), (getNumDataSetSamples(testData) - mismatchError), getNumDataSetSamples(testData));
