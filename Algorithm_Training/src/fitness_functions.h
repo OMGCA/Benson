@@ -31,7 +31,7 @@ void runKFold(struct parameters *params, int numGens, int kFoldVar, char *fitnes
 double* softmax(double arr[], int arrLength);
 void pdDecode(int index);
 
-char **importFile(char *fileName, int arrSize);
+char **importFile(char *fileName);
 char *strSplit(char *strArr, char *delimiter, int index);
 
 void insertionSort(double *arr, char **idArr, int length);

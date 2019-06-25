@@ -3759,7 +3759,7 @@ struct chromosome *runValiTestCGP(struct parameters *params, struct dataSet *dat
 	}
 	char outputFileName[20] = "_CGP_Output.txt";
 
-	char **cgp_params = importFile("cgp_params.txt", CGP_PARAMS);
+	char **cgp_params = importFile("cgp_params.txt");
     char randomNum[30];
     strtok(cgp_params[7],"\n");
     strcpy(randomNum, cgp_params[7]);

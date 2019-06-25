@@ -437,13 +437,13 @@ void pdDecode(int index)
 		printf("HC");
 }
 
-char **importFile(char *fileName, int arrSize)
+char **importFile(char *fileName)
 {
 	FILE *fp;
 	char line[1024];
-	int i = 0;
+	int i = 1;
 
-	char **strArr = malloc(arrSize * sizeof(char *));
+	char **strArr = malloc(sizeof(char *));
 
 	fp = fopen(fileName, "r");
 
@@ -453,15 +453,12 @@ char **importFile(char *fileName, int arrSize)
 		return 0;
 	}
 
-	for (i = 0; i < arrSize; i++)
-	{
-		strArr[i] = malloc(1024 * sizeof(char));
-	}
-	i = 0;
 
 	while (fgets(line, sizeof(line), fp))
 	{
-		strcpy(strArr[i], line);
+	    strArr = realloc(strArr, i * sizeof(char*));
+		strArr[i-1] = malloc(1024*sizeof(char));
+		strcpy(strArr[i-1], line);
 		i++;
 	}
 
