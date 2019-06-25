@@ -11,3 +11,4 @@ Algorithm_Training/*.txt
 Algorithm_Training/kfolddata
 bin/
 Matlab_dataplot/*.png
+.csv
