@@ -19,8 +19,8 @@ int main(void)
 	struct dataSet *testData = NULL;
 	struct chromosome *chromo = NULL;
 
-	char **cgp_params = importCGPParams("cgp_params.txt");
-	char **cgp_params2 = importCGPParams("cgp_params2.txt");
+	char **cgp_params = importFile("cgp_params.txt", CGP_PARAMS);
+	char **cgp_params2 = importFile("cgp_params2.txt", CGP_PARAMS);
 
 	/* Parse parameters from external text file */
 	threshold = atof(cgp_params[0]);

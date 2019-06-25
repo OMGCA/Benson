@@ -17,7 +17,7 @@ double fourOutputFitnessFunction(struct parameters *params, struct chromosome *c
 double totalSum(struct parameters *params, struct chromosome *chromo, struct dataSet *data);
 
 int maxIndex(double *arr);
-char **importCGPParams(char *paramFile);
+
 int getBestEntity(char* randomNum);
 
 void stcAction(struct chromosome *chromo, struct dataSet *testData);
@@ -30,5 +30,7 @@ void runKFold(struct parameters *params, int numGens, int kFoldVar, char *fitnes
 
 double* softmax(double arr[], int arrLength);
 void pdDecode(int index);
+
+char **importFile(char *fileName, int arrSize);
 
 #endif // FITNESS_FUNCTIONS_H_INCLUDED

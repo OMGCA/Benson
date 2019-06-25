@@ -141,39 +141,6 @@ double totalSum(struct parameters *params, struct chromosome *chromo, struct dat
 	return error / getNumDataSetSamples(data);
 }
 
-char **importCGPParams(char *paramFile)
-{
-	FILE *fp;
-	char line[256];
-	int i = 0;
-
-	char **cgp_params = malloc(CGP_PARAMS * sizeof(char *));
-
-	fp = fopen(paramFile, "r");
-
-	if (fp == NULL)
-	{
-		printf("File not found");
-		return 0;
-	}
-
-	for (i = 0; i < CGP_PARAMS; i++)
-	{
-		cgp_params[i] = malloc(10 * sizeof(char));
-	}
-	i = 0;
-
-	while (fgets(line, sizeof(line), fp))
-	{
-		strcpy(cgp_params[i], line);
-		i++;
-	}
-
-	fclose(fp);
-
-	return cgp_params;
-}
-
 int getBestEntity(char* randomNum)
 {
 	FILE *fp;
@@ -452,4 +419,34 @@ void pdDecode(int index)
         printf("HC");
 }
 
+char **importFile(char *fileName, int arrSize)
+{
+    FILE *fp;
+    char line[1024];
+    int i = 0;
 
+    char **strArr = malloc(arrSize * sizeof(char *));
+
+    fp = fopen(fileName, "r");
+
+    if(fp == NULL)
+    {
+        printf("File not found");
+        return 0;
+    }
+
+    for(i = 0; i < arrSize; i++)
+    {
+        strArr[i] = malloc(1024 * sizeof(char));
+    }
+    i = 0;
+
+    while(fgets(line, sizeof(line), fp))
+    {
+        strcpy(strArr[i], line);
+        i++;
+    }
+
+    fclose(fp);
+    return strArr;
+}
