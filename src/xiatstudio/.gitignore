@@ -1,7 +1,6 @@
 *.png
 *.jar
 Sheets/DataSet/
-Algorithm_Training/*.csv
 Algorithm_Training/*.txt
 .settings
 .vscode

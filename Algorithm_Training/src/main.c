@@ -17,6 +17,7 @@ int main(void)
 	struct dataSet *trainingData = NULL;
 	struct dataSet *validationData = NULL;
 	struct dataSet *testData = NULL;
+	struct dataSet *overallData = NULL;
 	struct chromosome *chromo = NULL;
 
 	char **cgp_params = importFile("cgp_params.txt");
@@ -52,6 +53,7 @@ int main(void)
 	trainingData = initialiseDataSetFromFile("./01_training.csv");
 	validationData = initialiseDataSetFromFile("./02_validation.csv");
 	testData = initialiseDataSetFromFile("./03_testing.csv");
+	overallData = initialiseDataSetFromFile("./overall.csv");
 
 	char *kFoldDataSrc = "./kfolddata";
 
@@ -67,7 +69,14 @@ int main(void)
 	saveChromosomeDot(chromo, 0, "chromo.dot");
 
 	/* Display test data execution result */
-	setDisplayAction(strtok(cgp_params2[0],"\n"), chromo, testData);
+	char userInput;
+	printf("Show test data result or overall result? (T/O):");
+	scanf("%c",&userInput);
+	if(userInput == 't' || userInput == 'T')
+        setDisplayAction(strtok(cgp_params2[0],"\n"), chromo, testData);
+    else if(userInput == 'o' || userInput == 'O')
+        setDisplayAction(strtok(cgp_params2[0],"\n"), chromo, overallData);
+
 
 	getBestEntity(cgp_params[7]);
 
