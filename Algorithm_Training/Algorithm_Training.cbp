@@ -30,10 +30,45 @@
 					<Add option="-s" />
 				</Linker>
 			</Target>
+			<Target title="MainCGP">
+				<Option output="Algorithm_Training" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add library="./CGP-Library.dll" />
+				</Linker>
+			</Target>
+			<Target title="BlackBox">
+				<Option output="Test_Debug" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add library="./CGP-Library.dll" />
+				</Linker>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="src/blackBox.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+			<Option target="BlackBox" />
+		</Unit>
+		<Unit filename="src/blackBox.h">
+			<Option target="Debug" />
+			<Option target="Release" />
+			<Option target="BlackBox" />
+		</Unit>
 		<Unit filename="src/cgp-sls.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -44,6 +79,9 @@
 		<Unit filename="src/fitness_functions.h" />
 		<Unit filename="src/main.c">
 			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+			<Option target="MainCGP" />
 		</Unit>
 		<Extensions>
 			<code_completion />

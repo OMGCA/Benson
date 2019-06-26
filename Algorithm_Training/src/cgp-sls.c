@@ -3757,15 +3757,6 @@ struct chromosome *runValiTestCGP(struct parameters *params, struct dataSet *dat
 	{
 		setChromosomeFitness(params, parentChromos[i], data);
 	}
-	char outputFileName[20] = "_CGP_Output.txt";
-
-	char **cgp_params = importFile("cgp_params.txt");
-    char randomNum[30];
-    strtok(cgp_params[7],"\n");
-    strcpy(randomNum, cgp_params[7]);
-    strcat(randomNum, outputFileName);
-
-	FILE *filePtr = fopen(randomNum, "w");
 
 	/* show the user whats going on */
 	if (params->updateFrequency != 0)
@@ -3774,7 +3765,16 @@ struct chromosome *runValiTestCGP(struct parameters *params, struct dataSet *dat
 		printf("Gen\tFitness\t\tValidation fitness\tTest fitness\n");
 	}
 
+    char outputFileName[20] = "_CGP_Output.txt";
 
+	char **cgp_params = importFile("cgp_params.txt");
+    char randomNum[30];
+    strtok(cgp_params[7],"\n");
+    strcpy(randomNum, cgp_params[7]);
+    strcat(randomNum, outputFileName);
+    free(cgp_params);
+
+	FILE *filePtr = fopen(randomNum, "w");
 	/* for each generation */
 	for (gen = 0; gen < numGens; gen++)
 	{
@@ -3851,8 +3851,6 @@ struct chromosome *runValiTestCGP(struct parameters *params, struct dataSet *dat
 
 		/* SLS free testChromo as now finished with reporting test fitness for this generaion */
 		freeChromosome(testChromo);
-
-
 
 		/*
 			Set the chromosomes which will be used by the selection scheme

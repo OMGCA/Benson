@@ -242,12 +242,13 @@ void ftcAction(struct chromosome *chromo, struct dataSet *testData)
 
 	char **originalDataSet = importFile("dataSet.csv");
 	int entries = 163;
-	
+
 	char **entrantID = malloc(entries * sizeof(char*));
 	for(i = 0; i < entries; i++)
 	{
 		entrantID[i] = (char*) malloc(10*sizeof(char));
 	}
+
 
 	double *entrantFootprint = malloc(entries*sizeof(double));
 
@@ -302,9 +303,17 @@ void ftcAction(struct chromosome *chromo, struct dataSet *testData)
 			mismatchError++;
 		}
 
+		free(softmaxOutput);
+		free(chromoOutput);
+		for(i = 0; i < entries; i++)
+        {
+            free(entrantID[i]);
+        }
+        free(entrantID);
+
 		printf("\n\n");
 
-		
+
 	}
 	free(entrantFootprint);
 	int j = 0;
@@ -458,6 +467,8 @@ double *softmax(double arr[], int arrLength)
 	{
 		logAns[i] = logArr[i] / logSum;
 	}
+
+	free(logArr);
 
 	return logAns;
 }
