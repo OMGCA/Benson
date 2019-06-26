@@ -151,6 +151,11 @@ void cgpExecute(void)
     char outputPath[50] = "./CGP_Outputs/";
     strcat(outputPath, kFoldIndexFLN);
 
+    if(kFoldIndex == 0)
+        printf("\nData set: original\n");
+    else
+        printf("\nData set: Fold %d\n",kFoldIndex);
+
     /* Read the evolution process file to automatically select best generation */
     getBestEntity(outputPath);
 

@@ -271,7 +271,6 @@ void ftcAction(struct chromosome *chromo, struct dataSet *testData)
 		double dataInput = getDataSetSampleInput(testData,i,0);
 
 		int idIndex = binarySearch(entrantFootprint, entries, dataInput*100000);
-
 		printf("Entity %d | Entrant ID %s\n", i + 1, entrantID[idIndex]);
 		printf("CGP Output: ");
 		int j = 0;
