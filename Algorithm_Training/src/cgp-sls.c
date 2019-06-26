@@ -3765,7 +3765,7 @@ struct chromosome *runValiTestCGP(struct parameters *params, struct dataSet *dat
 		printf("Gen\tFitness\t\tValidation fitness\tTest fitness\n");
 	}
 
-    char outputFileName[20] = "_CGP_Output_.txt";
+    char outputFileName[20] = "_CGP_Output.txt";
     char cgpOutputPath[20] = "./CGP_Outputs/";
 
 	char **cgp_params = importFile("cgp_params.txt");

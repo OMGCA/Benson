@@ -100,7 +100,27 @@ void cgpExecute(void)
 
     setDisplayAction(strtok(cgp_params2[0],"\n"), chromo, testData);
 
-    getBestEntity(cgp_params[7]);
+    char outputFileName[30];
+    strcpy(outputFileName, "_CGP_Output.txt");
+
+    char randomNum[30];
+    char kFoldIndexFLN[10];
+
+    strtok(cgp_params[7],"\n");
+    strtok(cgp_params[9],"\n");
+
+    strcpy(randomNum, cgp_params[7]);
+    strcpy(kFoldIndexFLN, cgp_params[9]);
+
+    strcat(randomNum,outputFileName);
+
+    strcat(kFoldIndexFLN,"_");
+    strcat(kFoldIndexFLN,randomNum);
+    char outputPath[50] = "./CGP_Outputs/";
+    strcat(outputPath, kFoldIndexFLN);
+    printf("%s\n",outputPath);
+
+    getBestEntity(outputPath);
 
 	free(cgp_params);
     free(cgp_params2);

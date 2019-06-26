@@ -141,21 +141,18 @@ double totalSum(struct parameters *params, struct chromosome *chromo, struct dat
 	return error / getNumDataSetSamples(data);
 }
 
-int getBestEntity(char *randomNum)
+int getBestEntity(char *fileName)
 {
 	FILE *fp;
 	char line[256];
 	int i = 0;
 
 	double tmpBest[4] = {0, 0, 0, 0};
-	char outputFileName[20] = "_CGP_Output.txt";
-	strtok(randomNum, "\n");
-	strcat(randomNum, outputFileName);
 
-	fp = fopen(randomNum, "r");
+	fp = fopen(fileName, "r");
 	if (fp == NULL)
 	{
-		printf("File not found.");
+		printf("\nFile not found.\n");
 		return 0;
 	}
 
