@@ -3,6 +3,7 @@
 Sheets/DataSet/
 Algorithm_Training/*.csv
 Algorithm_Training/*.txt
+Algorithm_Training/CGP_Outputs/*.txt
 .settings
 .vscode
 *.exe

@@ -3765,16 +3765,28 @@ struct chromosome *runValiTestCGP(struct parameters *params, struct dataSet *dat
 		printf("Gen\tFitness\t\tValidation fitness\tTest fitness\n");
 	}
 
-    char outputFileName[20] = "_CGP_Output.txt";
+    char outputFileName[20] = "_CGP_Output_.txt";
+    char cgpOutputPath[20] = "./CGP_Outputs/";
 
 	char **cgp_params = importFile("cgp_params.txt");
     char randomNum[30];
+    char kFoldIndex[10];
+
     strtok(cgp_params[7],"\n");
+    strtok(cgp_params[9],"\n");
+
     strcpy(randomNum, cgp_params[7]);
+    strcpy(kFoldIndex, cgp_params[9]);
+
     strcat(randomNum, outputFileName);
+    strcat(kFoldIndex, "_");
+    strcat(kFoldIndex, randomNum);
+
+    strcat(cgpOutputPath, kFoldIndex);
+
     free(cgp_params);
 
-	FILE *filePtr = fopen(randomNum, "w");
+	FILE *filePtr = fopen(cgpOutputPath, "w");
 	/* for each generation */
 	for (gen = 0; gen < numGens; gen++)
 	{
