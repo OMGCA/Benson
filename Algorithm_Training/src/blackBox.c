@@ -10,11 +10,39 @@ double classNumber;
 void idSortTest(void);
 void stringCastTest(void);
 void memoryLeakTest(void);
+void chromoFileNameTest(void);
 
 int main(void)
 {
 
-    memoryLeakTest();
+    chromoFileNameTest();
+
+}
+
+void chromoFileNameTest(void)
+{
+    char **cgpArr = importFile("cgp_params.txt");
+    char chromoFileName[30];
+    strtok(cgpArr[3],"\n");
+    strtok(cgpArr[4],"\n");
+    strtok(cgpArr[8],"\n");
+    double mutRate = atof(cgpArr[8]);
+
+    /* Process the mutation rate entity, in case of identified as file extension */
+    mutRate*=100;
+
+    char mutRateChar[3];
+
+    sprintf(mutRateChar, "%.f",mutRate);
+
+    strcpy(chromoFileName,cgpArr[3]);
+    strcat(chromoFileName,"_");
+    strcat(chromoFileName,cgpArr[4]);
+    strcat(chromoFileName,"_");
+    strcat(chromoFileName,mutRateChar);
+    strcat(chromoFileName,"_chromo.chromo");
+
+    printf("%s\n",chromoFileName);
 
 }
 

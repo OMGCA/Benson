@@ -95,8 +95,27 @@ void cgpExecute(void)
 	printChromosome(chromo, 0);
 
     /* Save the chromosome in external file */
-	saveChromosome(chromo, "latest_chromo.chromo");
-	saveChromosomeDot(chromo, 0, "chromo.dot");
+    char chromoFileName[30] = "./CGP_Chromo/";
+    strtok(cgp_params[3],"\n");
+    strtok(cgp_params[4],"\n");
+    strtok(cgp_params[8],"\n");
+    double mutRate = atof(cgp_params[8]);
+
+    /* Process the mutation rate entity, in case of identified as file extension */
+    mutRate*=100;
+
+    char mutRateChar[3];
+
+    sprintf(mutRateChar, "%.f",mutRate);
+
+    strcat(chromoFileName,cgp_params[3]);
+    strcat(chromoFileName,"_");
+    strcat(chromoFileName,cgp_params[4]);
+    strcat(chromoFileName,"_");
+    strcat(chromoFileName,mutRateChar);
+    strcat(chromoFileName,"_chromo.chromo");
+
+	saveChromosome(chromo, chromoFileName);
 
     setDisplayAction(strtok(cgp_params2[0],"\n"), chromo, testData);
 
@@ -118,7 +137,6 @@ void cgpExecute(void)
     strcat(kFoldIndexFLN,randomNum);
     char outputPath[50] = "./CGP_Outputs/";
     strcat(outputPath, kFoldIndexFLN);
-    printf("%s\n",outputPath);
 
     getBestEntity(outputPath);
 

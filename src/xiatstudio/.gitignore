@@ -1,6 +1,7 @@
 *.png
 *.jar
 Sheets/DataSet/
+Algorithm_Training/*.csv
 Algorithm_Training/*.txt
 .settings
 .vscode
@@ -11,3 +12,5 @@ Algorithm_Training/kfolddata
 bin/
 Matlab_dataplot/*.png
 .csv
+Algorithm_Training/CGP_Outputs/*.txt
+Algorithm_Training/CGP_Chromo/*.chromo
