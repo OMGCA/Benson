@@ -299,16 +299,12 @@ void ftcAction(struct chromosome *chromo, struct dataSet *testData)
 		printf("\tSoftmax: %.2f%%",softmaxOutput[maxIndex(chromoOutput)] * 100);
 
 		if (maxIndex(chromoOutput) != maxIndex(expectedOutput))
-		{
 			mismatchError++;
-		}
 
 		free(softmaxOutput);
 		free(chromoOutput);
 
-
 		printf("\n\n");
-
 
 	}
 	free(entrantFootprint);
@@ -318,6 +314,7 @@ void ftcAction(struct chromosome *chromo, struct dataSet *testData)
 		free(entrantID[i]);
 		free(originalDataSet[i]);
 	}
+
 	free(entrantID);
 	free(originalDataSet);
 	printf("Accuracy = %.4f (%d/%d)", 100 - ((float)mismatchError * 100 / getNumDataSetSamples(testData)), (getNumDataSetSamples(testData) - mismatchError), getNumDataSetSamples(testData));
