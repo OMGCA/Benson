@@ -35,6 +35,7 @@ void cgpExecute(void)
 	threshIncre = atof(cgp_params[1]);
 	classNumber = atof(cgp_params[2]);
 
+	/* Basic CGP parameters */
 	int numNodes    = atoi(cgp_params[3]);
 	int nodeArity   = atoi(cgp_params[4]);
 	int numGens     = atoi(cgp_params[5]);
@@ -43,12 +44,16 @@ void cgpExecute(void)
 	int numInputs   = atoi(cgp_params2[1]);
 	int numOutputs  = atoi(cgp_params2[2]);
 
+	/* The fold needed */
 	int kFoldIndex  = atoi(cgp_params[9]);
 
+	/* Dummy variable for API requirement, not used due to the cost function */
 	double targetFitness = 0.1;
 
+	/* Initialise all parameters in the param struct */
 	params = initialiseParameters(numInputs, numNodes, numOutputs, nodeArity);
 
+	/* Further CGP model parameters */
 	setRandomNumberSeed(atoi(cgp_params[7]));
 	addNodeFunction(params, "add, sub, mul, div");
 	setTargetFitness(params, targetFitness);
@@ -56,6 +61,8 @@ void cgpExecute(void)
 	setShortcutConnections(params, 0);
 	setUpdateFrequency(params, updateFreq);
 
+	/* If kFold index is non-zero, load one of the fold dataset */
+	/* Otherwise, load the default dataset */
     if(kFoldIndex != 0)
     {
         char index[1];
@@ -84,12 +91,15 @@ void cgpExecute(void)
     }
     printParameters(params);
 
+    /* Import dataset to the program */
     trainingData    = initialiseDataSetFromFile(dataTR);
     validationData  = initialiseDataSetFromFile(dataVA);
     testData        = initialiseDataSetFromFile(dataTE);
 
+    /* Set fitness function from the Java output file */
     setFitnessFromText(strtok(cgp_params2[0],"\n"), params);
 
+    /* Execute CGP with vali and test enabled, result stored in file */
 	chromo = runValiTestCGP(params, trainingData, validationData, testData, numGens);
 
 	printChromosome(chromo, 0);
@@ -108,6 +118,7 @@ void cgpExecute(void)
 
     sprintf(mutRateChar, "%.f",mutRate);
 
+    /* Generate chromo file name */
     strcat(chromoFileName,cgp_params[3]);
     strcat(chromoFileName,"_");
     strcat(chromoFileName,cgp_params[4]);
@@ -117,8 +128,10 @@ void cgpExecute(void)
 
 	saveChromosome(chromo, chromoFileName);
 
+	/* Display test dataset detailed result */
     setDisplayAction(strtok(cgp_params2[0],"\n"), chromo, testData);
 
+    /* Generate CGP evolution process file name */
     char outputFileName[30];
     strcpy(outputFileName, "_CGP_Output.txt");
 
@@ -138,8 +151,10 @@ void cgpExecute(void)
     char outputPath[50] = "./CGP_Outputs/";
     strcat(outputPath, kFoldIndexFLN);
 
+    /* Read the evolution process file to automatically select best generation */
     getBestEntity(outputPath);
 
+    /* Free allocated memories */
 	free(cgp_params);
     free(cgp_params2);
 
