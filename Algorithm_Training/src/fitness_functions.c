@@ -305,11 +305,7 @@ void ftcAction(struct chromosome *chromo, struct dataSet *testData)
 
 		free(softmaxOutput);
 		free(chromoOutput);
-		for(i = 0; i < entries; i++)
-        {
-            free(entrantID[i]);
-        }
-        free(entrantID);
+
 
 		printf("\n\n");
 

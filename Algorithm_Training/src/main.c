@@ -98,6 +98,8 @@ void cgpExecute(void)
 	saveChromosome(chromo, "latest_chromo.chromo");
 	saveChromosomeDot(chromo, 0, "chromo.dot");
 
+    setDisplayAction(strtok(cgp_params2[0],"\n"), chromo, testData);
+
     getBestEntity(cgp_params[7]);
 
 	free(cgp_params);
