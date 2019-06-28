@@ -11,11 +11,19 @@ void idSortTest(void);
 void stringCastTest(void);
 void memoryLeakTest(void);
 void chromoFileNameTest(void);
+void stcConfidenceTest(void);
 
 int main(void)
 {
 
-    chromoFileNameTest();
+}
+
+void stcConfidenceTest(void)
+{
+    int thresholdMargin[2] = {100,200};
+    double chromoOutput = 120;
+    double confidence = stcConfidence(thresholdMargin,chromoOutput);
+    printf("%f%%\n",confidence*100);
 
 }
 

@@ -202,6 +202,32 @@ int getBestEntity(char *fileName)
 void stcAction(struct chromosome *chromo, struct dataSet *testData)
 {
 	int i;
+
+	char **originalDataSet = importFile("dataSet.csv");
+	int entries = 163;
+
+	char **entrantID = malloc(entries * sizeof(char*));
+	for(i = 0; i < entries; i++)
+	{
+		entrantID[i] = (char*) malloc(10*sizeof(char));
+	}
+
+
+	double *entrantFootprint = malloc(entries*sizeof(double));
+
+	for(i = 0; i < entries; i++)
+	{
+		char* tmpID = (char*) strSplit(originalDataSet[i],",",0);
+		strcpy(entrantID[i], tmpID);
+		free(tmpID);
+
+		char* tmpData = strSplit(originalDataSet[i],",",1);
+		entrantFootprint[i] = atof(tmpData);
+		free(tmpData);
+	}
+
+	insertionSort(entrantFootprint, entrantID, entries);
+
 	int mismatchError = 0;
 	for (i = 0; i < getNumDataSetSamples(testData); i++)
 	{
@@ -211,9 +237,24 @@ void stcAction(struct chromosome *chromo, struct dataSet *testData)
 
 		chromoOutput = getChromosomeOutput(chromo, 0);
 		int expectedOutput = getDataSetSampleOutputs(testData, i)[0];
+		double dataInput = getDataSetSampleInput(testData,i,0);
+
+		int idIndex = binarySearch(entrantFootprint, entries, dataInput*100000);
+		int thresholdMargin[2] = {threshold + (expectedOutput - 1) * threshIncre,threshold + expectedOutput * threshIncre};
+		int confidenceMargin[2] = {threshold + stcOutputDecode(chromoOutput) * threshIncre,threshold + (stcOutputDecode(chromoOutput)+1) * threshIncre};
+		printf("\nEntity %d | Entrant ID %s\n", i + 1, entrantID[idIndex]);
+		printf("CGP Output: ");
 		printf("%.2f ", chromoOutput);
 
-		if (chromoOutput <= threshold + (expectedOutput - 1) * threshIncre || chromoOutput > threshold + expectedOutput * threshIncre)
+		printf("\nExpected Class: \t");
+		pdDecode(expectedOutput-1);
+		printf("\nConfidence Level: %.3f %%",stcConfidence(confidenceMargin,chromoOutput)*100);
+
+		printf("\nCGP Output Class: \t");
+		pdDecode(stcOutputDecode(chromoOutput));
+		printf("\n");
+
+		if (chromoOutput <= thresholdMargin[0] || chromoOutput > thresholdMargin[1])
 		{
 			printf("Mismatch ");
 			mismatchError++;
@@ -227,7 +268,7 @@ void stcAction(struct chromosome *chromo, struct dataSet *testData)
 		printf("\n");
 	}
 
-	printf("Accuracy = %.4f (%d/%d)", 100 - ((float)mismatchError * 100 / getNumDataSetSamples(testData)), (getNumDataSetSamples(testData) - mismatchError), getNumDataSetSamples(testData));
+	printf("\nAccuracy = %.4f (%d/%d)", 100 - ((float)mismatchError * 100 / getNumDataSetSamples(testData)), (getNumDataSetSamples(testData) - mismatchError), getNumDataSetSamples(testData));
 
 	printf("\n");
 }
@@ -462,6 +503,15 @@ double *softmax(double arr[], int arrLength)
 	return logAns;
 }
 
+double stcConfidence(int thresholdMargin[], double output)
+{
+    double middlePoint = (thresholdMargin[0]+thresholdMargin[1])/2;
+
+    double distance = fabs(output - middlePoint);
+
+    return 1 - distance/fabs(middlePoint - thresholdMargin[0]);
+}
+
 void pdDecode(int index)
 {
 	if (index == 0)
@@ -472,6 +522,25 @@ void pdDecode(int index)
 		printf("PD-D");
 	else if (index == 3)
 		printf("HC");
+    else
+        printf("Non-classified");
+}
+
+int stcOutputDecode(double chromoOutput)
+{
+    double tmpResult = floor(chromoOutput / threshIncre);
+    int i = 0;
+    if(chromoOutput < threshold)
+        return -1;
+
+    while(tmpResult != 0)
+    {
+        i++;
+        chromoOutput-=threshIncre;
+        tmpResult = floor(chromoOutput/threshIncre);
+    }
+
+    return i-1;
 }
 
 char **importFile(char *fileName)
