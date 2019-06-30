@@ -3762,15 +3762,20 @@ struct chromosome *runValiTestCGP(struct parameters *params, struct dataSet *dat
 	if (params->updateFrequency != 0)
 	{
 		printf("\n-- Starting CGP --\n\n");
-		printf("Gen\tFitness\t\tValidation fitness\tTest fitness\n");
+		printf("Gen\tFitness\t\tValidation fitness\tTest fitness\tMean confidence\n");
 	}
 
     char outputFileName[20] = "_CGP_Output.txt";
     char cgpOutputPath[20] = "./CGP_Outputs/";
 
 	char **cgp_params = importFile("cgp_params.txt");
+	char **cgp_params2 = importFile("cgp_params2.txt");
     char randomNum[30];
     char kFoldIndex[10];
+
+    char fitnessFunction[5];
+    strtok(cgp_params2[0],"\n");
+    strcpy(fitnessFunction,cgp_params2[0]);
 
     strtok(cgp_params[7],"\n");
     strtok(cgp_params[9],"\n");
@@ -3827,19 +3832,52 @@ struct chromosome *runValiTestCGP(struct parameters *params, struct dataSet *dat
 
 			break;
 		}
-*/
+
+*/      int j = 0;
+        double avgConfidence = 0;
+        if(strcmp("FTC",fitnessFunction) == 0)
+        {
+            for(j = 0; j < getNumDataSetSamples(testData); j++)
+            {
+                executeChromosome(bestChromo, getDataSetSampleInputs(testData, j));
+                double *chromoOutput = malloc(4*sizeof(double));
+                int l;
+                for(l = 0; l < 4; l++)
+                {
+                    chromoOutput[l] = getChromosomeOutput(bestChromo,l);
+                }
+                double *softmaxOutput = softmax(chromoOutput,4);
+                int maxIndexCOuput = maxIndex(softmaxOutput);
+                avgConfidence+=softmaxOutput[maxIndexCOuput];
+                free(chromoOutput);
+            }
+
+
+        }
+        else if(strcmp("STC",fitnessFunction) == 0)
+        {
+            for(j = 0; j < getNumDataSetSamples(testData); j++)
+            {
+
+            }
+        }
+        avgConfidence/=getNumDataSetSamples(testData);
+
+        free(cgp_params2);
+
+
 		/* display progress to the user at the update frequency specified */
 		if (params->updateFrequency != 0 && (gen % params->updateFrequency == 0 || gen >= numGens - 1))
 		{
-			printf("%d\t%5.2f\t\t%5.2f\t\t\t%5.2f\n", gen, 100 - bestChromo->fitness * 100, 100 - valiChromo->fitness * 100, 100 - testChromo->fitness * 100); /* SLS validation and test fitness */
+			printf("%d\t%5.2f\t\t%5.2f\t\t\t%5.2f\t\t%5.2f\n", gen, 100 - bestChromo->fitness * 100, 100 - valiChromo->fitness * 100, 100 - testChromo->fitness * 100,avgConfidence*100); /* SLS validation and test fitness */
 																																							   //printf("%d\t%5.2f\t%5.2f\t%5.2f\n", gen, bestChromo->fitness, valiChromo->fitness, testChromo->fitness); /* SLS validation and test fitness */
 
 			/* XT create new text file */
-			char **tmpFitness = malloc(3 * sizeof(char*));
+			char **tmpFitness = malloc(4 * sizeof(char*));
 			char *genString = malloc(10 * sizeof(char));
 			int tmp = 0;
 
-			for (tmp = 0; tmp < 3; tmp++)
+			for (tmp = 0; tmp < 4; tmp++)
 			{
 				tmpFitness[tmp] = malloc(10 * sizeof(char));
 			}
@@ -3848,9 +3886,10 @@ struct chromosome *runValiTestCGP(struct parameters *params, struct dataSet *dat
 			sprintf(tmpFitness[0], "%.2f", 100 - bestChromo->fitness * 100);
 			sprintf(tmpFitness[1], "%.2f", 100 - valiChromo->fitness * 100);
 			sprintf(tmpFitness[2], "%.2f", 100 - testChromo->fitness * 100);
-			fprintf(filePtr, "%s %s %s %s \n", genString, tmpFitness[0], tmpFitness[1], tmpFitness[2]);
+			sprintf(tmpFitness[3], "%.2f", avgConfidence*100);
+			fprintf(filePtr, "%s %s %s %s %s \n", genString, tmpFitness[0], tmpFitness[1], tmpFitness[2], tmpFitness[3]);
 
-			for(tmp = 0; tmp < 3; tmp++){
+			for(tmp = 0; tmp < 4; tmp++){
 				free(tmpFitness[tmp]);
 			}
 
