@@ -147,7 +147,7 @@ int getBestEntity(char *fileName)
 	char line[256];
 	int i = 0;
 
-	double tmpBest[4] = {0, 0, 0, 0};
+	double tmpBest[5] = {0, 0, 0, 0, 0};
 
 	fp = fopen(fileName, "r");
 	if (fp == NULL)
@@ -160,7 +160,7 @@ int getBestEntity(char *fileName)
 	{
 		i = 0;
 		char *pch = strtok(line, " ");
-		char **fitnessSeg = malloc(4 * sizeof(char *));
+		char **fitnessSeg = malloc(5 * sizeof(char *));
 
 		while (pch != NULL)
 		{
@@ -183,19 +183,19 @@ int getBestEntity(char *fileName)
 			}
 			else if (atof(fitnessSeg[2]) > tmpBest[2] && fabs(atof(fitnessSeg[2]) - atof(fitnessSeg[3])) < 30)
 			{
-				for (i = 0; i < 4; i++)
+				for (i = 0; i < 5; i++)
 				{
 					tmpBest[i] = atof(fitnessSeg[i]);
 				}
 			}
 		}
-		for (i = 0; i < 4; i++)
+		for (i = 0; i < 5; i++)
 		{
 			free(fitnessSeg[i]);
 		}
 		free(fitnessSeg);
 	}
-	printf("\nBest gen at %.0f with fitness of %.2f, %.2f and %.2f.\n", tmpBest[0], tmpBest[1], tmpBest[2], tmpBest[3]);
+	printf("\nBest gen at %.0f with fitness of %.2f, %.2f %.2f, mean confidence %.2f\n", tmpBest[0], tmpBest[1], tmpBest[2], tmpBest[3], tmpBest[4]);
 	return 1;
 }
 
