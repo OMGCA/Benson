@@ -3858,7 +3858,14 @@ struct chromosome *runValiTestCGP(struct parameters *params, struct dataSet *dat
         {
             for(j = 0; j < getNumDataSetSamples(testData); j++)
             {
+                executeChromosome(bestChromo, getDataSetSampleInputs(testData, j));
 
+                double chromoOutput = getChromosomeOutput(bestChromo, 0);
+                int expectedOutput = getDataSetSampleOutputs(testData, i)[0];
+
+                int thresholdMargin[2] = {threshold + (expectedOutput - 1) * threshIncre,threshold + expectedOutput * threshIncre};
+                int confidenceMargin[2] = {threshold + stcOutputDecode(chromoOutput) * threshIncre,threshold + (stcOutputDecode(chromoOutput)+1) * threshIncre};
+                avgConfidence+=stcConfidence(confidenceMargin,chromoOutput);
             }
         }
         avgConfidence/=getNumDataSetSamples(testData);
