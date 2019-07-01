@@ -3840,16 +3840,16 @@ struct chromosome *runValiTestCGP(struct parameters *params, struct dataSet *dat
             for(j = 0; j < getNumDataSetSamples(testData); j++)
             {
                 executeChromosome(bestChromo, getDataSetSampleInputs(testData, j));
-                double *chromoOutput = malloc(4*sizeof(double));
+                double chromoOutput[4] = {0,0,0,0};
                 int l;
                 for(l = 0; l < 4; l++)
                 {
                     chromoOutput[l] = getChromosomeOutput(bestChromo,l);
                 }
                 double *softmaxOutput = softmax(chromoOutput,4);
-                int maxIndexCOuput = maxIndex(softmaxOutput);
-                avgConfidence+=softmaxOutput[maxIndexCOuput];
-                free(chromoOutput);
+
+                avgConfidence+=softmaxOutput[maxIndex(chromoOutput)];
+
             }
 
 

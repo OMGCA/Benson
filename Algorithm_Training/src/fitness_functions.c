@@ -175,7 +175,7 @@ int getBestEntity(char *fileName)
 			{
 				if (atof(fitnessSeg[3]) >= tmpBest[3])
 				{
-					for (i = 0; i < 4; i++)
+					for (i = 0; i < 5; i++)
 					{
 						tmpBest[i] = atof(fitnessSeg[i]);
 					}
