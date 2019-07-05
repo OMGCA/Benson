@@ -146,6 +146,7 @@ int getBestEntity(char *fileName)
 	FILE *fp;
 	char line[256];
 	int i = 0;
+	double overfitThreshold = 30;
 
 	double tmpBest[5] = {0, 0, 0, 0, 0};
 
@@ -169,26 +170,74 @@ int getBestEntity(char *fileName)
 			pch = strtok(NULL, " ");
 			i++;
 		}
-		if (atof(fitnessSeg[1]) >= atof(fitnessSeg[2]))
-		{
-			if (atof(fitnessSeg[2]) == tmpBest[2])
-			{
-				if (atof(fitnessSeg[3]) >= tmpBest[3])
-				{
-					for (i = 0; i < 5; i++)
-					{
-						tmpBest[i] = atof(fitnessSeg[i]);
-					}
-				}
-			}
-			else if (atof(fitnessSeg[2]) > tmpBest[2] && fabs(atof(fitnessSeg[2]) - atof(fitnessSeg[3])) < 30)
-			{
-				for (i = 0; i < 5; i++)
-				{
-					tmpBest[i] = atof(fitnessSeg[i]);
-				}
-			}
-		}
+
+		double numGen = atof(fitnessSeg[0]);
+		double training = atof(fitnessSeg[1]);
+		double validation = atof(fitnessSeg[2]);
+		double testing = atof(fitnessSeg[3]);
+		double confidence = atof(fitnessSeg[4]);
+
+		if(training > tmpBest[1])
+        {
+            if(fabs(doubleMin(validation, testing) - training) < overfitThreshold)
+            {
+                if(fabs(doubleMax(validation,testing) - training) < overfitThreshold)
+                {
+                    if(doubleMax(validation,testing) <= training)
+                    {
+                        tmpBest[0] = numGen;
+                        tmpBest[1] = training;
+                        tmpBest[2] = validation;
+                        tmpBest[3] = testing;
+                        tmpBest[4] = confidence;
+                    }
+                }
+            }
+        }
+        else if (training == tmpBest[1])
+        {
+            if(doubleMax(validation, testing) == doubleMax(tmpBest[2], tmpBest[3]))
+            {
+                if(doubleMin(validation, testing) > doubleMin(tmpBest[2],tmpBest[3]))
+                {
+                    if(fabs(doubleMin(validation, testing) - training) < overfitThreshold)
+                    {
+                        if(fabs(doubleMax(validation,testing) - training) < overfitThreshold)
+                        {
+                            if(doubleMax(validation,testing) <= training)
+                            {
+                                tmpBest[0] = numGen;
+                                tmpBest[1] = training;
+                                tmpBest[2] = validation;
+                                tmpBest[3] = testing;
+                                tmpBest[4] = confidence;
+                            }
+                        }
+                    }
+                }
+            }
+            else if(doubleMax(validation, testing) > doubleMax(tmpBest[2], tmpBest[3]))
+            {
+                if(doubleMin(validation, testing) - doubleMin(tmpBest[2],tmpBest[3]) > -15)
+                {
+                    if(fabs(doubleMin(validation, testing) - training) < overfitThreshold)
+                    {
+                        if(fabs(doubleMax(validation,testing) - training) < overfitThreshold)
+                        {
+                            if(doubleMax(validation,testing) <= training)
+                            {
+                                tmpBest[0] = numGen;
+                                tmpBest[1] = training;
+                                tmpBest[2] = validation;
+                                tmpBest[3] = testing;
+                                tmpBest[4] = confidence;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
 		for (i = 0; i < 5; i++)
 		{
 			free(fitnessSeg[i]);
@@ -197,6 +246,22 @@ int getBestEntity(char *fileName)
 	}
 	printf("\nBest gen at %.0f with fitness of %.2f, %.2f %.2f, mean confidence %.2f\n", tmpBest[0], tmpBest[1], tmpBest[2], tmpBest[3], tmpBest[4]);
 	return 1;
+}
+
+double doubleMax(double a, double b)
+{
+    if(a > b)
+        return a;
+    else
+        return b;
+}
+
+double doubleMin(double a, double b)
+{
+    if(a < b)
+        return a;
+    else
+        return b;
 }
 
 void stcAction(struct chromosome *chromo, struct dataSet *testData)
@@ -284,7 +349,7 @@ void ftcAction(struct chromosome *chromo, struct dataSet *testData)
 	char **entrantID = malloc(entries * sizeof(char*));
 	for(i = 0; i < entries; i++)
 	{
-		entrantID[i] = (char*) malloc(10*sizeof(char));
+		entrantID[i] = (char*) malloc(50*sizeof(char));
 	}
 
 
@@ -489,7 +554,6 @@ double *softmax(double arr[], int arrLength)
 	{
 
 		logArr[i] = exp(arr[i]);
-		//printf("%.3f ",exp(arr[i]));
 
 		logSum += exp(arr[i]);
 	}

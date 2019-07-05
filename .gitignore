@@ -4,6 +4,7 @@ Sheets/DataSet/
 Algorithm_Training/*.csv
 Algorithm_Training/*.txt
 Algorithm_Training/CGP_Outputs/*.txt
+Algorithm_Training/CGP_Chromo/*.chromo
 .settings
 .vscode
 *.exe

@@ -3805,23 +3805,33 @@ struct chromosome *runValiTestCGP(struct parameters *params, struct dataSet *dat
 		/* get best chromosome */
 		getBestChromosome(parentChromos, childrenChromos, params->mu, params->lambda, bestChromo);
 
-		/* SLS Initialise validation chromosome (and copy) from best chromosome */
-		valiChromo = initialiseChromosomeFromChromosome(bestChromo);
+		setChromosomeFitness(params, bestChromo, valiData);
+		double valiFitness = bestChromo->fitness;
 
-		/* SLS reset the fitness of the validation chromosome */
-		valiChromo->fitness = -1;
+		bestChromo->fitness = -1;
 
-		/* SLS Set (calculate) validation chromosome */
-		setChromosomeFitness(params, valiChromo, valiData); /* SLS validation fitness */
+		setChromosomeFitness(params, bestChromo, testData);
+		double testFitness = bestChromo->fitness;
 
-		/* SLS Initialise test chromosome (and copy) from best chromosome */
-		testChromo = initialiseChromosomeFromChromosome(bestChromo);
+		bestChromo->fitness = -1;
 
-		/* SLS reset the fitness of the test chromosome */
-		testChromo->fitness = -1;
-
-		/* SLS Set (calculate) test chromosome */
-		setChromosomeFitness(params, testChromo, testData); /* SLS test fitness */
+//		/* SLS Initialise validation chromosome (and copy) from best chromosome */
+//		valiChromo = initialiseChromosomeFromChromosome(bestChromo);
+//
+//		/* SLS reset the fitness of the validation chromosome */
+//		valiChromo->fitness = -1;
+//
+//		/* SLS Set (calculate) validation chromosome */
+//		setChromosomeFitness(params, valiChromo, valiData); /* SLS validation fitness */
+//
+//		/* SLS Initialise test chromosome (and copy) from best chromosome */
+//		testChromo = initialiseChromosomeFromChromosome(bestChromo);
+//
+//		/* SLS reset the fitness of the test chromosome */
+//		testChromo->fitness = -1;
+//
+//		/* SLS Set (calculate) test chromosome */
+//		setChromosomeFitness(params, testChromo, testData); /* SLS test fitness */
 
 		/* check termination conditions */
 		/*		if(getChromosomeFitness(bestChromo) <= params->targetFitness){
@@ -3849,7 +3859,6 @@ struct chromosome *runValiTestCGP(struct parameters *params, struct dataSet *dat
                 double *softmaxOutput = softmax(chromoOutput,4);
 
                 avgConfidence+=softmaxOutput[maxIndex(chromoOutput)];
-                free(softmaxOutput);
 
             }
 
@@ -3877,7 +3886,7 @@ struct chromosome *runValiTestCGP(struct parameters *params, struct dataSet *dat
 		/* display progress to the user at the update frequency specified */
 		if (params->updateFrequency != 0 && (gen % params->updateFrequency == 0 || gen >= numGens - 1))
 		{
-			printf("%d\t%5.2f\t\t%5.2f\t\t\t%5.2f\t\t%.2f\n", gen, 100 - bestChromo->fitness * 100, 100 - valiChromo->fitness * 100, 100 - testChromo->fitness * 100,avgConfidence*100); /* SLS validation and test fitness */
+			printf("%d\t%5.2f\t\t%5.2f\t\t\t%5.2f\t\t%5.2f\n", gen, 100 - bestChromo->fitness * 100, 100 - valiChromo->fitness * 100, 100 - testChromo->fitness * 100,avgConfidence*100); /* SLS validation and test fitness */
 																																							   //printf("%d\t%5.2f\t%5.2f\t%5.2f\n", gen, bestChromo->fitness, valiChromo->fitness, testChromo->fitness); /* SLS validation and test fitness */
 
 			/* XT create new text file */
