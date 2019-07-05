@@ -18,7 +18,7 @@ double totalSum(struct parameters *params, struct chromosome *chromo, struct dat
 
 int maxIndex(double *arr);
 
-int getBestEntity(char* randomNum);
+int getBestEntity(char *fileName, struct dataSet* testData);
 double doubleMax(double a, double b);
 double doubleMin(double a, double b);
 

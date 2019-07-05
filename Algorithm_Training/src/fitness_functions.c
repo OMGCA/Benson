@@ -141,12 +141,14 @@ double totalSum(struct parameters *params, struct chromosome *chromo, struct dat
 	return error / getNumDataSetSamples(data);
 }
 
-int getBestEntity(char *fileName)
+int getBestEntity(char *fileName, struct dataSet* testData)
 {
 	FILE *fp;
 	char line[256];
 	int i = 0;
-	double overfitThreshold = 30;
+	double testDataNum = getNumDataSetSamples(testData);
+	double overfitThreshold = 200/testDataNum;
+	double undefitThreshold = 100/testDataNum;
 
 	double tmpBest[5] = {0, 0, 0, 0, 0};
 
@@ -177,19 +179,23 @@ int getBestEntity(char *fileName)
 		double testing = atof(fitnessSeg[3]);
 		double confidence = atof(fitnessSeg[4]);
 
-		if(training > tmpBest[1])
+        if(training > tmpBest[1])
         {
-            if(fabs(doubleMin(validation, testing) - training) < overfitThreshold)
+            if(validation - tmpBest[2] > -undefitThreshold && testing - tmpBest[3] > -undefitThreshold)
             {
-                if(fabs(doubleMax(validation,testing) - training) < overfitThreshold)
+
+                if(fabs(doubleMin(validation, testing) - training) < overfitThreshold)
                 {
-                    if(doubleMax(validation,testing) <= training)
+                    if(fabs(doubleMax(validation,testing) - training) < overfitThreshold)
                     {
-                        tmpBest[0] = numGen;
-                        tmpBest[1] = training;
-                        tmpBest[2] = validation;
-                        tmpBest[3] = testing;
-                        tmpBest[4] = confidence;
+                        if(doubleMax(validation,testing) <= training)
+                        {
+                            tmpBest[0] = numGen;
+                            tmpBest[1] = training;
+                            tmpBest[2] = validation;
+                            tmpBest[3] = testing;
+                            tmpBest[4] = confidence;
+                        }
                     }
                 }
             }
@@ -218,7 +224,7 @@ int getBestEntity(char *fileName)
             }
             else if(doubleMax(validation, testing) > doubleMax(tmpBest[2], tmpBest[3]))
             {
-                if(doubleMin(validation, testing) - doubleMin(tmpBest[2],tmpBest[3]) > -15)
+                if(doubleMin(validation, testing) - doubleMin(tmpBest[2],tmpBest[3]) > -undefitThreshold)
                 {
                     if(fabs(doubleMin(validation, testing) - training) < overfitThreshold)
                     {
@@ -527,7 +533,7 @@ void runKFold(struct parameters *params, int numGens, int kFoldVar, char *fitnes
 
 		//setDisplayAction(strtok(cgp_params[11],"\n"), chromo, testData);
 
-		getBestEntity(randomNum);
+		getBestEntity(randomNum, kFoldTest);
 
 		//printf("%s\n%s\n%s\n",foldTrain, foldValidate, foldTest);
 		freeDataSet(kFoldTraining[i]);

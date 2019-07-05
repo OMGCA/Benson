@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
+#include <gmp.h>
+#include <math.h>
+#include <assert.h>
+#include "cgp-sls.h"
 #include "fitness_functions.h"
 
 double threshIncre;
@@ -15,6 +20,20 @@ void stcConfidenceTest(void);
 
 int main(void)
 {
+
+    mpf_t p;
+    mpf_t k;
+
+    mpf_init_set_ui(p,1); /* p = 1 */
+    mpf_init_set_ui(k,exp(1));
+
+    mpf_pow_ui(p,k,INT_MAX); /* p = p * i */
+
+    //gmp_printf("%.Ff",p);
+    //mpz_out_str(stdout,10,p);
+    mpf_clear(p);
+    mpf_clear(k);
+
 
 }
 

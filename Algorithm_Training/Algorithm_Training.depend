@@ -11,7 +11,7 @@
 
 1552045808 m:\benson\algorithm_training\src\cgp-sls.h
 
-1562328427 source:m:\benson\algorithm_training\src\fitness_functions.c
+1562338470 source:m:\benson\algorithm_training\src\fitness_functions.c
 	<stdio.h>
 	<math.h>
 	<stdlib.h>
@@ -20,9 +20,9 @@
 	<time.h>
 	"fitness_functions.h"
 
-1562328252 m:\benson\algorithm_training\src\fitness_functions.h
+1562338457 m:\benson\algorithm_training\src\fitness_functions.h
 
-1561580234 source:m:\benson\algorithm_training\src\main.c
+1562338480 source:m:\benson\algorithm_training\src\main.c
 	<stdio.h>
 	<math.h>
 	<stdlib.h>
@@ -31,9 +31,19 @@
 	<time.h>
 	"fitness_functions.h"
 
-1561740361 source:m:\benson\algorithm_training\src\blackbox.c
+1562339918 source:m:\benson\algorithm_training\src\blackbox.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
+	<limits.h>
+	<gmp.h>
+	<math.h>
+	<assert.h>
+	"cgp-sls.h"
 	"fitness_functions.h"
+
+1035178803 m:\benson\algorithm_training\gmp\include\gmp.h
+	<iosfwd>
+	<cstddef>
+	<stddef.h>
 
