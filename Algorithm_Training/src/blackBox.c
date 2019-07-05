@@ -4,7 +4,6 @@
 #include <limits.h>
 #include <gmp.h>
 #include <math.h>
-#include <assert.h>
 #include "cgp-sls.h"
 #include "fitness_functions.h"
 
@@ -12,6 +11,7 @@ double threshIncre;
 double threshold;
 double classNumber;
 
+mpf_t* mpfArrTest(void);
 void idSortTest(void);
 void stringCastTest(void);
 void memoryLeakTest(void);
@@ -20,20 +20,40 @@ void stcConfidenceTest(void);
 
 int main(void)
 {
+//
+//    mpf_t* p = malloc(4*sizeof(mpf_t));
+//    mpf_t k;
+//    int i = 0;
+//    mpf_init_set_ui(k,2);
+//
+//    for(i = 0; i < 4; i++)
+//    {
+//       mpf_init_set_ui(p[i],1);
+//       mpf_pow_ui(p[i],k,i);
+//       gmp_printf("%.Ff\n",p[i]);
+//    }
+    mpf_t* p = mpfArrTest();
+    int i = 0;
+    for(i = 0; i < 4; i++)
+    {
+        gmp_printf("%.Ff\n",p[i]);
+    }
 
-    mpf_t p;
-    mpf_t k;
 
-    mpf_init_set_ui(p,1); /* p = 1 */
-    mpf_init_set_ui(k,exp(1));
+}
 
-    mpf_pow_ui(p,k,INT_MAX); /* p = p * i */
+mpf_t* mpfArrTest(void)
+{
+    mpf_t *foo;
+    foo = malloc(4*sizeof(mpf_t));
 
-    //gmp_printf("%.Ff",p);
-    //mpz_out_str(stdout,10,p);
-    mpf_clear(p);
-    mpf_clear(k);
+    int i ;
+    for(i = 0; i < 4; i++)
+    {
+        mpf_init_set_ui(foo[i],INT_MAX*i);
+    }
 
+    return foo;
 
 }
 

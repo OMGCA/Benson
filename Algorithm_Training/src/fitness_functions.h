@@ -30,7 +30,8 @@ void setFitnessFromText(char *arr, struct parameters *params);
 
 void runKFold(struct parameters *params, int numGens, int kFoldVar, char *fitnessFunction, char *randomNum);
 
-double* softmax(double arr[], int arrLength);
+double *softmax(double arr[], int arrLength);
+
 double stcConfidence(int thresholdMargin[], double output);
 void pdDecode(int index);
 int stcOutputDecode(double chromoOutput);

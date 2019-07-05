@@ -37,9 +37,12 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add directory="gmp/include" />
 				</Compiler>
 				<Linker>
 					<Add library="./CGP-Library.dll" />
+					<Add library="gmp" />
+					<Add directory="gmp/lib" />
 				</Linker>
 			</Target>
 			<Target title="BlackBox">
@@ -49,9 +52,12 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add directory="gmp/include" />
 				</Compiler>
 				<Linker>
 					<Add library="./CGP-Library.dll" />
+					<Add library="gmp" />
+					<Add directory="gmp/lib" />
 				</Linker>
 			</Target>
 		</Build>

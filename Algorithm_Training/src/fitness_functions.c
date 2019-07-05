@@ -4,7 +4,10 @@
 #include <string.h>
 #include "cgp-sls.h"
 #include <time.h>
+#include <gmp.h>
 #include "fitness_functions.h"
+
+mpf_t *softmaxMPF(double arr[], int arrLength);
 /* Find the maximum output for multi-output data */
 /* Used for FTC */
 int maxIndex(double *arr)
@@ -147,7 +150,7 @@ int getBestEntity(char *fileName, struct dataSet* testData)
 	char line[256];
 	int i = 0;
 	double testDataNum = getNumDataSetSamples(testData);
-	double overfitThreshold = 200/testDataNum;
+	double overfitThreshold = 300/testDataNum;
 	double undefitThreshold = 100/testDataNum;
 
 	double tmpBest[5] = {0, 0, 0, 0, 0};
@@ -393,18 +396,24 @@ void ftcAction(struct chromosome *chromo, struct dataSet *testData)
 		}
 		printf("\nSoftmax Probability: ");
 		double *softmaxOutput = softmax(chromoOutput, 4);
+		//mpf_t *mpfSoftmaxOutput = softmaxMPF(chromoOutput, 4);
+
 		for (j = 0; j < 4; j++)
 		{
 			printf("%.2f%% ", softmaxOutput[j] * 100);
+            //gmp_printf("%.Ff%% ",mpfSoftmaxOutput[j]);
+
 		}
 
 		printf("\nExpected Class: \t");
 		pdDecode(maxIndex(expectedOutput));
 		printf("\tSoftmax: %.2f%%",softmaxOutput[maxIndex(expectedOutput)] * 100);
+		//gmp_printf("\tSoftmax: %.Ff%%",mpfSoftmaxOutput[maxIndex(expectedOutput)]);
 
 		printf("\nCGP Output Class: \t");
 		pdDecode(maxIndex(chromoOutput));
 		printf("\tSoftmax: %.2f%%",softmaxOutput[maxIndex(chromoOutput)] * 100);
+		//gmp_printf("\tSoftmax: %.Ff%%",mpfSoftmaxOutput[maxIndex(chromoOutput)]);
 
 		if (maxIndex(chromoOutput) != maxIndex(expectedOutput))
 			mismatchError++;
@@ -552,25 +561,61 @@ void runKFold(struct parameters *params, int numGens, int kFoldVar, char *fitnes
 double *softmax(double arr[], int arrLength)
 {
 	double logSum = 0;
+
 	double *logArr = malloc(arrLength * sizeof(double));
 	double *logAns = malloc(arrLength * sizeof(double));
 	int i = 0;
 
 	for (i = 0; i < arrLength; i++)
 	{
-
 		logArr[i] = exp(arr[i]);
 
 		logSum += exp(arr[i]);
 	}
 	for (i = 0; i < arrLength; i++)
 	{
+
 		logAns[i] = logArr[i] / logSum;
+
 	}
 
 	free(logArr);
 
 	return logAns;
+}
+
+mpf_t *softmaxMPF(double arr[], int arrLength)
+{
+    mpf_t logSum;
+    mpf_init_set_ui(logSum,0);
+    mpf_t *logArr = malloc(arrLength * sizeof(mpf_t));
+    mpf_t *logAns = malloc(arrLength * sizeof(mpf_t));
+
+    int i;
+
+    for(i = 0; i < arrLength; i++)
+    {
+        mpf_init_set_ui(logArr[i],exp(arr[i]));
+
+        mpf_add(logSum, logSum, logArr[i]);
+
+        mpf_init_set_ui(logAns[i],0);
+    }
+
+    for(i = 0; i < arrLength; i++)
+    {
+        mpf_div(logAns[i],logArr[i],logSum);
+		mpf_mul_ui(logAns[i],logAns[i],100);
+    }
+
+    mpf_clear(logSum);
+
+    for(i = 0; i < arrLength; i++)
+	{
+		mpf_clear(logArr[i]);
+	}
+	free(logArr[i]);
+    return logAns;
 }
 
 double stcConfidence(int thresholdMargin[], double output)
