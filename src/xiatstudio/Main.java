@@ -883,6 +883,8 @@ public class Main extends JFrame {
 		double copyTotal[] = { 0, 0, 0, 0 };
 		double recallTotal[] = { 0, 0, 0, 0 };
 
+		double totalCount[][] = {classTotal, copyTotal, recallTotal};
+
 		BufferedReader br = null;
 		String line = "";
 
@@ -922,6 +924,11 @@ public class Main extends JFrame {
 			trainingClasses[i][0] = (int) Math.floor(classTotal[i] * trainingRatio);
 			trainingClasses[i][1] = (int) Math.floor(copyTotal[i] * trainingRatio);
 			trainingClasses[i][2] = (int) Math.floor(recallTotal[i] * trainingRatio);
+
+			for(int j = 0; j < 3; j++){
+				if((totalCount[j][i]-trainingClasses[i][j]) % 2 != 0)
+					trainingClasses[i][j]++;
+			}
 
 			validationClasses[i][0] = (int) Math.floor((classTotal[i] - trainingClasses[i][0]) / 2);
 			validationClasses[i][1] = (int) Math.floor((copyTotal[i] - trainingClasses[i][1]) / 2);
