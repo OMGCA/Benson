@@ -1,11 +1,12 @@
 #include <stdio.h>
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include <limits.h>
-#include <gmp.h>
-#include <math.h>
 #include "cgp-sls.h"
+#include <time.h>
+#include <gmp.h>
 #include "fitness_functions.h"
+#include <limits.h>
 
 double threshIncre;
 double threshold;
