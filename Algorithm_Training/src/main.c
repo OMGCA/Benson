@@ -128,6 +128,8 @@ void cgpExecute(void)
     strcat(chromoFileName,"_chromo.chromo");
 
 	saveChromosome(chromo, chromoFileName);
+	strcat(chromoFileName,".dot");
+	saveChromosomeDot(chromo, 0,chromoFileName);
 
 	/* Display test dataset detailed result */
     setDisplayAction(strtok(cgp_params2[0],"\n"), chromo, testData);

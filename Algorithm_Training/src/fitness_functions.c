@@ -4,12 +4,29 @@
 #include <string.h>
 #include "cgp-sls.h"
 #include <time.h>
-#include <gmp.h>
+#include "gmp.h"
 #include "fitness_functions.h"
+#include <limits.h>
 
 mpf_t *softmaxMPF(double arr[], int arrLength);
+mpf_t* mpfArrTest(void);
 /* Find the maximum output for multi-output data */
 /* Used for FTC */
+mpf_t* mpfArrTest(void)
+{
+    mpf_t *foo;
+    foo = malloc(4*sizeof(mpf_t));
+
+    int i ;
+    for(i = 0; i < 4; i++)
+    {
+        mpf_init_set_ui(foo[i],INT_MAX*i);
+    }
+
+    return foo;
+
+}
+
 int maxIndex(double *arr)
 {
 	int i = 0;
