@@ -5,6 +5,7 @@ Algorithm_Training/*.csv
 Algorithm_Training/*.txt
 Algorithm_Training/CGP_Outputs/*.txt
 Algorithm_Training/CGP_Chromo/*.chromo
+Algorithm_Training/CGP_Chromo/*.dot
 .settings
 .vscode
 *.exe
