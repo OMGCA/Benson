@@ -4,7 +4,7 @@
 #include <string.h>
 #include "cgp-sls.h"
 #include <time.h>
-
+#include <gmp.h>
 #include "fitness_functions.h"
 #include <limits.h>
 
@@ -12,7 +12,7 @@ double threshIncre;
 double threshold;
 double classNumber;
 
-
+mpf_t* mpfArrTest(void);
 void idSortTest(void);
 void stringCastTest(void);
 void memoryLeakTest(void);
@@ -21,10 +21,42 @@ void stcConfidenceTest(void);
 
 int main(void)
 {
+//
+//    mpf_t* p = malloc(4*sizeof(mpf_t));
+//    mpf_t k;
+//    int i = 0;
+//    mpf_init_set_ui(k,2);
+//
+//    for(i = 0; i < 4; i++)
+//    {
+//       mpf_init_set_ui(p[i],1);
+//       mpf_pow_ui(p[i],k,i);
+//       gmp_printf("%.Ff\n",p[i]);
+//    }
+    mpf_t* p = mpfArrTest();
+    int i = 0;
+    for(i = 0; i < 4; i++)
+    {
+        gmp_printf("%.Ff\n",p[i]);
+    }
+
 
 }
 
+mpf_t* mpfArrTest(void)
+{
+    mpf_t *foo;
+    foo = malloc(4*sizeof(mpf_t));
 
+    int i ;
+    for(i = 0; i < 4; i++)
+    {
+        mpf_init_set_ui(foo[i],INT_MAX*i);
+    }
+
+    return foo;
+
+}
 
 void stcConfidenceTest(void)
 {
