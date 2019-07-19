@@ -16,3 +16,4 @@ bin/
 Matlab_dataplot/*.png
 .csv
 Matlab_dataplot/Benson_Data
+Algorithm_Training/CGP_BestChromo/*.csv
