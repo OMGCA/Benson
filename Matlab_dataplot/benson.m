@@ -230,4 +230,19 @@ figure(5);
 clf;
 plot(velocityMax);
 
+figure(6);
+clf;
+penBin = zeros(size(rawPen));
+for c = 1:size(rawPen)
+    if(rawPen(c,1) == 0)
+        penBin(c,1) = 0;
+    else
+        penBin(c,1) = 1;
+    end
+end
+
+plot(penBin,'.');
+title(strcat("Pen-Paper interaction of ",patientID,", drawing mode ",drawingMode));
+ylim([-0.5 1.5]);
+
 
