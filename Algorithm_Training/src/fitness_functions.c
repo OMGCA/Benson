@@ -161,7 +161,7 @@ double totalSum(struct parameters *params, struct chromosome *chromo, struct dat
 	return error / getNumDataSetSamples(data);
 }
 
-int getBestEntity(char *fileName, struct dataSet* testData)
+double* getBestEntity(char *fileName, struct dataSet* testData, double* tmpBest)
 {
 	FILE *fp;
 	char line[256];
@@ -169,8 +169,9 @@ int getBestEntity(char *fileName, struct dataSet* testData)
 	double testDataNum = getNumDataSetSamples(testData);
 	double overfitThreshold = 300/testDataNum;
 	double undefitThreshold = 100/testDataNum;
-
-	double tmpBest[5] = {0, 0, 0, 0, 0};
+    for(i = 0; i < 5; i++){
+        tmpBest[i] = 0;
+    }
 
 	fp = fopen(fileName, "r");
 	if (fp == NULL)
@@ -271,7 +272,7 @@ int getBestEntity(char *fileName, struct dataSet* testData)
 		free(fitnessSeg);
 	}
 	printf("\nBest gen at %.0f with fitness of %.2f, %.2f %.2f, mean confidence %.2f\n", tmpBest[0], tmpBest[1], tmpBest[2], tmpBest[3], tmpBest[4]);
-	return 1;
+	return tmpBest;
 }
 
 double doubleMax(double a, double b)
@@ -507,73 +508,73 @@ void setDisplayAction(char *arr, struct chromosome *chromo, struct dataSet *test
 		tsAction(chromo, testData);
 	}
 }
-
-void runKFold(struct parameters *params, int numGens, int kFoldVar, char *fitnessFunction, char *randomNum)
-{
-	char *kFoldDataSrc = "./kfolddata";
-
-	struct chromosome *kFoldChromo[kFoldVar];
-	struct dataSet *kFoldTraining[kFoldVar];
-	struct dataSet *kFoldValidation[kFoldVar];
-	struct dataSet *kFoldTest[kFoldVar];
-
-	int i = 0;
-	for (i = 0; i < kFoldVar; i++)
-	{
-		kFoldChromo[i] = NULL;
-		kFoldTraining[i] = NULL;
-		kFoldValidation[i] = NULL;
-		kFoldTest[i] = NULL;
-
-		char foldIndex[kFoldVar];
-		char nFold[80];
-
-		strcpy(nFold, kFoldDataSrc);
-		strcat(nFold, "/fold_");
-		itoa(i, foldIndex, kFoldVar);
-		strcat(nFold, foldIndex);
-
-		char foldTrain[80];
-		strcpy(foldTrain, nFold);
-
-		char foldValidate[80];
-		strcpy(foldValidate, nFold);
-
-		char foldTest[80];
-		strcpy(foldTest, nFold);
-
-		strcat(foldTrain, "/01_training.csv");
-		strcat(foldValidate, "/02_validation.csv");
-		strcat(foldTest, "/03_testing.csv");
-
-		kFoldTraining[i] = initialiseDataSetFromFile(foldTrain);
-		kFoldValidation[i] = initialiseDataSetFromFile(foldValidate);
-		kFoldTest[i] = initialiseDataSetFromFile(foldTest);
-
-		kFoldChromo[i] = runValiTestCGP(params, kFoldTraining[i], kFoldValidation[i], kFoldTest[i], numGens);
-
-		printChromosome(kFoldChromo[i], 0);
-
-		saveChromosome(kFoldChromo[i], "latest_chromo.chromo");
-		saveChromosomeDot(kFoldChromo[i], 0, "chromo.dot");
-
-		//setDisplayAction(strtok(cgp_params[11],"\n"), chromo, testData);
-
-		getBestEntity(randomNum, kFoldTest);
-
-		//printf("%s\n%s\n%s\n",foldTrain, foldValidate, foldTest);
-		freeDataSet(kFoldTraining[i]);
-		freeDataSet(kFoldValidation[i]);
-	}
-
-	for (i = 0; i < kFoldVar; i++)
-	{
-		printf("\nIteration %d: \n", i);
-		setDisplayAction(fitnessFunction, kFoldChromo[i], kFoldTest[i]);
-		freeChromosome(kFoldChromo[i]);
-		freeDataSet(kFoldTest[i]);
-	}
-}
+//
+//void runKFold(struct parameters *params, int numGens, int kFoldVar, char *fitnessFunction, char *randomNum)
+//{
+//	char *kFoldDataSrc = "./kfolddata";
+//
+//	struct chromosome *kFoldChromo[kFoldVar];
+//	struct dataSet *kFoldTraining[kFoldVar];
+//	struct dataSet *kFoldValidation[kFoldVar];
+//	struct dataSet *kFoldTest[kFoldVar];
+//
+//	int i = 0;
+//	for (i = 0; i < kFoldVar; i++)
+//	{
+//		kFoldChromo[i] = NULL;
+//		kFoldTraining[i] = NULL;
+//		kFoldValidation[i] = NULL;
+//		kFoldTest[i] = NULL;
+//
+//		char foldIndex[kFoldVar];
+//		char nFold[80];
+//
+//		strcpy(nFold, kFoldDataSrc);
+//		strcat(nFold, "/fold_");
+//		itoa(i, foldIndex, kFoldVar);
+//		strcat(nFold, foldIndex);
+//
+//		char foldTrain[80];
+//		strcpy(foldTrain, nFold);
+//
+//		char foldValidate[80];
+//		strcpy(foldValidate, nFold);
+//
+//		char foldTest[80];
+//		strcpy(foldTest, nFold);
+//
+//		strcat(foldTrain, "/01_training.csv");
+//		strcat(foldValidate, "/02_validation.csv");
+//		strcat(foldTest, "/03_testing.csv");
+//
+//		kFoldTraining[i] = initialiseDataSetFromFile(foldTrain);
+//		kFoldValidation[i] = initialiseDataSetFromFile(foldValidate);
+//		kFoldTest[i] = initialiseDataSetFromFile(foldTest);
+//
+//		kFoldChromo[i] = runValiTestCGP(params, kFoldTraining[i], kFoldValidation[i], kFoldTest[i], numGens);
+//
+//		printChromosome(kFoldChromo[i], 0);
+//
+//		saveChromosome(kFoldChromo[i], "latest_chromo.chromo");
+//		saveChromosomeDot(kFoldChromo[i], 0, "chromo.dot");
+//
+//		//setDisplayAction(strtok(cgp_params[11],"\n"), chromo, testData);
+//        double tmpBest[5];
+//		getBestEntity(randomNum, kFoldTest,tmpBest);
+//
+//		//printf("%s\n%s\n%s\n",foldTrain, foldValidate, foldTest);
+//		freeDataSet(kFoldTraining[i]);
+//		freeDataSet(kFoldValidation[i]);
+//	}
+//
+//	for (i = 0; i < kFoldVar; i++)
+//	{
+//		printf("\nIteration %d: \n", i);
+//		setDisplayAction(fitnessFunction, kFoldChromo[i], kFoldTest[i]);
+//		freeChromosome(kFoldChromo[i]);
+//		freeDataSet(kFoldTest[i]);
+//	}
+//}
 
 double *softmax(double arr[], int arrLength)
 {
@@ -769,4 +770,45 @@ int binarySearch(double *arr, int arrSize, double target)
 	}
 
 	return -1;
+}
+
+void exportBestChromo(double* bestTemp)
+{
+    /* Concatrating file name */
+    char**  cgp_params  = importFile("cgp_params.txt");
+	double mutRate = atof(cgp_params[8]);
+	strtok(cgp_params[3],"\n");
+    strtok(cgp_params[4],"\n");
+    strtok(cgp_params[8],"\n");
+
+    mutRate*=100;
+
+	char mutRateChar[3];
+	char chromoFileName[30] = "./CGP_BestChromo/";
+    sprintf(mutRateChar, "%.f",mutRate);
+	strcat(chromoFileName,cgp_params[3]);
+    strcat(chromoFileName,"_");
+    strcat(chromoFileName,cgp_params[4]);
+    strcat(chromoFileName,"_");
+    strcat(chromoFileName,mutRateChar);
+	strcat(chromoFileName,"_bestChromo.csv");
+
+
+	/* Read file, if not exist, create one */
+	FILE *tmpFile = fopen(chromoFileName, "a");
+	if(tmpFile == NULL){
+		printf("Error with opening file.\n");
+	}
+	/* Write parameters before exporting chromo performance details */
+	fprintf(tmpFile, "%d,", atoi(cgp_params[7]));
+	/* Write kfold detail */
+	fprintf(tmpFile, "Fold %d,",atoi(cgp_params[9]));
+
+
+	/* Write chromo performance detail */
+	fprintf(tmpFile, "%.0f,%.2f,%.2f,%.2f,%.2f\n",bestTemp[0],bestTemp[1],bestTemp[2],bestTemp[3],bestTemp[4]);
+
+	free(cgp_params);
+	fclose(tmpFile);
+
 }

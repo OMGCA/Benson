@@ -18,7 +18,7 @@ double totalSum(struct parameters *params, struct chromosome *chromo, struct dat
 
 int maxIndex(double *arr);
 
-int getBestEntity(char *fileName, struct dataSet* testData);
+double* getBestEntity(char *fileName, struct dataSet* testData, double* tmpBest);
 double doubleMax(double a, double b);
 double doubleMin(double a, double b);
 
@@ -40,5 +40,7 @@ char *strSplit(char *strArr, char *delimiter, int index);
 
 void insertionSort(double *arr, char **idArr, int length);
 int binarySearch(double *arr, int arrSize, double target);
+
+void exportBestChromo(double* bestTemp);
 
 #endif // FITNESS_FUNCTIONS_H_INCLUDED

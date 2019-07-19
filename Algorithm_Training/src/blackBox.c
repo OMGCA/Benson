@@ -21,9 +21,19 @@ void stcConfidenceTest(void);
 
 int main(void)
 {
-
+    writeExistFile();
 }
 
+void writeExistFile(void)
+{
+    FILE *pFile = fopen("test.txt","a");
+    char buffer[256] = "\nXTTest";
+
+
+    fprintf(pFile, "%s", buffer);
+
+
+}
 
 
 void stcConfidenceTest(void)

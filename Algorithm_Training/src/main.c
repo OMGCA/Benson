@@ -160,7 +160,11 @@ void cgpExecute(void)
         printf("\nData set: Fold %d\n",kFoldIndex);
 
     /* Read the evolution process file to automatically select best generation */
-    getBestEntity(outputPath, testData);
+    double* bestTemp;
+    double tmpBest[5];
+    bestTemp = getBestEntity(outputPath, testData,tmpBest);
+
+    exportBestChromo(bestTemp);
 
     /* Free allocated memories */
 	free(cgp_params);
