@@ -369,9 +369,22 @@ public class Main extends JFrame {
 				kFold.setFont(xtDefault);
 				windowAddComponent(popUp, c, tmp + 1, 4, kFold);
 
-				TextField kFoldVar = new TextField("4");
+				TextField kFoldVar = new TextField("10");
 				kFoldVar.setFont(xtDefault);
 				windowAddComponent(popUp, c, tmp + 2, 4, kFoldVar);
+				
+				JRadioButton oldKFold = new JRadioButton("Old");
+				oldKFold.setFont(xtDefault);
+				windowAddComponent(popUp,c,tmp+1,5,oldKFold);
+				
+				JRadioButton newKFold = new JRadioButton("New");
+				newKFold.setFont(xtDefault);
+				windowAddComponent(popUp,c,tmp+2,5,newKFold);
+				
+				ButtonGroup kFoldSelect = new ButtonGroup();
+				kFoldSelect.add(oldKFold);
+				kFoldSelect.add(newKFold);
+				newKFold.setSelected(true);
 
 				JLabel featureTitle = new JLabel("Feature selection");
 				featureTitle.setFont(new Font("Segoe UI", Font.PLAIN, 15));
@@ -488,7 +501,13 @@ public class Main extends JFrame {
 						statusBar.setText("Data set exported to " + dataSetFolder + " folder.");
 
 						if (kFold.isSelected()) {
-							dataKFold(dataSetFolder, Integer.parseInt(kFoldVar.getText()));
+							if(oldKFold.isSelected()) {
+								dataKFold(dataSetFolder, Integer.parseInt(kFoldVar.getText()));
+							}
+							else if(newKFold.isSelected()) {
+								newKFoldTest2(dataSetFolder, Integer.parseInt(kFoldVar.getText()));
+							}
+								
 						}
 
 						/* Provide data overwrite option when exporting is done */
@@ -1319,7 +1338,7 @@ public class Main extends JFrame {
 			String cgpTags[] = { "Threshold Initial", "Threshold Increment", "Class Numbers", "Nodes", "Arity",
 					"Max Generations", "Update Frequency", "Random number seed", "Mutation Rate", "Fold Index"};
 
-			String defaultValue[] = { "10", "10", "4", "20", "3", "100000", "500", "1234", "0.08","1"};
+			String defaultValue[] = { "10", "10", "4", "20", "3", "100000", "500", "1234", "0.08","0"};
 			JLabel params[] = new JLabel[defaultValue.length];
 			TextField cgpParams[] = new TextField[defaultValue.length];
 
@@ -1586,6 +1605,161 @@ public class Main extends JFrame {
 				fwTesting.close();
 			} catch (Exception e) {
 				e.printStackTrace();
+			}
+
+		}
+	}
+	
+	public static void newKFoldTest2(String srcFolder, int iteration) {
+		File srcFileFolder = new File(srcFolder);
+		File srcTraining = new File(srcFileFolder.getPath() + "\\01_training.csv");
+		File srcValidation = new File(srcFileFolder.getPath() + "\\02_validation.csv");
+		File srcTesting = new File(srcFileFolder.getPath() + "\\03_testing.csv");
+
+		File kFoldFile = new File(srcFolder + "_fold");
+		kFoldFile.mkdir();
+		File[] nFold = new File[3];
+
+		FileWriter[] fwArray = new FileWriter[3];
+
+		for (int i = 0; i < iteration; i++) {
+			File nFolder = new File(kFoldFile.getPath() + "\\fold_" + i);
+			nFolder.mkdir();
+			nFold[0] = new File(nFolder.getPath() + "\\01_training.csv");
+			nFold[1] = new File(nFolder.getPath() + "\\02_validation.csv");
+			nFold[2] = new File(nFolder.getPath() + "\\03_testing.csv");
+			try{
+				for(int tmp = 0; tmp < 3; tmp++){
+					nFold[tmp].createNewFile();
+					fwArray[tmp] = new FileWriter(nFold[tmp]);
+				}
+			} catch (Exception e) {
+					e.printStackTrace();
+			}
+
+			BufferedReader brArray[] = new BufferedReader[3];
+			ArrayList<String>[] dataSets = new ArrayList[3];
+			ArrayList<String>[] swapCache = new ArrayList[3];
+			int numInputs = 0;
+			int numOutputs = 0;
+			try {
+				brArray[0] = new BufferedReader(new FileReader(srcTraining));
+				brArray[1] = new BufferedReader(new FileReader(srcValidation));
+				brArray[2] = new BufferedReader(new FileReader(srcTesting));
+
+				for (int tmp = 0; tmp < 3; tmp++) {
+					swapCache[tmp] = new ArrayList<String>();
+					dataSets[tmp] = new ArrayList<String>();
+					String line = "";
+					line = brArray[tmp].readLine();
+					fwArray[tmp].append(line+"\r\n");
+					numInputs = Integer.parseInt(line.split(",")[0]);
+					numOutputs = Integer.parseInt(line.split(",")[1]);
+					while ((line = brArray[tmp].readLine()) != null) {
+						dataSets[tmp].add(line);
+					}
+					ConsoleExport.arrListInsertionSort(dataSets[tmp], numInputs, numOutputs);
+
+				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			int[][] classLimit = new int[3][ConsoleExport.getClassNum(dataSets[0], numInputs, numOutputs)];
+			int[][] swapLimit = new int[3][ConsoleExport.getClassNum(dataSets[0], numInputs, numOutputs)];
+			for (int tmp = 0; tmp < 3; tmp++) {
+				for (int tmp2 = 0; tmp2 < classLimit[tmp].length; tmp2++) {
+					classLimit[tmp][tmp2] = 0;
+				}
+				int tmpCounter = 0;
+				for (int tmp2 = 0; tmp2 < dataSets[tmp].size(); tmp2++) {
+					if (tmp2 > 0) {
+						if (ConsoleExport.getDataLineClass(dataSets[tmp].get(tmp2), numInputs,
+								numOutputs) != ConsoleExport.getDataLineClass(dataSets[tmp].get(tmp2 - 1), numInputs, numOutputs)) {
+							tmpCounter++;
+
+						}
+					}
+					classLimit[tmp][tmpCounter]++;
+				}
+
+				for (int tmp2 = 0; tmp2 < tmpCounter + 1; tmp2++) {
+					swapLimit[tmp][tmp2] = (int) Math.floor(((double) classLimit[tmp][tmp2] * 2 / iteration) + 0.5);
+					if (swapLimit[tmp][tmp2] == 0)
+						swapLimit[tmp][tmp2] = 1;
+				}
+			}
+			int[][] swapIndex = new int[3][classLimit[0].length];
+			for (int tmp = 0; tmp < 3; tmp++) {
+
+				int tmpIndex = 0;
+				for (int tmp2 = 0; tmp2 < classLimit[0].length; tmp2++) {
+					if (tmp2 == 0)
+						swapIndex[tmp][tmp2] = tmpIndex + classLimit[tmp][tmp2] + (0 - swapLimit[0][tmp2]);
+					else
+						swapIndex[tmp][tmp2] = tmpIndex + classLimit[tmp][tmp2]
+								+ (swapLimit[0][tmp2 - 1] - swapLimit[0][tmp2]);
+					tmpIndex = swapIndex[tmp][tmp2];
+
+					for (int tmp3 = 0; tmp3 < swapLimit[0][tmp2]; tmp3++) {
+						swapCache[tmp].add(dataSets[tmp].get(swapIndex[tmp][tmp2] + tmp3));
+					}
+					
+					
+				}
+
+			}
+			ArrayList<String>[] writePendingData = new ArrayList[3];
+			int[][] classIndex = new int[3][classLimit[0].length];
+			for (int tmp = 0; tmp < 3; tmp++) {
+				classIndex[tmp][0] = 0;
+				for (int tmp2 = 1; tmp2 < classLimit[0].length; tmp2++) {
+					classIndex[tmp][tmp2] = classIndex[tmp][tmp2 - 1] + classLimit[tmp][tmp2 - 1];
+
+				}
+
+			}
+			for (int tmp = 0; tmp < 3; tmp++) {
+				writePendingData[tmp] = new ArrayList<String>();
+				int swapCacheIndex = 0;
+				for (int tmp2 = 0; tmp2 < classLimit[0].length; tmp2++) {
+
+					for (int tmp3 = 0; tmp3 < classLimit[tmp][tmp2]; tmp3++) {
+						if (tmp3 < swapLimit[0][tmp2]) {
+							writePendingData[tmp].add(swapCache[ConsoleExport.swapFunc(tmp)].get(swapCacheIndex));
+							swapCacheIndex++;
+						} else {
+							writePendingData[tmp]
+									.add(dataSets[tmp].get(classIndex[tmp][tmp2] + tmp3 - swapLimit[tmp][tmp2]));
+
+						}
+					}
+				}
+
+				for (int tmp2 = 0; tmp2 < writePendingData[tmp].size(); tmp2++) {
+					try {
+						fwArray[tmp].append(writePendingData[tmp].get(tmp2) + "\r\n");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+
+			srcTraining = new File(nFolder.getPath() + "\\01_training.csv");
+			srcValidation = new File(nFolder.getPath() + "\\02_validation.csv");
+			srcTesting = new File(nFolder.getPath() + "\\03_testing.csv");
+
+			for(int tmp = 0; tmp < 3; tmp++){
+				try {
+					fwArray[tmp].flush();
+					fwArray[tmp].close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 			}
 
 		}
