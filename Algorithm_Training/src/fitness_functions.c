@@ -772,7 +772,7 @@ int binarySearch(double *arr, int arrSize, double target)
 	return -1;
 }
 
-void exportBestChromo(double* bestTemp)
+void exportBestChromo(double* bestTemp, int kIndex)
 {
     /* Concatrating file name */
     char**  cgp_params  = importFile("cgp_params.txt");
@@ -802,7 +802,7 @@ void exportBestChromo(double* bestTemp)
 	/* Write parameters before exporting chromo performance details */
 	fprintf(tmpFile, "%d,", atoi(cgp_params[7]));
 	/* Write kfold detail */
-	fprintf(tmpFile, "Fold %d,",atoi(cgp_params[9]));
+	fprintf(tmpFile, "Fold %d,",kIndex);
 
 
 	/* Write chromo performance detail */

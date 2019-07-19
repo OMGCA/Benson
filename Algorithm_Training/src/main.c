@@ -164,7 +164,7 @@ void cgpExecute(void)
     double tmpBest[5];
     bestTemp = getBestEntity(outputPath, testData,tmpBest);
 
-    exportBestChromo(bestTemp);
+    exportBestChromo(bestTemp,kFoldIndex);
 
     /* Free allocated memories */
 	free(cgp_params);
